@@ -12,6 +12,8 @@ import com.google.api.server.spi.config.ApiNamespace;
 
 import javax.inject.Named;
 
+import ifn372.sevencolors.backend.connection.ConnectionProvider;
+
 /**
  * An endpoint class we are exposing
  */
@@ -31,10 +33,12 @@ public class MyEndpoint {
      */
     @ApiMethod(name = "sayHi")
     public MyBean sayHi(@Named("name") String name) {
+        ConnectionProvider connectionProvider = new ConnectionProvider();
+        connectionProvider.getConnection();
+
         MyBean response = new MyBean();
         response.setData("Hi, " + name);
 
         return response;
     }
-
 }

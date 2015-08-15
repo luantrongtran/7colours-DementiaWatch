@@ -25,7 +25,14 @@ dependencies {
     appengineSdk 'com.google.appengine:appengine-java-sdk:1.9.18'
     compile 'com.google.appengine:appengine-endpoints:1.9.18'
     compile 'com.google.appengine:appengine-endpoints-deps:1.9.18'
+    compile 'mysql:mysql-connector-java:5.1.16'
     compile 'javax.servlet:servlet-api:2.5'
+
+    testCompile 'junit:junit:4.12'
+    testCompile "org.mockito:mockito-core:1.+"
+    testCompile 'mysql:mysql-connector-java:5.1.16'
+    testCompile  'com.google.appengine:appengine-endpoints:1.9.18'
+    testCompile 'com.google.appengine:appengine-endpoints-deps:1.9.18'
 }
 
 appengine {

@@ -7,4 +7,9 @@
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties" />
     </system-properties>
+
+    <resource-files>
+        <include path="/**.properties" />
+    </resource-files>
+    <use-google-connector-j>true</use-google-connector-j>
 </appengine-web-app>
