@@ -4,8 +4,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import ifn372.sevencolors.watch_app.webservices.ISayHi;
+import ifn372.sevencolors.watch_app.webservices.SayHi;
+
+public class MainActivity extends AppCompatActivity implements ISayHi {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,5 +39,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void sayHi(View view) {
+        EditText nameEdt = (EditText)findViewById(R.id.txtName);
+        String name = nameEdt.getText().toString();
+        SayHi sh = new SayHi(this);
+        sh.execute(name);
+    }
+
+    @Override
+    public void processData(String greeting) {
+        Toast.makeText(this, greeting, Toast.LENGTH_SHORT).show();
     }
 }

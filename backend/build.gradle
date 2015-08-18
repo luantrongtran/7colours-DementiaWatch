@@ -27,12 +27,16 @@ dependencies {
     compile 'com.google.appengine:appengine-endpoints-deps:1.9.18'
     compile 'mysql:mysql-connector-java:5.1.16'
     compile 'javax.servlet:servlet-api:2.5'
+    compile 'com.googlecode.objectify:objectify:5.0.3'
 
     testCompile 'junit:junit:4.12'
     testCompile "org.mockito:mockito-core:1.+"
     testCompile 'mysql:mysql-connector-java:5.1.16'
     testCompile  'com.google.appengine:appengine-endpoints:1.9.18'
     testCompile 'com.google.appengine:appengine-endpoints-deps:1.9.18'
+    testCompile 'com.google.appengine:appengine-api-labs:1.9.8'
+    testCompile 'com.google.appengine:appengine-api-stubs:1.9.8'
+    testCompile 'com.google.appengine:appengine-testing:1.9.8'
 }
 
 appengine {

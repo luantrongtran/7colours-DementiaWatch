@@ -22,4 +22,26 @@ public class Location {
 
     private float lat;
     private float lon;
+
+    public Location(){}
+    public Location(float lat, float lon) {
+        this.lat = lat;
+        this.lon = lon;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Location)) {
+            return false;
+        }
+        Location location = (Location)obj;
+        if(this.lat == location.lat) {
+            if(this.lon != location.getLon()){
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
 }

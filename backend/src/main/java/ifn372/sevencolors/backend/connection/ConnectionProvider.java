@@ -32,6 +32,10 @@ public class ConnectionProvider {
     }
 
     public ConnectionProperty getConnectionProperty() {
+        if(conProperties != null){
+            return conProperties;
+        }
+
         if (isGoogleAppEngineServer() == true) {
            return getGAEConnectionProperty();
         } else {

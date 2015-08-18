@@ -1,4 +1,4 @@
-package ifn372.sevencolors.dementiawatch.webservices;
+package ifn372.sevencolors.watch_app.webservices;
 
 import android.os.AsyncTask;
 
@@ -10,8 +10,8 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import java.io.IOException;
 
 import ifn372.sevencolors.backend.myApi.MyApi;
+import ifn372.sevencolors.watch_app.Constants;
 import ifn372.sevencolors.backend.myApi.model.MyBean;
-import ifn372.sevencolors.dementiawatch.Constants;
 
 /**
  * Created by lua on 2/08/2015.
@@ -26,7 +26,7 @@ public class SayHi extends AsyncTask<String, Void, MyBean> {
 
     @Override
     protected MyBean doInBackground(String... params) {
-        MyApi.Builder myApi = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
+        ifn372.sevencolors.backend.myApi.MyApi.Builder myApi = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                 new AndroidJsonFactory(), null);
 
         myApi.setRootUrl(Constants.webServiceUrl);

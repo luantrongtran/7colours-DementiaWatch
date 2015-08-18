@@ -6,7 +6,9 @@ import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.util.Iterator;
@@ -16,16 +18,18 @@ import java.util.Properties;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import ifn372.sevencolors.backend.connection.ConnectionProperty;
 import ifn372.sevencolors.backend.connection.ConnectionProvider;
 
-public class LocalConnectionTest {
-
+@RunWith(MockitoJUnitRunner.class)
+public class LocalConnectionTest extends LocalDatabaseTest{
     ConnectionProvider conProvider = null;
-    ConnectionProvider spyProvider;
+//    ConnectionProvider spyProvider;
 
     @Before
     public void setUp() {
@@ -37,9 +41,10 @@ public class LocalConnectionTest {
         when(mockProp.getProperty("properties.password")).thenReturn("1231988");
 
         ConnectionProperty conProp = new ConnectionProperty(mockProp);
+        conProvider.setConProperties(conProp);
 
-        spyProvider = spy(conProvider);
-        doReturn(conProp).when(spyProvider).getConnectionProperty();
+//        spyProvider = spy(conProvider);
+//        doReturn(conProp).when(spyProvider).getConnectionProperty();
     }
 
     @After
@@ -49,7 +54,7 @@ public class LocalConnectionTest {
 
     @Test
     public void testLocalConnection(){
-        assertNotNull(spyProvider.getConnection());
+        assertNotNull(conProvider.getConnection());
     }
 
     @Test
