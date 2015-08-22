@@ -1,7 +1,7 @@
 # 7colours-DementiaWatch
 
 ##Material
-### Please feel free to add websites or documents which are helpful
+### Please feel free to add websites or documents which you think are helpful to the project
 
 		Google Endpoints: https://github.com/GoogleCloudPlatform/gradle-appengine-templates/tree/master/HelloEndpoints
 		Location API: http://www.vogella.com/tutorials/AndroidLocationAPI/article.html
