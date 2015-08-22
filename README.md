@@ -20,3 +20,6 @@ you need to configure your backend server. Follow these 2 pictures:
 you need to change the web service url on your Android application. There are 2 Android applications in this project. They have the same structure. If you want to configure the web service url then change "webServiceUrl" variable in the Constants class in both Android applications. Particularly, you should change it into your computer's ip address. For example your ip is 192.168.0.10 then you should change the webServiceUrl to 
 
 		 public static String webServiceUrl = "http://192.168.0.10:8080/_ah/api/";
+
+
+## How to config your backend to connect to the database
