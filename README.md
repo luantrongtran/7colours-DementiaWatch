@@ -23,3 +23,8 @@ you need to change the web service url on your Android application. There are 2 
 
 
 ## How to config your backend to connect to the database
+
+## How to display google map on Android Studio emulators
+Please watch this video which shows how to run google map on an emulator: https://www.youtube.com/watch?v=S-LW0DinKrk
+
+In short, you should create a new android emulator by following the video. Then you should go to SDK Manager and in the Extras, install the package of "Google play APK Expansion Library" in case you didn't download it.
