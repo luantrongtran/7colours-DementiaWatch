@@ -1,5 +1,12 @@
 # 7colours-DementiaWatch
 
+##Material
+### Please feel free to add websites or documents which are helpful
+
+		Google Endpoints: https://github.com/GoogleCloudPlatform/gradle-appengine-templates/tree/master/HelloEndpoints
+		Location API: http://www.vogella.com/tutorials/AndroidLocationAPI/article.html
+		Background services: https://guides.codepath.com/android/Starting-Background-Services
+
 ## How to run the project locally
 This instruction is for people who want to run the project on a real android device or an emulator which is different from the integrated one in Android Studio. This way can also be applied for the emulator integrated within Android Studio
 
