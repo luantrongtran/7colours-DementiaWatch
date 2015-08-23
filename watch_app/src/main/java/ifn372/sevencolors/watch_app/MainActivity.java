@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements ISayHi {
         EditText nameEdt = (EditText)findViewById(R.id.txtName);
         String name = nameEdt.getText().toString();
         SayHi sh = new SayHi(this);
+        System.out.println(name);
         sh.execute(name);
     }
 

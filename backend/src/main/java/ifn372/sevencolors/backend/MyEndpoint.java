@@ -34,8 +34,8 @@ public class MyEndpoint {
      */
     @ApiMethod(name = "sayHi")
     public MyBean sayHi(@Named("name") String name) {
-        ConnectionProvider connectionProvider = new ConnectionProvider();
-        connectionProvider.getConnection();
+//        ConnectionProvider connectionProvider = new ConnectionProvider();
+//        connectionProvider.getConnection();
 
         MyBean response = new MyBean();
         response.setData("Hi, " + name);
