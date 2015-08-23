@@ -4,15 +4,15 @@
    https://github.com/GoogleCloudPlatform/gradle-appengine-templates/tree/master/HelloEndpoints
 */
 
-package ifn372.sevencolors.backend;
+package ifn372.sevencolors.backend.webservices;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
-import com.google.appengine.api.utils.SystemProperty;
 
 import javax.inject.Named;
 
+import ifn372.sevencolors.backend.entities.MyBean;
 import ifn372.sevencolors.backend.connection.ConnectionProvider;
 
 /**
@@ -34,11 +34,11 @@ public class MyEndpoint {
      */
     @ApiMethod(name = "sayHi")
     public MyBean sayHi(@Named("name") String name) {
-//        ConnectionProvider connectionProvider = new ConnectionProvider();
-//        connectionProvider.getConnection();
+        ConnectionProvider connectionProvider = new ConnectionProvider();
+        connectionProvider.getConnection();
 
         MyBean response = new MyBean();
-        response.setData("Hi, " + name);
+        response.setData("Hi 1, " + name);
 
         return response;
     }

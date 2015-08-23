@@ -5,7 +5,8 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>ifn372.sevencolors.backend.MyEndpoint</param-value>
+            <param-value>ifn372.sevencolors.backend.webservices.MyEndpoint,
+                ifn372.sevencolors.backend.webservices.PatientEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

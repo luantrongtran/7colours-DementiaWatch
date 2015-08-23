@@ -1,4 +1,4 @@
-package ifn372.sevencolors.backend;
+package ifn372.sevencolors.backend.entities;
 
 /**
  * The object model for the data we are sending through endpoints
