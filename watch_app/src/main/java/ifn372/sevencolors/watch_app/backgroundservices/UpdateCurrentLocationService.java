@@ -50,7 +50,7 @@ public class UpdateCurrentLocationService extends IntentService {
             patientApi.updatePatientCurrentLocation(patient).execute();
             Log.e("MyAPI", "Update location to backend");
         } catch (IOException e) {
-            Log.e("MyAPI", "Faield update location to backend");
+            Log.e("MyAPI", "Failed update location to backend");
             e.printStackTrace();
         }
     }
