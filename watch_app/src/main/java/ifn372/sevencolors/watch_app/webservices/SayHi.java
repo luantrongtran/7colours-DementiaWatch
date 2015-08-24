@@ -38,9 +38,10 @@ public class SayHi extends AsyncTask<String, Void, MyBean> {
                 abstractGoogleClientRequest.setDisableGZipContent(true);
             }
         });
-        String name = params[0];
 
         MyApi myApiService = myApi.build();
+
+        String name = params[0];
         MyBean myBean = null;
         try {
             myBean = myApiService.sayHi(name).execute();

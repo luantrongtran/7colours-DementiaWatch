@@ -20,8 +20,8 @@ import ifn372.sevencolors.backend.entities.Patient;
         version = "v1",
         resource = "patient",
         namespace = @ApiNamespace(
-                ownerDomain = "entities.backend.sevencolors.ifn372",
-                ownerName = "entities.backend.sevencolors.ifn372",
+                ownerDomain = "backend.sevencolors.ifn372",
+                ownerName = "backend.sevencolors.ifn372",
                 packagePath = ""
         )
 )

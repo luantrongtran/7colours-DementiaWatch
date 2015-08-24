@@ -110,9 +110,9 @@ public class PatientDao extends DAOBase {
         PreparedStatement ps = null;
         try {
             ps = con.prepareStatement(sql);
-            ps.setFloat(1, patient.getId());
-            ps.setFloat(2, patient.getCurrentLocation().getLat());
-            ps.setFloat(3, patient.getCurrentLocation().getLat());
+            ps.setInt(1, patient.getId());
+            ps.setDouble(2, patient.getCurrentLocation().getLat());
+            ps.setDouble(3, patient.getCurrentLocation().getLon());
 
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             ps.setTimestamp(4, timestamp);

@@ -2,9 +2,20 @@ package ifn372.sevencolors.watch_app.backgroundservices;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.util.Log;
+
+import java.io.IOException;
+
+import ifn372.sevencolors.backend.patientApi.model.Patient;
+import ifn372.sevencolors.backend.patientApi.model.Location;
+import ifn372.sevencolors.watch_app.BackendApiBuilderProvider;
+import ifn372.sevencolors.watch_app.Constants;
+import ifn372.sevencolors.watch_app.Utitlies;
+import ifn372.sevencolors.backend.patientApi.PatientApi;
 
 /**
- * Created by lua on 17/08/2015.
+ * This class update current location to the backend automatically on scheduled time
  */
 public class UpdateCurrentLocationService extends IntentService {
 
@@ -14,6 +25,33 @@ public class UpdateCurrentLocationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        SharedPreferences currentLocationSharedPref = getApplicationContext().
+                getSharedPreferences(Constants.sharedPreferences_current_location, MODE_PRIVATE);
 
+        double lat = Utitlies.getDoubleFromSharedPreferences(currentLocationSharedPref,
+                Constants.sharedPreferences_current_location_lat, 0);
+        double lon = Utitlies.getDoubleFromSharedPreferences(currentLocationSharedPref,
+                Constants.sharedPreferences_current_location_lon, 0);
+
+        Location currentLocation = new Location();
+//        location.setLat(lat);
+//        location.setLon(lon);
+
+        SharedPreferences userInfoSharedPref = getApplicationContext()
+                .getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
+        Patient patient = new Patient();
+        patient.setId(userInfoSharedPref.getInt(Constants.sharedPreferences_user_info_id, -1));
+
+        patient.setCurrentLocation(currentLocation);
+
+        PatientApi patientApi = BackendApiBuilderProvider.getPatientApiBuilder();
+
+        try {
+            patientApi.updatePatientCurrentLocation(patient).execute();
+            Log.e("MyAPI", "Update location to backend");
+        } catch (IOException e) {
+            Log.e("MyAPI", "Faield update location to backend");
+            e.printStackTrace();
+        }
     }
 }
