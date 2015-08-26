@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
  * http://stackoverflow.com/questions/16319237/cant-put-double-sharedpreferences
  *
  */
-public class Utitlies {
+public class SharedPreferencesUtitlies {
     public static void putDoubleIntoSharedPreferences(SharedPreferences.Editor editor, String key, double value) {
         editor.putLong(key, Double.doubleToRawLongBits(value));
     }
@@ -18,6 +18,6 @@ public class Utitlies {
             return defaultValue;
         }
 
-        return Double.doubleToLongBits(sharedPref.getLong(key, 0));
+        return Double.longBitsToDouble(sharedPref.getLong(key, 0));
     }
 }

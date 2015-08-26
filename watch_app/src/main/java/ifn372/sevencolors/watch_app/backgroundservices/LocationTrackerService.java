@@ -14,7 +14,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import ifn372.sevencolors.watch_app.Constants;
-import ifn372.sevencolors.watch_app.Utitlies;
+import ifn372.sevencolors.watch_app.SharedPreferencesUtitlies;
 
 /**
  * This service will be called by LocationAutooTracker and stores current location into
@@ -50,15 +50,16 @@ public class LocationTrackerService extends IntentService implements GoogleApiCl
         Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
 
-        Log.e("MyAPI", "My current location: " + lastLocation.getLatitude() + ", " + lastLocation.getLongitude());
+        Log.e("MyAPI", "My current location before storing: " + lastLocation.getLatitude() + ", " + lastLocation.getLongitude());
+
 
         SharedPreferences sharedPref = getApplicationContext().
                 getSharedPreferences(Constants.sharedPreferences_current_location, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        Utitlies.putDoubleIntoSharedPreferences(editor,
+        SharedPreferencesUtitlies.putDoubleIntoSharedPreferences(editor,
                 Constants.sharedPreferences_current_location_lat, lastLocation.getLatitude());
-        Utitlies.putDoubleIntoSharedPreferences(editor,
-                Constants.sharedPreferences_current_location_lat, lastLocation.getLongitude());
+        SharedPreferencesUtitlies.putDoubleIntoSharedPreferences(editor,
+                Constants.sharedPreferences_current_location_lon, lastLocation.getLongitude());
 
         editor.commit();
     }

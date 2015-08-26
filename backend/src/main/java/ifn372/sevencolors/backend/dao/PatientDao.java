@@ -54,6 +54,8 @@ public class PatientDao extends DAOBase {
 //
 //                patient.setLocation_last_update(rs.getTimestamp(colUpdateTime));
 //            }
+//
+//
 //        } catch (SQLException e) {
 //            e.printStackTrace();
 //        }
