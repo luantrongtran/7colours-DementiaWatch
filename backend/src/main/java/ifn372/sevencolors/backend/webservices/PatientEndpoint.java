@@ -4,12 +4,12 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.inject.Named;
 
 import ifn372.sevencolors.backend.dao.PatientDao;
-import ifn372.sevencolors.backend.entities.Location;
 import ifn372.sevencolors.backend.entities.Patient;
 
 /**
@@ -38,16 +38,13 @@ public class PatientEndpoint {
         patientDao.updateCurrentLocation(patient);
     }
 
-    /**
-     * This inserts a new <code>Patient</code> object.
-     *
-     * @param patient The object to be added.
-     * @return The object to be added.
-     */
-    @ApiMethod(name = "insertPatient")
-    public Patient insertPatient(Patient patient) {
-        // TODO: Implement this function
-        logger.info("Calling insertPatient method");
-        return patient;
+    @ApiMethod (name = "getPatientListByCarer")
+    public Vector<Patient> getPatientsListByCarer(@Named("carerId") int carerId) {
+        Vector<Patient> patientList = new Vector<Patient>();
+
+        PatientDao patientDao = new PatientDao();
+        patientList = patientDao.getPatientsListByCarer(carerId);
+
+        return patientList;
     }
 }

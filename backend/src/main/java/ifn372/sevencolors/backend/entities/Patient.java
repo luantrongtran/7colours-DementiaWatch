@@ -23,6 +23,16 @@ public class Patient extends User {
         this.currentLocation = currentLocation;
     }
 
+
+    public int getCarer_id() {
+        return carer_id;
+    }
+
+    public void setCarer_id(int carer_id) {
+        this.carer_id = carer_id;
+    }
+
     Location currentLocation;
     private Timestamp location_last_update;
+    int carer_id;
 }

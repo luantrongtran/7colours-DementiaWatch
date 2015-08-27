@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Vector;
 
 import ifn372.sevencolors.backend.entities.Location;
 import ifn372.sevencolors.backend.entities.Patient;
@@ -17,6 +19,7 @@ public class PatientDao extends DAOBase {
     public static String colPatientId = "id";
     public static String colFullName = "fullname";
     public static String colRoes = "roles";
+    public static String colCarer = "carer_id";
 
 
     public static String currentLocationTableName = "current_location";
@@ -25,6 +28,8 @@ public class PatientDao extends DAOBase {
     public static String cl_colUpdateTime = "time";
     public static String cl_colLat = "lat";
     public static String cl_colLon = "lon";
+
+    public static String patientView = "patient_view";
 
     /**
      *
@@ -123,5 +128,39 @@ public class PatientDao extends DAOBase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public Vector<Patient> getPatientsListByCarer(int carerId) {
+        Connection con = getConnection();
+        String sql = "SELECT * FROM " + patientView + " WHERE " + colCarer + " = ?";
+        PreparedStatement ps = null;
+        Vector<Patient> patientList = new Vector<Patient>();
+        try{
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, carerId);
+
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                Patient patient = new Patient();
+                patient.setId(rs.getInt(colPatientId));
+                patient.setFullName(rs.getString(colFullName));
+                patient.setRole(rs.getInt(colRoes));
+
+                Location location = new Location();
+                location.setLat(rs.getDouble(cl_colLat));
+                location.setLon(rs.getDouble(cl_colLon));
+                patient.setCurrentLocation(location);
+
+                patient.setLocation_last_update(rs.getTimestamp(cl_colUpdateTime));
+
+                patient.setCarer_id(carerId);
+
+                patientList.add(patient);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return patientList;
     }
 }

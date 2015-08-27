@@ -20,6 +20,15 @@ public abstract class User {
         this.fullName = fullName;
     }
 
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
+    }
+
     private int id;
+    private int role;
     private String fullName;
 }
