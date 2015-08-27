@@ -1,7 +1,11 @@
 package ifn372.sevencolors.backend.entities;
 
 /**
+<<<<<<< HEAD
  * Created by koji on 2015/08/28.
+=======
+ * Created by koji on 2015/08/27.
+>>>>>>> master
  */
 public class Fence {
 
@@ -15,10 +19,17 @@ public class Fence {
     float radius;
     String address;
 
+<<<<<<< HEAD
     public Fence() {
     }
 
     public Fence(boolean success) {
+=======
+    public Fence(){
+    }
+    public Fence(boolean success)
+    {
+>>>>>>> master
         this.success = success;
     }
 
@@ -79,5 +90,8 @@ public class Fence {
         this.radius = radius;
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 }
