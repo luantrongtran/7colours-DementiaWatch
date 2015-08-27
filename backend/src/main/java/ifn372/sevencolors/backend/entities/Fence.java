@@ -15,8 +15,9 @@ public class Fence {
     float radius;
     String address;
 
-    public Fence(){
+    public Fence() {
     }
+
     public Fence(boolean success)
     {
         this.success = success;

@@ -23,7 +23,7 @@ public class FenceDao extends DAOBase {
         try
         {
             con = getConnection();
-            StringBuffer sql = new StringBuffer("insert into fence (user_id, fence_name, lat, lon, radius, address) ");
+            StringBuffer sql = new StringBuffer("insert into fence (user_id, fence_name, lat, lon, fence_radius, address) ");
             sql.append(" values (?, ?, ?, ?, ?, ?) ");
             PreparedStatement ps = con.prepareStatement(sql.toString());
 
