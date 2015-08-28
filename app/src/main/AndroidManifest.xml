@@ -39,6 +39,9 @@
             android:name=".activities.MapsActivity"
             android:label="@string/title_activity_maps" >
         </activity>
+
+        <receiver android:name=".webservices.UpdatePatientsListReceiver" />
+        <service android:name=".webservices.UpdatePatientsListService"/>
     </application>
 
 </manifest>

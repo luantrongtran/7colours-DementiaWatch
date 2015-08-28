@@ -18,12 +18,20 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 
+import ifn372.sevencolors.dementiawatch.Constants;
+import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
+import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReceiver;
+import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
 
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+
+    public long updatePatientsListInterval = 20*1000; //seconds
+
+    public static PatientManager patientManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +45,16 @@ public class MapsActivity extends FragmentActivity {
     }
 
     public void scheduleAlarm() {
-        scheduleAutoLocationTrackerAlarm();
-        scheduleAutoUpdateCurrentLocationAlarm();
+        scheduleAutoUpdatePatientsList();
     }
 
     public void setUpDummyData() {
-//        SharedPreferences userInfoSharedPref = getApplicationContext().getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
-//        SharedPreferences.Editor editor = userInfoSharedPref.edit();
-//        editor.putInt(Constants.sharedPreferences_user_info_id, 1);
-//        editor.commit();
+        SharedPreferences userInfoSharedPref = getApplicationContext()
+                .getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
+        SharedPreferences.Editor editor = userInfoSharedPref.edit();
+        editor.putInt(Constants.sharedPreferences_user_info_id, 3);
+        editor.putInt(Constants.sharedPreferences_user_info_role, 2);
+        editor.commit();
     }
 
     //    @Override
@@ -133,33 +142,15 @@ public class MapsActivity extends FragmentActivity {
         mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").snippet("Consider yourself located"));
     }
 
-    public void scheduleAutoLocationTrackerAlarm() {
-//        Intent intent = new Intent(getApplicationContext(), LocationAutoTracker.class);
-//        PendingIntent pIntent = PendingIntent.getBroadcast(this,
-//                0, intent,
-//                PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//        long firstMillis = System.currentTimeMillis(); // alarm is set right away
-//        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-//
-//        long interval = 10 * 1000;//seconds
-//        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-//                firstMillis,
-//                interval,
-//                pIntent);
-//
-//        Log.e("MyAPI", "alarm");
-    }
 
-    public void scheduleAutoUpdateCurrentLocationAlarm() {
-//        Intent intent = new Intent(getApplicationContext(), UpdateCurrentLocationReceiver.class);
-//        PendingIntent pIntent =
-//                PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//        long firstMillis = System.currentTimeMillis();
-//        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-//
-//        long interval = 20 * 1000; //seconds
-//        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, interval, pIntent);
+    public void scheduleAutoUpdatePatientsList() {
+        Intent intent = new Intent(getApplicationContext(), UpdatePatientsListReceiver.class);
+        PendingIntent pIntent =
+                PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        long firstMillis = System.currentTimeMillis();
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, updatePatientsListInterval, pIntent);
     }
 }

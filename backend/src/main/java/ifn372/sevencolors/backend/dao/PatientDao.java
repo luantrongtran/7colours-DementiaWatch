@@ -130,6 +130,14 @@ public class PatientDao extends DAOBase {
         }
     }
 
+    public Vector<Patient> getPatientsListByRelative(int relativeId) {
+        Vector<Patient> patientList = new Vector<Patient>();
+
+        //need implementing later
+
+        return patientList;
+    }
+
     public Vector<Patient> getPatientsListByCarer(int carerId) {
         Connection con = getConnection();
         String sql = "SELECT * FROM " + patientView + " WHERE " + colCarer + " = ?";
@@ -151,7 +159,7 @@ public class PatientDao extends DAOBase {
                 location.setLon(rs.getDouble(cl_colLon));
                 patient.setCurrentLocation(location);
 
-                patient.setLocation_last_update(rs.getTimestamp(cl_colUpdateTime));
+                patient.setLocation_last_update(rs.getTimestamp(cl_colUpdateTime).getTime());
 
                 patient.setCarer_id(carerId);
 

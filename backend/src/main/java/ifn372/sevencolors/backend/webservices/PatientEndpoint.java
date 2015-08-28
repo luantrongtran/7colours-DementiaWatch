@@ -3,7 +3,9 @@ package ifn372.sevencolors.backend.webservices;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.api.server.spi.response.CollectionResponse;
 
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -11,14 +13,16 @@ import javax.inject.Named;
 
 import ifn372.sevencolors.backend.dao.PatientDao;
 import ifn372.sevencolors.backend.entities.Patient;
+import ifn372.sevencolors.backend.entities.PatientList;
+import ifn372.sevencolors.backend.entities.User;
 
 /**
  * An endpoint class we are exposing
  */
 @Api(
-        name = "patientApi",
+        name = "myApi",
         version = "v1",
-        resource = "patient",
+//        resource = "patient",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.sevencolors.ifn372",
                 ownerName = "backend.sevencolors.ifn372",
@@ -38,13 +42,28 @@ public class PatientEndpoint {
         patientDao.updateCurrentLocation(patient);
     }
 
-    @ApiMethod (name = "getPatientListByCarer")
-    public Vector<Patient> getPatientsListByCarer(@Named("carerId") int carerId) {
-        Vector<Patient> patientList = new Vector<Patient>();
+    /**
+     *
+     * @param carerOrRelativeId
+     * @param role indicating if the request sender is a carer or relative, see User class
+     *             for more details about the role attribute
+     * @return
+     */
+    @ApiMethod (name = "getPatientListByCarerOrRelative")
+    public PatientList getPatientsListByCarerOrRelative(@Named("carerId") int carerOrRelativeId, @Named("role") int role) {
+        if(role == User.CARER_ROLE) {
+            Vector<Patient> patients = new Vector<Patient>();
 
-        PatientDao patientDao = new PatientDao();
-        patientList = patientDao.getPatientsListByCarer(carerId);
+            PatientDao patientDao = new PatientDao();
+            patients = patientDao.getPatientsListByCarer(carerOrRelativeId);
 
-        return patientList;
+            PatientList patientList = new PatientList();
+            patientList.setItems(patients);
+            return patientList;
+        } else if (role == User.RELATIVE_ROLE) {
+            //return patient list related to the given relative.
+        }
+
+        return null;
     }
 }

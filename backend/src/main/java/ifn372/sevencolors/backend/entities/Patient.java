@@ -7,11 +7,11 @@ import java.sql.Timestamp;
  */
 public class Patient extends User {
 
-    public Timestamp getLocation_last_update() {
+    public long getLocation_last_update() {
         return location_last_update;
     }
 
-    public void setLocation_last_update(Timestamp location_last_update) {
+    public void setLocation_last_update(long location_last_update) {
         this.location_last_update = location_last_update;
     }
 
@@ -33,6 +33,6 @@ public class Patient extends User {
     }
 
     Location currentLocation;
-    private Timestamp location_last_update;
+    private long location_last_update;
     int carer_id;
 }

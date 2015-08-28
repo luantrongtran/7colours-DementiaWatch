@@ -9,7 +9,7 @@ import java.io.IOException;
 
 import ifn372.sevencolors.backend.patientApi.model.Patient;
 import ifn372.sevencolors.backend.patientApi.model.Location;
-import ifn372.sevencolors.watch_app.BackendApiBuilderProvider;
+import ifn372.sevencolors.watch_app.BackendApiProvider;
 import ifn372.sevencolors.watch_app.Constants;
 import ifn372.sevencolors.watch_app.SharedPreferencesUtitlies;
 import ifn372.sevencolors.backend.patientApi.PatientApi;
@@ -44,7 +44,7 @@ public class UpdateCurrentLocationService extends IntentService {
 
         patient.setCurrentLocation(currentLocation);
 
-        PatientApi patientApi = BackendApiBuilderProvider.getPatientApiBuilder();
+        PatientApi patientApi = BackendApiProvider.getPatientApiBuilder();
 
         try {
             patientApi.updatePatientCurrentLocation(patient).execute();
