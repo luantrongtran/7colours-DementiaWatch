@@ -11,10 +11,13 @@ import java.util.List;
 import java.util.Vector;
 
 import ifn372.sevencolors.backend.myApi.MyApi;
+import ifn372.sevencolors.backend.myApi.model.Location;
 import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.backend.myApi.model.PatientList;
 import ifn372.sevencolors.dementiawatch.BackendApiProvider;
 import ifn372.sevencolors.dementiawatch.Constants;
+import ifn372.sevencolors.dementiawatch.parcelable.LocationParcelable;
+import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
 
 /**
  * Created by lua on 27/08/2015.
@@ -44,7 +47,10 @@ public class UpdatePatientsListService extends IntentService {
             Log.i(Constants.application_id, patientList.toString());
 
             Intent broadCastIntent = new Intent(ACTION);
-//            LocalBroadcastManager.getInstance(this).sendBroadcast(broadCastIntent);
+
+            PatientListParcelable patientListParcelable = new PatientListParcelable(patientList);
+            broadCastIntent.putExtra("patientList", patientListParcelable);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(broadCastIntent);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,8 @@
 package ifn372.sevencolors.dementiawatch.activities;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
@@ -17,10 +19,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import ifn372.sevencolors.dementiawatch.Constants;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
+import ifn372.sevencolors.dementiawatch.parcelable.LocationParcelable;
+import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReceiver;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
@@ -40,8 +46,11 @@ public class MapsActivity extends FragmentActivity {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         // mapFragment.getMapAsync(this);
+
         setUpDummyData();
         scheduleAlarm();
+        IntentFilter intentFilter = new IntentFilter(UpdatePatientsListService.ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onPatientsListUpdateReceiver, intentFilter);
     }
 
     public void scheduleAlarm() {
@@ -153,4 +162,13 @@ public class MapsActivity extends FragmentActivity {
 
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, updatePatientsListInterval, pIntent);
     }
+
+    private BroadcastReceiver onPatientsListUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(Constants.application_id, "Maps Activity received patient list update event");
+
+            PatientListParcelable p = intent.getParcelableExtra("patientList");
+        }
+    };
 }
