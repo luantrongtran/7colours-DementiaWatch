@@ -7,12 +7,12 @@ import android.util.Log;
 
 import java.io.IOException;
 
-import ifn372.sevencolors.backend.patientApi.model.Patient;
-import ifn372.sevencolors.backend.patientApi.model.Location;
+import ifn372.sevencolors.backend.myApi.MyApi;
+import ifn372.sevencolors.backend.myApi.model.Location;
+import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.watch_app.BackendApiProvider;
 import ifn372.sevencolors.watch_app.Constants;
 import ifn372.sevencolors.watch_app.SharedPreferencesUtitlies;
-import ifn372.sevencolors.backend.patientApi.PatientApi;
 
 /**
  * This class update current location to the backend automatically on scheduled time
@@ -44,7 +44,7 @@ public class UpdateCurrentLocationService extends IntentService {
 
         patient.setCurrentLocation(currentLocation);
 
-        PatientApi patientApi = BackendApiProvider.getPatientApiBuilder();
+        MyApi patientApi = BackendApiProvider.getPatientApiBuilder();
 
         try {
             patientApi.updatePatientCurrentLocation(patient).execute();

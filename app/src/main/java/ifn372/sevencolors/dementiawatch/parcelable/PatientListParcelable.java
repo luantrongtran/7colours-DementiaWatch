@@ -17,6 +17,8 @@ import ifn372.sevencolors.backend.myApi.model.PatientList;
 public class PatientListParcelable implements Parcelable {
 
     private PatientList patientList;
+    private PatientParcelable[] patientParcelableList;
+
     public PatientParcelable[] getPatientParcelableList() {
         return patientParcelableList;
     }
@@ -24,8 +26,6 @@ public class PatientListParcelable implements Parcelable {
     public void setPatientParcelableList(PatientParcelable[] patientParcelableList) {
         this.patientParcelableList = patientParcelableList;
     }
-
-    private PatientParcelable[] patientParcelableList;
 
     public PatientListParcelable(PatientList patientList) {
         this.patientList = patientList;
@@ -70,4 +70,12 @@ public class PatientListParcelable implements Parcelable {
             return new PatientListParcelable[size];
         }
     };
+
+    public PatientList getPatientList() {
+        return patientList;
+    }
+
+    public void setPatientList(PatientList patientList) {
+        this.patientList = patientList;
+    }
 }

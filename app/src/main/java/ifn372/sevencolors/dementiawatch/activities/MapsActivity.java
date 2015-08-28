@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import ifn372.sevencolors.backend.myApi.model.PatientList;
 import ifn372.sevencolors.dementiawatch.Constants;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
@@ -37,7 +38,7 @@ public class MapsActivity extends FragmentActivity {
 
     public long updatePatientsListInterval = 20*1000; //seconds
 
-    public static PatientManager patientManager;
+    public static PatientManager patientManager = new PatientManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,7 +149,7 @@ public class MapsActivity extends FragmentActivity {
 
         // Zoom in the Google Map
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").snippet("Consider yourself located"));
+//        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").snippet("Consider yourself located"));
     }
 
 
@@ -167,8 +168,14 @@ public class MapsActivity extends FragmentActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(Constants.application_id, "Maps Activity received patient list update event");
-
             PatientListParcelable p = intent.getParcelableExtra("patientList");
+            patientManager.setPatientList(p.getPatientList());
+
+            updateMap();
         }
     };
+
+    public void updateMap() {
+        patientManager.updatePatientsMarkerOnMap(mMap);
+    }
 }

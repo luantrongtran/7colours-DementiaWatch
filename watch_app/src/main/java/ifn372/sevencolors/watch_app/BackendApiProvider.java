@@ -5,12 +5,13 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import java.io.IOException;
-import ifn372.sevencolors.backend.patientApi.PatientApi;
+
+import ifn372.sevencolors.backend.myApi.MyApi;
 
 
 public class BackendApiProvider {
-    public static PatientApi getPatientApiBuilder(){
-        PatientApi.Builder myApi = new PatientApi.Builder(AndroidHttp.newCompatibleTransport(),
+    public static MyApi getPatientApiBuilder(){
+        MyApi.Builder myApi = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                 new AndroidJsonFactory(), null);
 
         myApi.setRootUrl(Constants.webServiceUrl);
