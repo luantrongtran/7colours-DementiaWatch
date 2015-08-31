@@ -7,6 +7,11 @@ import java.sql.Timestamp;
  */
 public class Patient extends User {
 
+    private boolean safety;
+
+    public void setSafety(boolean safety) { this.safety = safety; }
+    public boolean getSafety() { return safety; }
+
     public Timestamp getLocation_last_update() {
         return location_last_update;
     }
