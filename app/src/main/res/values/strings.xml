@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">DementiaWatch</string>
-
+    <string name="notification_title">Out of Bound Alert</string>
+    <string name="notification_text">Your patient has step out of the fence!</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_main2">Main2Activity</string>

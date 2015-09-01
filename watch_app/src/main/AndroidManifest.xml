@@ -42,6 +42,7 @@
 
         <receiver android:name=".backgroundservices.UpdateCurrentLocationReceiver"/>
         <service android:name=".backgroundservices.UpdateCurrentLocationService" />
+        <service android:name=".OutOfBoundCheck" />
 
         <meta-data
             android:name="com.google.android.gms.version"

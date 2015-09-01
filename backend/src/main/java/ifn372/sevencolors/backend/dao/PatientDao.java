@@ -6,12 +6,16 @@ import java.sql.ResultSet;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.logging.Logger;
 
 import ifn372.sevencolors.backend.entities.Location;
 import ifn372.sevencolors.backend.entities.Patient;
 
 public class PatientDao extends DAOBase {
+
+    private static final Logger logger = Logger.getLogger(PatientDao.class.getName());
 
     public static String tableName = "user";
     public static String colPatientId = "id";
@@ -123,5 +127,47 @@ public class PatientDao extends DAOBase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public Location getPatientLocation(int patientId) {
+        Connection con = null;
+        Statement stmt = null;
+        Location location = new Location();
+        try
+        {
+            con = getConnection();
+            stmt = con.createStatement();
+            Timestamp time = null;
+            String sql = "SELECT * FROM current_location WHERE patient_id=" + String.valueOf(patientId);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            /* for testing row count
+            int rowcount = 0;
+            if (rs.last()) {
+                rowcount = rs.getRow();
+                rs.beforeFirst(); // not rs.first() because the rs.next() below will move on, missing the first element
+            }
+            logger.info("Row Count: " + String.valueOf(rowcount));*/
+
+            // set fence data
+            while(rs.next()) {
+                if (time == null) {
+                    location.setLat(rs.getDouble("lat"));
+                    location.setLon(rs.getDouble("lon"));
+                    time = rs.getTimestamp("time");
+                } else {
+                    if (rs.getTimestamp("time").after(time)) {
+                        location.setLat(rs.getDouble("lat"));
+                        location.setLon(rs.getDouble("lon"));
+                        time = rs.getTimestamp("time");
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return location;
     }
 }

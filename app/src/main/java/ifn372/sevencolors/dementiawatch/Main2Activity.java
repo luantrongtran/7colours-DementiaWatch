@@ -88,7 +88,7 @@ public class Main2Activity extends AppCompatActivity implements IFenceService
             Pass dummy user id until user login function is developed.
             TODO: Pass actual user id.
          */
-        String userId = "00000";
+        String userId = "1";
 
         FenceService fence = new FenceService(this);
         try

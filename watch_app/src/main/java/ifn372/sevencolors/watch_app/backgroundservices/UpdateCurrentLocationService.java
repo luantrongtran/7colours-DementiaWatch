@@ -1,6 +1,7 @@
 package ifn372.sevencolors.watch_app.backgroundservices;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -11,6 +12,7 @@ import ifn372.sevencolors.backend.patientApi.model.Patient;
 import ifn372.sevencolors.backend.patientApi.model.Location;
 import ifn372.sevencolors.watch_app.BackendApiBuilderProvider;
 import ifn372.sevencolors.watch_app.Constants;
+import ifn372.sevencolors.watch_app.OutOfBoundCheck;
 import ifn372.sevencolors.watch_app.SharedPreferencesUtitlies;
 import ifn372.sevencolors.backend.patientApi.PatientApi;
 
@@ -25,6 +27,8 @@ public class UpdateCurrentLocationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Context context = getApplicationContext();
+
         SharedPreferences currentLocationSharedPref = getApplicationContext().
                 getSharedPreferences(Constants.sharedPreferences_current_location, MODE_PRIVATE);
 
@@ -49,6 +53,8 @@ public class UpdateCurrentLocationService extends IntentService {
         try {
             patientApi.updatePatientCurrentLocation(patient).execute();
             Log.e("MyAPI", "Update location to backend");
+            Intent in = new Intent(context, OutOfBoundCheck.class);
+            context.startService(in);
 
         } catch (IOException e) {
             Log.e("MyAPI", "Failed update location to backend");
