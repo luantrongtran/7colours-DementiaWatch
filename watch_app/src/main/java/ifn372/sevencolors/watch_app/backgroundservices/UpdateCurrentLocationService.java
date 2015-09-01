@@ -39,6 +39,7 @@ public class UpdateCurrentLocationService extends IntentService {
 
         SharedPreferences userInfoSharedPref = getApplicationContext()
                 .getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
+        
         Patient patient = new Patient();
         patient.setId(userInfoSharedPref.getInt(Constants.sharedPreferences_user_info_id, -1));
 

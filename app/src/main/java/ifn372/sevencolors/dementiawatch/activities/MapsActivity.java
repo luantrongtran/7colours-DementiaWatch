@@ -36,7 +36,7 @@ public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
-    public long updatePatientsListInterval = 20*1000; //seconds
+    public long updatePatientsListInterval = 6*1000; //seconds
 
     public static PatientManager patientManager = new PatientManager();
 
