@@ -19,4 +19,12 @@
         android:onClick="sayHi"
         />
 
+    <Button
+        android:layout_width="159dp"
+        android:layout_height="wrap_content"
+        android:text="Change Screen"
+        android:id="@+id/button2"
+        android:layout_gravity="center_vertical"
+        android:onClick="btnChangeEvent" />
+
 </LinearLayout>

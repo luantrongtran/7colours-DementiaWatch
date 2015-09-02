@@ -6,7 +6,9 @@
         <init-param>
             <param-name>services</param-name>
             <param-value>ifn372.sevencolors.backend.webservices.MyEndpoint,
-                ifn372.sevencolors.backend.webservices.PatientEndpoint</param-value>
+                ifn372.sevencolors.backend.webservices.PatientEndpoint,
+                ifn372.sevencolors.backend.webservices.FenceEndpoint,
+                ifn372.sevencolors.backend.webservices.CarerEndPoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

@@ -1,11 +1,15 @@
 package ifn372.sevencolors.backend.entities;
 
-import java.sql.Timestamp;
-
 /**
  * Created by lua on 15/08/2015.
  */
 public class Patient extends User {
+
+
+    private boolean safety;
+
+    public void setSafety(boolean safety) { this.safety = safety; }
+    public boolean getSafety() { return safety; }
 
     public long getLocation_last_update() {
         return location_last_update;
