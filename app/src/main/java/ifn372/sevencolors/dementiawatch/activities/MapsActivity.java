@@ -8,7 +8,6 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,9 +19,17 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 
-import ifn372.sevencolors.backend.myApi.model.PatientList;
+import ifn372.sevencolors.dementiawatch.CheckReceiver;
+
 import ifn372.sevencolors.dementiawatch.Constants;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
@@ -32,13 +39,31 @@ import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReceiver;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends AppCompatActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     public long updatePatientsListInterval = 6*1000; //seconds
 
     public static PatientManager patientManager = new PatientManager();
+
+    //Navigation menu
+    String TITLES[] = {"Patient 1","Patient 2","Patient 3"};
+    int ICONS[] = {R.drawable.ic_one, R.drawable.ic_two, R.drawable.ic_three};
+
+    String NAME = "Carer 1";
+    String EMAIL = "carer1@gmail.com";
+    int PROFILE = R.drawable.profile;
+
+    private Toolbar toolbar;
+
+    RecyclerView mRecyclerView;
+    RecyclerView.Adapter mAdapter;
+    RecyclerView.LayoutManager mLayoutManager;
+    DrawerLayout Drawer;
+
+    ActionBarDrawerToggle mDrawerToggle;
+    //end navigation menu
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +77,42 @@ public class MapsActivity extends FragmentActivity {
         scheduleAlarm();
         IntentFilter intentFilter = new IntentFilter(UpdatePatientsListService.ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPatientsListUpdateReceiver, intentFilter);
+
+        //Navigation Menu
+        toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+
+
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.RecyclerView);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        mAdapter = new MyAdapter(TITLES,ICONS,NAME,EMAIL,PROFILE);
+
+        mRecyclerView.setAdapter(mAdapter);
+        mLayoutManager = new LinearLayoutManager(this);
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+
+        Drawer = (DrawerLayout) findViewById(R.id.DrawerLayout);
+        mDrawerToggle = new ActionBarDrawerToggle(this,Drawer,toolbar,R.string.drawer_open,R.string.drawer_close){
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+
+            }
+        };
+        Drawer.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
     }
 
     public void scheduleAlarm() {
