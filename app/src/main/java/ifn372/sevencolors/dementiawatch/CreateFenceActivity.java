@@ -1,10 +1,13 @@
 package ifn372.sevencolors.dementiawatch;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,17 +16,30 @@ import android.widget.EditText;
 import java.util.List;
 import java.util.Locale;
 
-import ifn372.sevencolors.backend.entities.fenceApi.model.Fence;
+import ifn372.sevencolors.backend.myApi.model.Patient;
+import ifn372.sevencolors.dementiawatch.activities.MapsActivity;
 import ifn372.sevencolors.dementiawatch.webservices.FenceService;
 import ifn372.sevencolors.dementiawatch.webservices.IFenceService;
+import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
-public class Main2Activity extends AppCompatActivity implements IFenceService
+public class CreateFenceActivity extends AppCompatActivity implements IFenceService
 {
+    Patient patient;
+    ProgressDialog progressDialog ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_create_fence);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+        Intent intent = getIntent();
+        int index = intent.getIntExtra(Constants.create_new_fence_intent_data,
+                Constants.sharedPreferences_integer_default_value);
+        this.patient = MapsActivity.patientManager.getPatientList().getItems().get(index);
+
+        setTitle(patient.getFullName());
     }
 
     @Override
@@ -84,32 +100,26 @@ public class Main2Activity extends AppCompatActivity implements IFenceService
         String address = this.getValue(R.id.txtAddress);
         address += ", " + this.getValue(R.id.txtCity) + ", " + this.getValue(R.id.txtState);
 
-        /*
-            Pass dummy user id until user login function is developed.
-            TODO: Pass actual user id.
-         */
-        String userId = "1";
+        String userId = patient.getId()+"";
 
-        FenceService fence = new FenceService(this);
-        try
-        {
-            Fence info = fence.execute(
+        FenceService fenceService = new FenceService(this);
+        showProgressBar();
+        fenceService.execute(
                     userId, fenceName,
                     Double.toString(location[0]), Double.toString(location[1]),
-                    radius, address).get();
-            if(info == null || !info.getSuccess())
-            {
-                this.showMessage("Error", "An error has occurred. Please try again.");
-            }
-            else
-            {
-                this.showMessage("Info", "Fence has been created.");
-            }
-        }
-        catch (Exception e)
-        {
-            System.err.println(e.getStackTrace());
-        }
+                    radius, address);
+//        try
+//        {
+//            Fence info = fenceService.execute(
+//                    userId, fenceName,
+//                    Double.toString(location[0]), Double.toString(location[1]),
+//                    radius, address).get();
+//
+//        }
+//        catch (Exception e)
+//        {
+//            System.err.println(e.getStackTrace());
+//        }
 
     }
 
@@ -184,8 +194,28 @@ public class Main2Activity extends AppCompatActivity implements IFenceService
         alert.show();
     }
 
+    public void showProgressBar() {
+        progressDialog = ProgressDialog.show(this, "", "Creating fence");
+    }
+
     @Override
-    public void processData(boolean isSuccess) {
-        //Toast.makeText(this, greeting, Toast.LENGTH_SHORT).show();
+    public void processAfterCreatingFence(boolean isSuccess) {
+        progressDialog.dismiss();
+        if(isSuccess == false)
+        {
+            this.showMessage(getResources().getString(R.string.dialog_title_error),
+                    getResources().getString(R.string.create_fence_failed));
+        }
+        else
+        {
+            this.showMessage(getResources().getString(R.string.dialog_title_success),
+                    getResources().getString(R.string.create_fence_success));
+            onBackPressed();
+        }
+
+        //Update patient list
+        Intent intent = new Intent(getApplicationContext(),
+                UpdatePatientsListService.class);
+        startService(intent);
     }
 }

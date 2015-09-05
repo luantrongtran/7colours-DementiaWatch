@@ -3,7 +3,6 @@ package ifn372.sevencolors.dementiawatch.activities;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -26,16 +25,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 
+import ifn372.sevencolors.dementiawatch.CheckReceiver;
 import ifn372.sevencolors.dementiawatch.Constants;
 import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferences;
+import ifn372.sevencolors.dementiawatch.CreateFenceActivity;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
 import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
-import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientList;
-import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsLocation;
-import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsLocationService;
+import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReciever;
+import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
 
 public class MapsActivity extends AppCompatActivity {
@@ -43,6 +45,7 @@ public class MapsActivity extends AppCompatActivity {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     public long updatePatientsListInterval = 6*1000; //seconds
+    public long outOfBoundCheckInterval = 8*1000; // seconds
 
     public static PatientManager patientManager = new PatientManager();
 
@@ -56,7 +59,7 @@ public class MapsActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
     public static RecyclerView.Adapter mLeftMenuAdapter;
     RecyclerView.LayoutManager mLayoutManager;
-    DrawerLayout Drawer;
+    DrawerLayout drawer;
 
     ActionBarDrawerToggle mDrawerToggle;
     //end navigation menu
@@ -73,13 +76,8 @@ public class MapsActivity extends AppCompatActivity {
 
         scheduleAlarm();
 
-        IntentFilter intentFilter = new IntentFilter(UpdatePatientsLocationService.ACTION);
+        IntentFilter intentFilter = new IntentFilter(UpdatePatientsListService.ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPatientsListUpdateReceiver, intentFilter);
-
-        //Get the patient list for the first time
-        UserInfoPreferences userPrefs = new UserInfoPreferences(getApplicationContext());
-        UpdatePatientList updatePatientList = new UpdatePatientList();
-        updatePatientList.execute(userPrefs.getUserId(), userPrefs.getRole());
 
         setUpNavigationMenu();
     }
@@ -96,13 +94,54 @@ public class MapsActivity extends AppCompatActivity {
         mLeftMenuAdapter = new LeftMenuAdapter(NAME,EMAIL,PROFILE);
 
         mRecyclerView.setAdapter(mLeftMenuAdapter);
+
+        final GestureDetector oneTouchGesture = new GestureDetector(MapsActivity.this,
+                new GestureDetector.SimpleOnGestureListener(){
+                    @Override
+                    public boolean onSingleTapUp(MotionEvent e) {
+                        return true;
+                    }
+                });
+        mRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+
+                View view = rv.findChildViewUnder(e.getX(), e.getY());
+
+                if (view != null && oneTouchGesture.onTouchEvent(e)) {
+                    drawer.closeDrawers();
+                    int clickedIndex = rv.getChildAdapterPosition(view);
+                    if (clickedIndex == 0) {
+                        //If the header was clicked
+                        return false;
+                    }
+
+                    int index = clickedIndex - 1;
+                    Intent intent = new Intent(MapsActivity.this, CreateFenceActivity.class);
+                    intent.putExtra(Constants.create_new_fence_intent_data, index);
+                    startActivity(intent);
+
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+            }
+        });
+
         mLayoutManager = new LinearLayoutManager(this);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 
-        Drawer = (DrawerLayout) findViewById(R.id.DrawerLayout);
-        mDrawerToggle = new ActionBarDrawerToggle(this,Drawer,toolbar,R.string.drawer_open,R.string.drawer_close){
+        drawer = (DrawerLayout) findViewById(R.id.DrawerLayout);
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawer,toolbar,R.string.drawer_open,R.string.drawer_close){
 
             @Override
             public void onDrawerOpened(View drawerView) {
@@ -116,12 +155,13 @@ public class MapsActivity extends AppCompatActivity {
 
             }
         };
-        Drawer.setDrawerListener(mDrawerToggle);
+        drawer.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
     }
 
     public void scheduleAlarm() {
         scheduleAutoUpdatePatientsList();
+//        scheduleAutoCheckPatientsOutOfBound();
     }
 
     public void setUpDummyData() {
@@ -218,7 +258,7 @@ public class MapsActivity extends AppCompatActivity {
 
 
     public void scheduleAutoUpdatePatientsList() {
-        Intent intent = new Intent(getApplicationContext(), UpdatePatientsLocation.class);
+        Intent intent = new Intent(getApplicationContext(), UpdatePatientsListReciever.class);
         PendingIntent pIntent =
                 PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -228,6 +268,18 @@ public class MapsActivity extends AppCompatActivity {
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, updatePatientsListInterval, pIntent);
     }
 
+    public void scheduleAutoCheckPatientsOutOfBound(){
+        // Retrieve a PendingIntent that will perform a broadcast
+        Intent alarmIntent = new Intent(this, CheckReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+
+        AlarmManager manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        long interval = outOfBoundCheckInterval;
+
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+                interval, pendingIntent);
+    }
+
     private BroadcastReceiver onPatientsListUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -235,6 +287,7 @@ public class MapsActivity extends AppCompatActivity {
             PatientListParcelable p = intent.getParcelableExtra("patientList");
             patientManager.setPatientList(p.getPatientList());
             updateMap();
+            mLeftMenuAdapter.notifyDataSetChanged(); //update patient list on left menu
         }
     };
 

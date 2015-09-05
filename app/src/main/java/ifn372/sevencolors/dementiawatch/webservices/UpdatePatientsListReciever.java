@@ -10,12 +10,12 @@ import ifn372.sevencolors.dementiawatch.Constants;
 /**
  * Created by lua on 27/08/2015.
  */
-public class UpdatePatientsLocation extends BroadcastReceiver {
+public class UpdatePatientsListReciever extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
         Log.i(Constants.application_id, "update patients list receiver");
-        Intent in = new Intent(context, UpdatePatientsLocationService.class);
+        Intent in = new Intent(context, UpdatePatientsListService.class);
         context.startService(in);
     }
 }

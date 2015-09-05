@@ -1,22 +1,23 @@
 package ifn372.sevencolors.backend.entities;
 
+import java.util.List;
 import java.util.Vector;
 
 /**
  * Created by lua on 28/08/2015.
  */
 public class PatientList {
-    Vector<Patient> mPatientList;
+    List<Patient> patientList;
 
     public PatientList(){
-        mPatientList = new Vector<Patient>();
+        patientList = new Vector<>();
     }
 
     public void setItems(Vector<Patient> patientList) {
-        mPatientList = patientList;
+        this.patientList = patientList;
     }
 
-    public Vector<Patient> getItems() {
-        return mPatientList;
+    public List<Patient> getItems() {
+        return patientList;
     }
 }

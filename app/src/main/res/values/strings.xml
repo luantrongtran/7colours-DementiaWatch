@@ -5,8 +5,14 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_maps">Dementia_Map</string>
-    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_create_fence">Create Fence</string>
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+
+    <string name="dialog_title_error">Error</string>
+    <string name="dialog_title_success">Success</string>
+
+    <string name="create_fence_success">Fence created successfully</string>
+    <string name="create_fence_failed">Could not create fence</string>
 </resources>

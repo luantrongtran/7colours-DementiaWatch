@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements ISayHi {
 
     public void btnChangeEvent(View view)
     {
-        Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+        Intent intent = new Intent(MainActivity.this, CreateFenceActivity.class);
         startActivity(intent);
     }
 }

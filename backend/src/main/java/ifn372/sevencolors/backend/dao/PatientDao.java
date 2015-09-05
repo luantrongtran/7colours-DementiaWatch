@@ -9,9 +9,12 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import ifn372.sevencolors.backend.entities.Fence;
+import ifn372.sevencolors.backend.entities.FenceList;
 import ifn372.sevencolors.backend.entities.Location;
 import ifn372.sevencolors.backend.entities.Patient;
 
@@ -221,5 +224,19 @@ public class PatientDao extends DAOBase {
             e.printStackTrace();
         }
         return location;
+    }
+
+    /**
+     * This methods will update the fence list of each patient
+     */
+    public void getFencesForPatients(List<Patient> patientList) {
+        FenceDao fenceDao = new FenceDao();
+        for(Patient p : patientList) {
+            int patientId = p.getId();
+            List<Fence> fences = fenceDao.getFences(patientId);
+            FenceList fenceList = new FenceList();
+            fenceList.setItems(fences);
+            p.setFenceList(fenceList);
+        }
     }
 }

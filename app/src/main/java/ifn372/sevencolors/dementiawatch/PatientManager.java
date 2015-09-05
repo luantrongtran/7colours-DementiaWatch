@@ -1,5 +1,7 @@
 package ifn372.sevencolors.dementiawatch;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -40,7 +42,11 @@ public class PatientManager {
     }
 
     public void updatePatientsMarkerOnMap(GoogleMap gMap) {
-        gMap.clear();
+        Log.i(Constants.application_id, "Update map according to patient list");
+//        gMap.clear();
+        for(Marker marker : patientMarkers) {
+            marker.remove();
+        }
         patientMarkers.clear();
 
         List<Patient> patients = patientList.getItems();
@@ -57,5 +63,9 @@ public class PatientManager {
 
             patientMarkers.add(marker);
         }
+    }
+
+    public void updatePatientFenceOnMap(GoogleMap gMap){
+
     }
 }

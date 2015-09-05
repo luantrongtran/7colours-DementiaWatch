@@ -27,6 +27,14 @@ public class Patient extends User {
         this.currentLocation = currentLocation;
     }
 
+    public FenceList getFenceList() {
+        return fenceList;
+    }
+
+    public void setFenceList(FenceList fenceList) {
+        this.fenceList = fenceList;
+    }
+
 
     public int getCarer_id() {
         return carer_id;
@@ -39,4 +47,6 @@ public class Patient extends User {
     Location currentLocation;
     private long location_last_update;
     int carer_id;
+
+    FenceList fenceList = new FenceList();
 }

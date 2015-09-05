@@ -67,6 +67,6 @@ public class FenceService extends AsyncTask<String, Void, Fence> {
     protected void onPostExecute(Fence info) {
 //        super.onPostExecute(myBean);
         //System.out.println("Bean: " + myBean);
-        ifs.processData(info.getSuccess());
+        ifs.processAfterCreatingFence(info.getSuccess());
     }
 }

@@ -2,6 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <include
+        android:id="@+id/tool_bar"
+        layout="@layout/tool_bar"
+        >
+    </include>
 
     <TextView
         android:layout_width="wrap_content"
@@ -9,7 +14,9 @@
         android:text="Fence Name"
         android:id="@+id/textView6"
         android:layout_marginLeft="20dp"
-        android:textSize="20dp" />
+        android:textSize="20dp"
+        android:paddingTop="20dp"
+        />
 
     <EditText
         android:layout_width="match_parent"
@@ -74,16 +81,16 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="10dp" />
 
-    <ImageView android:id="@+id/titleDivider"
-        android:layout_width="fill_parent"
-        android:layout_height="3dip"
-        android:src="@android:drawable/divider_horizontal_bright"
-        android:scaleType="fitXY"
-        android:gravity="fill_horizontal"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="10dp" />
+    <!--<ImageView android:id="@+id/titleDivider"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="3dip"-->
+        <!--android:src="@android:drawable/divider_horizontal_bright"-->
+        <!--android:scaleType="fitXY"-->
+        <!--android:gravity="fill_horizontal"-->
+        <!--android:layout_marginTop="5dp"-->
+        <!--android:layout_marginBottom="5dp"-->
+        <!--android:layout_marginLeft="20dp"-->
+        <!--android:layout_marginRight="10dp" />-->
 
     <TextView
         android:layout_width="wrap_content"

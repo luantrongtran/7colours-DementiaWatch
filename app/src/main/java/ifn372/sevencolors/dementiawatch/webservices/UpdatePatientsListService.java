@@ -17,11 +17,11 @@ import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
 /**
  * Created by lua on 27/08/2015.
  */
-public class UpdatePatientsLocationService extends IntentService {
+public class UpdatePatientsListService extends IntentService {
 
-    public static String ACTION = UpdatePatientsLocationService.class.getCanonicalName();
+    public static String ACTION = UpdatePatientsListService.class.getCanonicalName();
 
-    public UpdatePatientsLocationService() {
+    public UpdatePatientsListService() {
         super("UpdatePatientsListService");
     }
     @Override

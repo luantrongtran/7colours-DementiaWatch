@@ -60,6 +60,7 @@ public class PatientEndpoint {
 
             PatientDao patientDao = new PatientDao();
             patients = patientDao.getPatientsListByCarer(carerOrRelativeId);
+            patientDao.getFencesForPatients(patients);
 
             PatientList patientList = new PatientList();
             patientList.setItems(patients);
