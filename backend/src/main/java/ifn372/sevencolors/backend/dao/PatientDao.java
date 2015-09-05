@@ -163,7 +163,12 @@ public class PatientDao extends DAOBase {
                 location.setLon(rs.getDouble(cl_colLon));
                 patient.setCurrentLocation(location);
 
-                patient.setLocation_last_update(rs.getTimestamp(cl_colUpdateTime).getTime());
+                Timestamp ts = rs.getTimestamp(cl_colUpdateTime);
+                if(ts == null) {
+                    patient.setLocation_last_update(-1l);
+                } else {
+                    patient.setLocation_last_update(ts.getTime());
+                }
 
                 patient.setCarer_id(carerId);
 

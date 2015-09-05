@@ -28,13 +28,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
-import ifn372.sevencolors.backend.carerApi.model.Carer;
 import ifn372.sevencolors.dementiawatch.Constants;
+import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferences;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
 import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
-import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReceiver;
-import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
+import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientList;
+import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsLocation;
+import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsLocationService;
 
 
 public class MapsActivity extends AppCompatActivity {
@@ -44,11 +45,8 @@ public class MapsActivity extends AppCompatActivity {
     public long updatePatientsListInterval = 6*1000; //seconds
 
     public static PatientManager patientManager = new PatientManager();
-//    public static Carer
 
     //Navigation menu
-    String TITLES[] = {"Patient 1","Patient 2","Patient 3"};
-
     String NAME = "Carer 1";
     String EMAIL = "carer1@gmail.com";
     int PROFILE = R.drawable.profile;
@@ -56,7 +54,7 @@ public class MapsActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
     RecyclerView mRecyclerView;
-    RecyclerView.Adapter mAdapter;
+    public static RecyclerView.Adapter mLeftMenuAdapter;
     RecyclerView.LayoutManager mLayoutManager;
     DrawerLayout Drawer;
 
@@ -72,9 +70,16 @@ public class MapsActivity extends AppCompatActivity {
         // mapFragment.getMapAsync(this);
 
         setUpDummyData();
+
         scheduleAlarm();
-        IntentFilter intentFilter = new IntentFilter(UpdatePatientsListService.ACTION);
+
+        IntentFilter intentFilter = new IntentFilter(UpdatePatientsLocationService.ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPatientsListUpdateReceiver, intentFilter);
+
+        //Get the patient list for the first time
+        UserInfoPreferences userPrefs = new UserInfoPreferences(getApplicationContext());
+        UpdatePatientList updatePatientList = new UpdatePatientList();
+        updatePatientList.execute(userPrefs.getUserId(), userPrefs.getRole());
 
         setUpNavigationMenu();
     }
@@ -88,9 +93,9 @@ public class MapsActivity extends AppCompatActivity {
 
         mRecyclerView.setHasFixedSize(true);
 
-        mAdapter = new LeftMenuAdapter(NAME,EMAIL,PROFILE);
+        mLeftMenuAdapter = new LeftMenuAdapter(NAME,EMAIL,PROFILE);
 
-        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mLeftMenuAdapter);
         mLayoutManager = new LinearLayoutManager(this);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -121,12 +126,9 @@ public class MapsActivity extends AppCompatActivity {
 
     public void setUpDummyData() {
         //The user, a carer, information
-        SharedPreferences userInfoSharedPref = getApplicationContext()
-                .getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
-        SharedPreferences.Editor editor = userInfoSharedPref.edit();
-        editor.putInt(Constants.sharedPreferences_user_info_id, 3);
-        editor.putInt(Constants.sharedPreferences_user_info_role, 2);
-        editor.apply();
+        UserInfoPreferences userPrefs = new UserInfoPreferences(getApplicationContext());
+        userPrefs.setUserId(3);
+        userPrefs.setRole(2);
     }
 
     //    @Override
@@ -216,7 +218,7 @@ public class MapsActivity extends AppCompatActivity {
 
 
     public void scheduleAutoUpdatePatientsList() {
-        Intent intent = new Intent(getApplicationContext(), UpdatePatientsListReceiver.class);
+        Intent intent = new Intent(getApplicationContext(), UpdatePatientsLocation.class);
         PendingIntent pIntent =
                 PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

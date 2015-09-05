@@ -45,8 +45,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".webservices.UpdatePatientsListReceiver" />
-        <service android:name=".webservices.UpdatePatientsListService"/>
+        <receiver android:name=".webservices.UpdatePatientsLocation" />
+        <service android:name=".webservices.UpdatePatientsLocationService"/>
         <activity
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2" >

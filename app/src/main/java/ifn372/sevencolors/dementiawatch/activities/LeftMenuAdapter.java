@@ -1,3 +1,6 @@
+/**
+ * References http://www.android4devs.com/2015/01/recycler-view-handling-onitemtouch-for.html
+ */
 package ifn372.sevencolors.dementiawatch.activities;
 
 import android.support.v7.widget.RecyclerView;
@@ -7,12 +10,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
+import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
 
-/**
- * Created by lua on 5/09/2015.
- */
 public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMenuViewHolder> {
     private static final int TYPE_HEADER = 0;
 
@@ -56,6 +59,8 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
     @Override
     public void onBindViewHolder(LeftMenuViewHolder holder, int position) {
         if (holder.Holderid == 1) {
+            if(MapsActivity.patientManager.getPatientList().getItems() == null)
+                return;
             holder.textView.setText(MapsActivity.patientManager.getPatientList().getItems().get(position - 1).getFullName());
             holder.imageView.setImageResource(patientIcon);
         } else {
@@ -67,6 +72,8 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
 
     @Override
     public int getItemCount() {
+        if(MapsActivity.patientManager.getPatientList().getItems() == null)
+            return 0;
         return MapsActivity.patientManager.getPatientList().getItems().size() + 1;
     }
 

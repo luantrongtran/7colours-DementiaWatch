@@ -11,9 +11,6 @@ import ifn372.sevencolors.backend.myApi.model.Location;
 import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.backend.myApi.model.PatientList;
 
-/**
- * Created by lua on 28/08/2015.
- */
 public class PatientListParcelable implements Parcelable {
 
     private PatientList patientList;

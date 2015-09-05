@@ -22,6 +22,7 @@ public class PatientManager {
     Vector<Marker> patientMarkers ;
 
     public PatientManager() {
+        patientList = new PatientList();
         patientList.setItems(new Vector<Patient>());
         patientMarkers = new Vector<Marker>();
     }

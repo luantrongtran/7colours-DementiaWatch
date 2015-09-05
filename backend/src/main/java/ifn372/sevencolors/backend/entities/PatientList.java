@@ -8,6 +8,10 @@ import java.util.Vector;
 public class PatientList {
     Vector<Patient> mPatientList;
 
+    public PatientList(){
+        mPatientList = new Vector<Patient>();
+    }
+
     public void setItems(Vector<Patient> patientList) {
         mPatientList = patientList;
     }

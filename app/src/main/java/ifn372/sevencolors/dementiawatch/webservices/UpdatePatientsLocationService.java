@@ -7,26 +7,21 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Vector;
 
 import ifn372.sevencolors.backend.myApi.MyApi;
-import ifn372.sevencolors.backend.myApi.model.Location;
-import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.backend.myApi.model.PatientList;
 import ifn372.sevencolors.dementiawatch.BackendApiProvider;
 import ifn372.sevencolors.dementiawatch.Constants;
-import ifn372.sevencolors.dementiawatch.parcelable.LocationParcelable;
 import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
 
 /**
  * Created by lua on 27/08/2015.
  */
-public class UpdatePatientsListService extends IntentService {
+public class UpdatePatientsLocationService extends IntentService {
 
-    public static String ACTION = UpdatePatientsListService.class.getCanonicalName();
+    public static String ACTION = UpdatePatientsLocationService.class.getCanonicalName();
 
-    public UpdatePatientsListService () {
+    public UpdatePatientsLocationService() {
         super("UpdatePatientsListService");
     }
     @Override

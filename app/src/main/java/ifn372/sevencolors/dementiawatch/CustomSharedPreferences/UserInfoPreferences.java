@@ -25,4 +25,14 @@ public class UserInfoPreferences {
                 .getInt(Constants.sharedPreferences_user_info_id,
                         Constants.sharedPreferences_integer_default_value);
     }
+
+    public void setRole(int role) {
+        sharedPreferences.edit().putInt(Constants.sharedPreferences_user_info_role, role).apply();
+
+    }
+
+    public int getRole() {
+        return sharedPreferences.getInt(Constants.sharedPreferences_user_info_role,
+                Constants.sharedPreferences_integer_default_value);
+    }
 }
