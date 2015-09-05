@@ -78,11 +78,13 @@ public class MapsActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter(UpdatePatientsListService.ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPatientsListUpdateReceiver, intentFilter);
 
+        setUpNavigationMenu();
+    }
+
+    private void setUpNavigationMenu() {
         //Navigation Menu
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
-
-
 
         mRecyclerView = (RecyclerView) findViewById(R.id.RecyclerView);
 
