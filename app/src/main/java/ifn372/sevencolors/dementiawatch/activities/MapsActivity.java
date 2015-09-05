@@ -28,12 +28,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
-import ifn372.sevencolors.dementiawatch.CheckReceiver;
-
+import ifn372.sevencolors.backend.carerApi.model.Carer;
 import ifn372.sevencolors.dementiawatch.Constants;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
-import ifn372.sevencolors.dementiawatch.parcelable.LocationParcelable;
 import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReceiver;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
@@ -46,10 +44,10 @@ public class MapsActivity extends AppCompatActivity {
     public long updatePatientsListInterval = 6*1000; //seconds
 
     public static PatientManager patientManager = new PatientManager();
+//    public static Carer
 
     //Navigation menu
     String TITLES[] = {"Patient 1","Patient 2","Patient 3"};
-    int ICONS[] = {R.drawable.ic_one, R.drawable.ic_two, R.drawable.ic_three};
 
     String NAME = "Carer 1";
     String EMAIL = "carer1@gmail.com";
@@ -90,7 +88,7 @@ public class MapsActivity extends AppCompatActivity {
 
         mRecyclerView.setHasFixedSize(true);
 
-        mAdapter = new MyAdapter(TITLES,ICONS,NAME,EMAIL,PROFILE);
+        mAdapter = new LeftMenuAdapter(NAME,EMAIL,PROFILE);
 
         mRecyclerView.setAdapter(mAdapter);
         mLayoutManager = new LinearLayoutManager(this);
@@ -122,12 +120,13 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     public void setUpDummyData() {
+        //The user, a carer, information
         SharedPreferences userInfoSharedPref = getApplicationContext()
                 .getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
         SharedPreferences.Editor editor = userInfoSharedPref.edit();
         editor.putInt(Constants.sharedPreferences_user_info_id, 3);
         editor.putInt(Constants.sharedPreferences_user_info_role, 2);
-        editor.commit();
+        editor.apply();
     }
 
     //    @Override
@@ -233,7 +232,6 @@ public class MapsActivity extends AppCompatActivity {
             Log.i(Constants.application_id, "Maps Activity received patient list update event");
             PatientListParcelable p = intent.getParcelableExtra("patientList");
             patientManager.setPatientList(p.getPatientList());
-
             updateMap();
         }
     };

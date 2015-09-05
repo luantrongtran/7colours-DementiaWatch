@@ -16,9 +16,15 @@ import ifn372.sevencolors.backend.myApi.model.PatientList;
  * Created by lua on 28/08/2015.
  */
 public class PatientManager {
+
     private PatientList patientList;
 
-    Vector<Marker> patientMarkers = new Vector<Marker>();
+    Vector<Marker> patientMarkers ;
+
+    public PatientManager() {
+        patientList.setItems(new Vector<Patient>());
+        patientMarkers = new Vector<Marker>();
+    }
 
     public PatientList getPatientList() {
         return patientList;
@@ -26,7 +32,6 @@ public class PatientManager {
 
     public void setPatientList(PatientList patientList) {
         this.patientList = patientList;
-
     }
 
     public Vector<Marker> getPatientMarkers() {
