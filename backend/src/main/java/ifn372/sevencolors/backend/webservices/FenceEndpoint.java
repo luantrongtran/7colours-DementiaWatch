@@ -35,7 +35,7 @@ public class FenceEndpoint {
      * @return
      */
     @ApiMethod(name = "createFence")
-    public Fence createFence(@Named("userId") String userId, @Named("fenceName") String fenceName,
+    public Fence createFence(@Named("userId") int userId, @Named("fenceName") String fenceName,
                                  @Named("lat") double lat, @Named("lon") double lon,
                                  @Named("radius") float radius, @Named("add") String address)
     {
@@ -54,7 +54,8 @@ public class FenceEndpoint {
         try
         {
             FenceDao dao = new FenceDao();
-            info.setSuccess(dao.createFence(req));
+            int id = dao.createFence(req);
+            info.setSuccess(id != -1 ? true : false);
         }
         catch(Exception exp)
         {
