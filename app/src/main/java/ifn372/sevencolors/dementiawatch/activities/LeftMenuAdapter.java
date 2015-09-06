@@ -3,6 +3,9 @@
  */
 package ifn372.sevencolors.dementiawatch.activities;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.support.v4.graphics.drawable.DrawableWrapper;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import ifn372.sevencolors.backend.myApi.model.Patient;
+import ifn372.sevencolors.dementiawatch.BitMapUtils;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
 
@@ -21,17 +25,18 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
 
     private static final int TYPE_ITEM = 1;
 
-    private int patientIcon;
+    Drawable patientIcon;
 
     private String name;
     private int profile;
     private String email;
 
-    LeftMenuAdapter(String Name, String Email, int Profile) {
-        patientIcon = R.drawable.patient_bullet;
+    LeftMenuAdapter(String Name, String Email, int Profile, Drawable patientIcon) {
         name = Name;
         email = Email;
         profile = Profile;
+
+        this.patientIcon = patientIcon;
     }
 
     @Override
@@ -62,7 +67,7 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
             if(MapsActivity.patientManager.getPatientList().getItems() == null)
                 return;
             holder.textView.setText(MapsActivity.patientManager.getPatientList().getItems().get(position - 1).getFullName());
-            holder.imageView.setImageResource(patientIcon);
+            holder.imageView.setImageBitmap(BitMapUtils.getMutableBitmapFromResourceFromResource(patientIcon, PatientManager.patientColors[position-1]));
         } else {
             holder.profile.setImageResource(profile);
             holder.Name.setText(name);

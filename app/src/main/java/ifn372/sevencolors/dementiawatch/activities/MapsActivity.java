@@ -91,7 +91,8 @@ public class MapsActivity extends AppCompatActivity {
 
         mRecyclerView.setHasFixedSize(true);
 
-        mLeftMenuAdapter = new LeftMenuAdapter(NAME,EMAIL,PROFILE);
+        mLeftMenuAdapter = new LeftMenuAdapter(NAME,EMAIL,PROFILE,
+                getResources().getDrawable(R.drawable.ic_room_black_24dp));
 
         mRecyclerView.setAdapter(mLeftMenuAdapter);
 
@@ -292,6 +293,6 @@ public class MapsActivity extends AppCompatActivity {
     };
 
     public void updateMap() {
-        patientManager.updatePatientsMarkerOnMap(mMap);
+        patientManager.updatePatientsMarkerOnMap(mMap, getApplicationContext());
     }
 }
