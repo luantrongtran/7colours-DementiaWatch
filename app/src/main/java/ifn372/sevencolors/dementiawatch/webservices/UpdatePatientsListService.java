@@ -3,12 +3,16 @@ package ifn372.sevencolors.dementiawatch.webservices;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
 
 import ifn372.sevencolors.backend.myApi.MyApi;
+import ifn372.sevencolors.backend.myApi.model.Fence;
+import ifn372.sevencolors.backend.myApi.model.FenceList;
+import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.backend.myApi.model.PatientList;
 import ifn372.sevencolors.dementiawatch.BackendApiProvider;
 import ifn372.sevencolors.dementiawatch.Constants;
@@ -38,7 +42,7 @@ public class UpdatePatientsListService extends IntentService {
 
         try {
             PatientList patientList = patientApi.getPatientListByCarerOrRelative(userId, role).execute();
-
+            checkPatientsLost(patientList);
             Log.i(Constants.application_id, patientList.toString());
 
             Intent broadCastIntent = new Intent(ACTION);
@@ -48,6 +52,34 @@ public class UpdatePatientsListService extends IntentService {
             LocalBroadcastManager.getInstance(this).sendBroadcast(broadCastIntent);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void checkPatientsLost(PatientList patientList) {
+        for(Patient patient : patientList.getItems()) {
+            FenceList fenceList = patient.getFenceList();
+            if(fenceList.getItems() == null){
+                patient.setSafety(true);//doesn't have any fence
+                continue;
+            }
+            boolean isSafe = false;
+            for(Fence fence : fenceList.getItems()) {
+                float[] distance = new float[2];
+                Location
+                        .distanceBetween(patient.getCurrentLocation().getLat(),
+                                patient.getCurrentLocation().getLon(),
+                                fence.getLat(), fence.getLon(), distance);
+//                        (fence.getLat() - patient.getCurrentLocation().getLat())
+//                        * (fence.getLat() - patient.getCurrentLocation().getLat())
+//                        + (fence.getLon() - patient.getCurrentLocation().getLon())
+//                        * (fence.getLon() - patient.getCurrentLocation().getLon());
+                isSafe = distance[0] < fence.getRadius();
+                if(isSafe==true){
+                    break;
+                }
+                Log.i(Constants.application_id, "Distance: " + distance[0]);
+            }
+            patient.setSafety(isSafe);
         }
     }
 }

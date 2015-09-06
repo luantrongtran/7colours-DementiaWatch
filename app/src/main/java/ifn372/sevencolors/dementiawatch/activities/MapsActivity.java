@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import ifn372.sevencolors.backend.myApi.model.Fence;
 import ifn372.sevencolors.backend.myApi.model.FenceList;
@@ -292,7 +293,7 @@ public class MapsActivity extends AppCompatActivity {
             Log.i(Constants.application_id, "Maps Activity received patient list update event");
             PatientListParcelable p = intent.getParcelableExtra("patientList");
             patientManager.setPatientList(p.getPatientList());
-            checkPatientsLost();
+            notifyPatientsLost();
             updateMap();
             mLeftMenuAdapter.notifyDataSetChanged(); //update patient list on left menu
         }
@@ -302,27 +303,16 @@ public class MapsActivity extends AppCompatActivity {
         patientManager.updatePatientsMarkerOnMap(mMap, getApplicationContext());
     }
 
-    public void checkPatientsLost() {
+    public void notifyPatientsLost() {
+        String names = "";
         for(Patient patient : patientManager.getPatientList().getItems()) {
-            FenceList fenceList = patient.getFenceList();
-            if(fenceList.getItems() == null){
-                patient.setSafety(true);//doesn't have any fence
-                continue;
+            if(patient.getSafety() == false) {
+                names += patient.getFullName() + " ";
             }
-            for(Fence fence : fenceList.getItems()) {
-                float[] distance = new float[2];
-                Location
-                        .distanceBetween(patient.getCurrentLocation().getLat(),
-                                patient.getCurrentLocation().getLon(),
-                                fence.getLat(), fence.getLon(), distance);
-//                        (fence.getLat() - patient.getCurrentLocation().getLat())
-//                        * (fence.getLat() - patient.getCurrentLocation().getLat())
-//                        + (fence.getLon() - patient.getCurrentLocation().getLon())
-//                        * (fence.getLon() - patient.getCurrentLocation().getLon());
-                boolean b = distance[0] < fence.getRadius();
-                Log.i(Constants.application_id, "Distance: " + distance[0]);
-                patient.setSafety(b);
-            }
+        }
+
+        if(names.isEmpty() == false) {
+            Toast.makeText(MapsActivity.this, names + " outside fence", Toast.LENGTH_SHORT).show();
         }
     }
 }
