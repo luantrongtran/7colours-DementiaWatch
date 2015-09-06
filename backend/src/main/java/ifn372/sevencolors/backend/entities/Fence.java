@@ -8,7 +8,7 @@ public class Fence {
     //Return value (creation successful/fail)
     boolean success;
 
-    String userId;
+    int userId;
     String fenceName;
     double lon;
     double lat;
@@ -32,11 +32,11 @@ public class Fence {
     }
 
 
-    public String getUserId() {
+    public int  getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
