@@ -164,7 +164,7 @@ public class MapsActivity extends FragmentActivity {
         long firstMillis = System.currentTimeMillis();
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
-        long interval = 5 * 1000; //seconds
+        long interval = 10 * 1000; //seconds
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, interval, pIntent);
     }
 }
