@@ -28,8 +28,8 @@ public class ConnectionProperty {
 
     @Override
     public String toString() {
-        String str = getDriverClassName() + "\n" + url + "\nUsername: " + getUsername()
-                + "\npassword: " + getPassword();
+        String str = getDriverClassName() + "\n" + url + "\nUsername1: " + getUsername()
+                + "\npassword: " + getPassword().isEmpty();
         return str;
     }
 

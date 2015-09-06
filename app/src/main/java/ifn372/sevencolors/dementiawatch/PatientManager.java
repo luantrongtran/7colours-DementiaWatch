@@ -44,7 +44,8 @@ public class PatientManager {
 
     Vector<Circle> patientFences;
 
-    public static int[] patientColors = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.GRAY};
+    public static int[] patientColors = {0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xCCCCCC};
+    public static int[] fenceColors = {0x4DFF0000, 0x4D00FF00, 0x4D0000FF, 0x4DFFFF00, 0x4DCCCCCC};;
 
     public PatientManager() {
         patientList = new PatientList();
@@ -111,7 +112,7 @@ public class PatientManager {
                 CircleOptions circleOptions = new CircleOptions()
                         .center(new LatLng(fence.getLat(), fence.getLon()))
                         .strokeColor(patientColors[j])
-                        .fillColor(0xff0000CC)//(patientColors[j])
+                        .fillColor(fenceColors[j])//(patientColors[j])
                         .radius(fence.getRadius());
 
                 patientFences.add(gMap.addCircle(circleOptions));

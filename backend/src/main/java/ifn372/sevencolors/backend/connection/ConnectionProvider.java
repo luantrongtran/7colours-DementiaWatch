@@ -7,11 +7,13 @@ import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class ConnectionProvider {
     public static String GAE_DATABASE_CONFIG_FILE = "WEB-INF/database_properties/gae_connection.properties";
     public static String LOCAL_DATABASE_CONFIG_FILE = "WEB-INF/database_properties/local_connection.properties";
 
+    Logger log = Logger.getLogger(ConnectionProvider.class.getName());
     Connection connection = null;
 
     ConnectionProperty conProperties = null;
@@ -24,7 +26,7 @@ public class ConnectionProvider {
                 Class.forName(conProperties.getDriverClassName());
                 connection = DriverManager.getConnection(conProperties.getUrl(), conProperties.getUsername(), conProperties.getPassword());
             } catch (Exception e) {
-                System.out.println(e);
+                System.out.print(e);
                 e.printStackTrace();
             }
         }
@@ -35,7 +37,6 @@ public class ConnectionProvider {
         if(conProperties != null){
             return conProperties;
         }
-
         if (isGoogleAppEngineServer() == true) {
            return getGAEConnectionProperty();
         } else {
