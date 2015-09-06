@@ -43,7 +43,6 @@
         </activity>
 
         <receiver android:name=".webservices.UpdatePatientsListReciever" />
-
         <service android:name=".webservices.UpdatePatientsListService" />
 
         <activity
@@ -53,7 +52,6 @@
         </activity>
 
         <receiver android:name=".CheckReceiver" />
-
         <service android:name=".OutOfBoundCheck" />
 
     </application>

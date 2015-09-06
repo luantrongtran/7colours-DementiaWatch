@@ -17,4 +17,6 @@ public class Constants {
     public static String sharedPreferences_user_info_role = "user_role";
 
     public static String create_new_fence_intent_data = "create_new_fence_intent_data";
+
+    public static String patients_lost_intent_data = "patients_lost_intent_data";
 }

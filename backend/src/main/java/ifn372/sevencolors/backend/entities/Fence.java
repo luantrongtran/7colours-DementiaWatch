@@ -79,5 +79,4 @@ public class Fence {
     public void setRadius(float radius) {
         this.radius = radius;
     }
-
 }

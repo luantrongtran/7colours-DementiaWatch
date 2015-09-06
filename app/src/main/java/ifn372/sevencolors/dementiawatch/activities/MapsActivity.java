@@ -29,6 +29,9 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import ifn372.sevencolors.backend.myApi.model.Fence;
+import ifn372.sevencolors.backend.myApi.model.FenceList;
+import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.dementiawatch.CheckReceiver;
 import ifn372.sevencolors.dementiawatch.Constants;
 import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferences;
@@ -45,7 +48,7 @@ public class MapsActivity extends AppCompatActivity {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     public long updatePatientsListInterval = 6*1000; //seconds
-    public long outOfBoundCheckInterval = 8*1000; // seconds
+    public long outOfBoundCheckInterval = 3*1000; // seconds
 
     public static PatientManager patientManager = new PatientManager();
 
@@ -77,7 +80,8 @@ public class MapsActivity extends AppCompatActivity {
         scheduleAlarm();
 
         IntentFilter intentFilter = new IntentFilter(UpdatePatientsListService.ACTION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(onPatientsListUpdateReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(onPatientsListUpdateReceiver, intentFilter);
 
         setUpNavigationMenu();
     }
@@ -162,6 +166,7 @@ public class MapsActivity extends AppCompatActivity {
 
     public void scheduleAlarm() {
         scheduleAutoUpdatePatientsList();
+//        scheduleAutoCheckPatientLost();
 //        scheduleAutoCheckPatientsOutOfBound();
     }
 
@@ -260,25 +265,25 @@ public class MapsActivity extends AppCompatActivity {
 
     public void scheduleAutoUpdatePatientsList() {
         Intent intent = new Intent(getApplicationContext(), UpdatePatientsListReciever.class);
-        PendingIntent pIntent =
+        PendingIntent autoUpdatePatientsListPendingIntent =
                 PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         long firstMillis = System.currentTimeMillis();
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, updatePatientsListInterval, pIntent);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, updatePatientsListInterval, autoUpdatePatientsListPendingIntent);
     }
 
     public void scheduleAutoCheckPatientsOutOfBound(){
         // Retrieve a PendingIntent that will perform a broadcast
         Intent alarmIntent = new Intent(this, CheckReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+        PendingIntent autoCheckPatientPendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
         AlarmManager manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         long interval = outOfBoundCheckInterval;
 
         manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-                interval, pendingIntent);
+                interval, autoCheckPatientPendingIntent);
     }
 
     private BroadcastReceiver onPatientsListUpdateReceiver = new BroadcastReceiver() {
@@ -287,6 +292,7 @@ public class MapsActivity extends AppCompatActivity {
             Log.i(Constants.application_id, "Maps Activity received patient list update event");
             PatientListParcelable p = intent.getParcelableExtra("patientList");
             patientManager.setPatientList(p.getPatientList());
+            checkPatientsLost();
             updateMap();
             mLeftMenuAdapter.notifyDataSetChanged(); //update patient list on left menu
         }
@@ -294,5 +300,29 @@ public class MapsActivity extends AppCompatActivity {
 
     public void updateMap() {
         patientManager.updatePatientsMarkerOnMap(mMap, getApplicationContext());
+    }
+
+    public void checkPatientsLost() {
+        for(Patient patient : patientManager.getPatientList().getItems()) {
+            FenceList fenceList = patient.getFenceList();
+            if(fenceList.getItems() == null){
+                patient.setSafety(true);//doesn't have any fence
+                continue;
+            }
+            for(Fence fence : fenceList.getItems()) {
+                float[] distance = new float[2];
+                Location
+                        .distanceBetween(patient.getCurrentLocation().getLat(),
+                                patient.getCurrentLocation().getLon(),
+                                fence.getLat(), fence.getLon(), distance);
+//                        (fence.getLat() - patient.getCurrentLocation().getLat())
+//                        * (fence.getLat() - patient.getCurrentLocation().getLat())
+//                        + (fence.getLon() - patient.getCurrentLocation().getLon())
+//                        * (fence.getLon() - patient.getCurrentLocation().getLon());
+                boolean b = distance[0] < fence.getRadius();
+                Log.i(Constants.application_id, "Distance: " + distance[0]);
+                patient.setSafety(b);
+            }
+        }
     }
 }
