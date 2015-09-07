@@ -268,11 +268,7 @@ public class MapsActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), UpdatePatientsListReciever.class);
         PendingIntent autoUpdatePatientsListPendingIntent =
                 PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        long firstMillis = System.currentTimeMillis();
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, updatePatientsListInterval, autoUpdatePatientsListPendingIntent);
+        scheduleAutoTask(autoUpdatePatientsListPendingIntent, updatePatientsListInterval);
     }
 
     public void scheduleAutoCheckPatientsOutOfBound(){
@@ -314,5 +310,18 @@ public class MapsActivity extends AppCompatActivity {
         if(names.isEmpty() == false) {
             Toast.makeText(MapsActivity.this, names + " outside fence", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void scheduleAutoTask(PendingIntent pendingIntent, long interval) {
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+                interval, pendingIntent);
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+//            // only for KITKAT and newer versions
+//            alarm.setExact(AlarmManager.RTC_WAKEUP, interval, pendingIntent);
+//        } else {
+//            alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+//                    interval, pendingIntent);
+//        }
     }
 }

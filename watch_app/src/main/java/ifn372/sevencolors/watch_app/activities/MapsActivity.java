@@ -1,10 +1,12 @@
 package ifn372.sevencolors.watch_app.activities;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
@@ -29,6 +31,8 @@ import ifn372.sevencolors.watch_app.backgroundservices.UpdateCurrentLocationRece
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    public long autoUpdateCurrentLocationInterval = 15*1000;//10s
+    public long locationTrackerInterval = 10*1000;//10s
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,16 +148,7 @@ public class MapsActivity extends FragmentActivity {
                 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        long firstMillis = System.currentTimeMillis(); // alarm is set right away
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-
-        long interval = 10 * 1000;//seconds
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-                firstMillis,
-                interval,
-                pIntent);
-
-        Log.e("MyAPI", "alarm");
+        scheduleAutoTask(pIntent, locationTrackerInterval);
     }
 
     public void scheduleAutoUpdateCurrentLocationAlarm() {
@@ -161,10 +156,20 @@ public class MapsActivity extends FragmentActivity {
         PendingIntent pIntent =
                 PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        long firstMillis = System.currentTimeMillis();
+        scheduleAutoTask(pIntent, autoUpdateCurrentLocationInterval);
+    }
+
+    public void scheduleAutoTask(PendingIntent pendingIntent, long interval) {
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
-        long interval = 10 * 1000; //seconds
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, interval, pIntent);
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+//            // only for KITKAT and newer versions
+//            alarm.setExact(AlarmManager.RTC_WAKEUP, interval, pendingIntent);
+//        } else {
+//            alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+//                    interval, pendingIntent);
+//        }
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+                interval, pendingIntent);
     }
 }
