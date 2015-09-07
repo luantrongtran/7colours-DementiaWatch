@@ -58,7 +58,7 @@ public class UpdatePatientsListService extends IntentService {
     public void checkPatientsLost(PatientList patientList) {
         for(Patient patient : patientList.getItems()) {
             FenceList fenceList = patient.getFenceList();
-            if(fenceList.getItems() == null){
+            if(fenceList == null || fenceList.getItems() == null){
                 patient.setSafety(true);//doesn't have any fence
                 continue;
             }

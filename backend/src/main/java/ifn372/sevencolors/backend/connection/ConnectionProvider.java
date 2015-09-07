@@ -24,7 +24,8 @@ public class ConnectionProvider {
             System.out.print(conProperties);
             try {
                 Class.forName(conProperties.getDriverClassName());
-                connection = DriverManager.getConnection(conProperties.getUrl(), conProperties.getUsername(), conProperties.getPassword());
+                connection = DriverManager.getConnection(conProperties.getUrl(),
+                        conProperties.getUsername(), conProperties.getPassword());
             } catch (Exception e) {
                 System.out.print(e);
                 e.printStackTrace();

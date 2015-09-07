@@ -102,6 +102,9 @@ public class PatientManager {
 
         for(int j = 0; j < patientList.getItems().size() ; j++) {
             Patient patient = patientList.getItems().get(j);
+            if(patient.getFenceList() == null){
+                continue;
+            }
             List<Fence> fences = patient.getFenceList().getItems();
             if(fences == null) {
                 continue;

@@ -28,7 +28,7 @@ public class ConnectionProperty {
 
     @Override
     public String toString() {
-        String str = getDriverClassName() + "\n" + url + "\nUsername1: " + getUsername()
+        String str = getDriverClassName() + "\n" + url + "\nUsername123: " + getUsername()
                 + "\npassword: " + getPassword().isEmpty();
         return str;
     }
