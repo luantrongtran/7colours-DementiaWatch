@@ -11,8 +11,9 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import ifn372.sevencolors.backend.entities.fenceApi.FenceApi;
-import ifn372.sevencolors.backend.entities.fenceApi.model.Fence;
+import ifn372.sevencolors.backend.myApi.MyApi;
+import ifn372.sevencolors.backend.myApi.model.Fence;
+import ifn372.sevencolors.dementiawatch.BackendApiProvider;
 import ifn372.sevencolors.dementiawatch.Constants;
 
 /**
@@ -31,16 +32,6 @@ public class FenceService extends AsyncTask<String, Void, Fence> {
     protected Fence doInBackground(String... params)
     {
         logger.info("CreateFence class doInBackground() method called");
-        FenceApi.Builder apiBuilder = new FenceApi.Builder(AndroidHttp.newCompatibleTransport(),
-                new AndroidJsonFactory(), null);
-        apiBuilder.setRootUrl(Constants.webServiceUrl);
-        //when running on google app engine disable zip function
-        apiBuilder.setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-            @Override
-            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                abstractGoogleClientRequest.setDisableGZipContent(true);
-            }
-        });
         String userId = params[0];
         String fenceName = params[1];
         double lat = Double.parseDouble(params[2]);
@@ -50,7 +41,7 @@ public class FenceService extends AsyncTask<String, Void, Fence> {
 
         logger.info("req params:" + userId + ", " + fenceName + ", " + lat + ", " + lon + ", " + radius + ", " + address);
 
-        FenceApi fenceEndpoint = apiBuilder.build();
+        MyApi fenceEndpoint = BackendApiProvider.getPatientApi();
         Fence info = null;
         try
         {

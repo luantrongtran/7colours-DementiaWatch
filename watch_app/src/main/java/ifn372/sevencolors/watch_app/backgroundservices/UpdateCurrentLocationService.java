@@ -13,7 +13,6 @@ import ifn372.sevencolors.backend.myApi.model.Location;
 import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.watch_app.BackendApiProvider;
 import ifn372.sevencolors.watch_app.Constants;
-import ifn372.sevencolors.watch_app.OutOfBoundCheck;
 import ifn372.sevencolors.watch_app.SharedPreferencesUtitlies;
 
 /**
@@ -54,8 +53,6 @@ public class UpdateCurrentLocationService extends IntentService {
         try {
             patientApi.updatePatientCurrentLocation(patient).execute();
             Log.e("MyAPI", "Update location to backend");
-//            Intent in = new Intent(context, OutOfBoundCheck.class);
-//            context.startService(in);
 
         } catch (IOException e) {
             Log.e("MyAPI", "Failed update location to backend");

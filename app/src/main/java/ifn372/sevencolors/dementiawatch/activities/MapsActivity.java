@@ -30,10 +30,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import ifn372.sevencolors.backend.myApi.model.Fence;
-import ifn372.sevencolors.backend.myApi.model.FenceList;
 import ifn372.sevencolors.backend.myApi.model.Patient;
-import ifn372.sevencolors.dementiawatch.CheckReceiver;
 import ifn372.sevencolors.dementiawatch.Constants;
 import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferences;
 import ifn372.sevencolors.dementiawatch.CreateFenceActivity;
@@ -269,18 +266,6 @@ public class MapsActivity extends AppCompatActivity {
         PendingIntent autoUpdatePatientsListPendingIntent =
                 PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         scheduleAutoTask(autoUpdatePatientsListPendingIntent, updatePatientsListInterval);
-    }
-
-    public void scheduleAutoCheckPatientsOutOfBound(){
-        // Retrieve a PendingIntent that will perform a broadcast
-        Intent alarmIntent = new Intent(this, CheckReceiver.class);
-        PendingIntent autoCheckPatientPendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
-
-        AlarmManager manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        long interval = outOfBoundCheckInterval;
-
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-                interval, autoCheckPatientPendingIntent);
     }
 
     private BroadcastReceiver onPatientsListUpdateReceiver = new BroadcastReceiver() {

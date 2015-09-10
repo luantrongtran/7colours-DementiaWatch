@@ -26,7 +26,6 @@ import ifn372.sevencolors.backend.entities.User;
 @Api(
         name = "myApi",
         version = "v1",
-//        resource = "patient",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.sevencolors.ifn372",
                 ownerName = "backend.sevencolors.ifn372",

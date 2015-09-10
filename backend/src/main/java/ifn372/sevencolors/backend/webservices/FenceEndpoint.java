@@ -15,12 +15,11 @@ import ifn372.sevencolors.backend.entities.Fence;
  * An endpoint class we are exposing
  */
 @Api(
-        name = "fenceApi",
+        name = "myApi",
         version = "v1",
-        resource = "fence",
         namespace = @ApiNamespace(
-                ownerDomain = "entities.backend.sevencolors.ifn372",
-                ownerName = "entities.backend.sevencolors.ifn372",
+                ownerDomain = "backend.sevencolors.ifn372",
+                ownerName = "backend.sevencolors.ifn372",
                 packagePath = ""
         )
 )

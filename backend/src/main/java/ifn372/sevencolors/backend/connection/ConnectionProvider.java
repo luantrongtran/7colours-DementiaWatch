@@ -23,9 +23,17 @@ public class ConnectionProvider {
             conProperties = getConnectionProperty();
             System.out.print(conProperties);
             try {
-                Class.forName(conProperties.getDriverClassName());
-                connection = DriverManager.getConnection(conProperties.getUrl(),
-                        conProperties.getUsername(), conProperties.getPassword());
+                if (isGoogleAppEngineServer()) {
+                    String url = "jdbc:google:mysql://dementiawatch-7colors:dementiawatch/dementia" +
+                            "?user=root";
+                    connection = DriverManager.getConnection("jdbc:google:mysql://dementiawatch-" +
+                            "7colors:dementiawatch/dementia?user=root");
+                } else {
+                    Class.forName(conProperties.getDriverClassName());
+                    connection = DriverManager.getConnection(conProperties.getUrl(),
+                            conProperties.getUsername(), conProperties.getPassword());
+                }
+
             } catch (Exception e) {
                 System.out.print(e);
                 e.printStackTrace();
@@ -35,13 +43,13 @@ public class ConnectionProvider {
     }
 
     public ConnectionProperty getConnectionProperty() {
-        if(conProperties != null){
+        if (conProperties != null) {
             return conProperties;
         }
         if (isGoogleAppEngineServer() == true) {
-           return getGAEConnectionProperty();
+            return getGAEConnectionProperty();
         } else {
-           return getLocalConnectionProperty();
+            return getLocalConnectionProperty();
         }
     }
 
@@ -50,7 +58,7 @@ public class ConnectionProvider {
     }
 
     public ConnectionProperty getGAEConnectionProperty() {
-         return getPropertiesFromFile(GAE_DATABASE_CONFIG_FILE);
+        return getPropertiesFromFile(GAE_DATABASE_CONFIG_FILE);
     }
 
     public ConnectionProperty getPropertiesFromFile(String filename) {
@@ -67,6 +75,7 @@ public class ConnectionProvider {
 
     /**
      * Checking if the Server is running locally or on google app engine server
+     *
      * @return true if the server is running on app engine server
      */
     public boolean isGoogleAppEngineServer() {
