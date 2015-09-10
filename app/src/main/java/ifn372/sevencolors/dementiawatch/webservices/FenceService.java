@@ -45,7 +45,7 @@ public class FenceService extends AsyncTask<String, Void, Fence> {
         Fence info = null;
         try
         {
-            info = fenceEndpoint.createFence(userId, fenceName, lat, lon, radius, address).execute();
+            info = fenceEndpoint.createFence(Integer.valueOf(userId), fenceName, lat, lon, radius, address).execute();
             logger.info("return value: " + info.getSuccess());
 
         } catch (Exception e) {

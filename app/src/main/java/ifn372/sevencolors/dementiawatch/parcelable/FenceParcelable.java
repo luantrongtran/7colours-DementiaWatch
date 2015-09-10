@@ -24,7 +24,7 @@ public class FenceParcelable implements Parcelable {
     }
 
     public FenceParcelable(Parcel in) {
-        fence.setUserId(in.readString());
+        fence.setUserId(in.readInt());
         fence.setFenceName(in.readString());
         fence.setLat(in.readDouble());
         fence.setLon(in.readDouble());
@@ -39,7 +39,7 @@ public class FenceParcelable implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(fence.getUserId());
+        dest.writeInt(fence.getUserId());
         dest.writeString(fence.getFenceName());
         dest.writeDouble(fence.getLat());
         dest.writeDouble(fence.getLon());

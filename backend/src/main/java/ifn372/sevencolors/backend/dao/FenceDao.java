@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import ifn372.sevencolors.backend.entities.Fence;
@@ -100,5 +102,45 @@ public class FenceDao extends DAOBase {
         return insertedRecordId;
     }
 
+    /**
+     * Created by Zachary Tang
+     * @param patientId The ID of the patient
+     * @return fences An ArrayList of fences related to the patient
+     */
+    public List<Fence> getFences(int patientId)
+    {
+        logger.info("FenceDao class getFence() method starts.....");
+        List<Fence> fences = new ArrayList<Fence>();
+        Connection con = null;
+        Statement stmt = null;
+        try
+        {
+            con = getConnection();
+            stmt = con.createStatement();
+            String sql = "SELECT * FROM fence WHERE user_id=" + String.valueOf(patientId);
+            ResultSet rs = stmt.executeQuery(sql);
 
+            // set fence data
+            while(rs.next())
+            {
+                Fence fence = new Fence(); // temporal fence to be stored
+                fence.setFenceName(rs.getString("fence_name"));
+                fence.setLat(rs.getDouble("lat"));
+                fence.setLon(rs.getDouble("lon"));
+                fence.setRadius(rs.getFloat("fence_radius"));
+                fence.setAddress(rs.getString("address"));
+
+                fences.add(fence); // add fence to the list
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            logger.info("FenceDao class getFence() method end.");
+        }
+        return fences;
+    }
 }
