@@ -3,6 +3,7 @@ package ifn372.sevencolors.backend.local_database_test_cases;
 /**
  * Created by Kirti on 31/8/2015.
  */
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,11 +14,12 @@ import java.sql.SQLException;
 
 import ifn372.sevencolors.backend.dao.FenceDao;
 import ifn372.sevencolors.backend.entities.Fence;
+import ifn372.sevencolors.backend.webservices.FenceEndpoint;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -31,9 +33,35 @@ public class FenceDaoTest extends LocalDatabaseTest{
     @Before
     public void setUp(){
         fenceDao = new FenceDao();
-
         spyFenceDao = spy(fenceDao);
         doReturn(getSpiedConnectionProvider()).when(spyFenceDao).getConnection();
+    }
+
+
+    public Fence findById(int id) {
+        Connection con = spyFenceDao.getConnection();
+        Fence fence = null;
+        String sql = "SELECT * FROM " + FenceDao.TABLE_NAME + " WHERE " + FenceDao.COL_NAME_ID + " = ?";
+        PreparedStatement ps = null;
+        try {
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                fence = new Fence();
+                fence.setUserId(rs.getInt(FenceDao.COL_NAME_USER_ID));
+                fence.setAddress(rs.getString(FenceDao.COL_NAME_ADDRESS));
+                fence.setFenceName(rs.getString(FenceDao.COL_NAME_FENCE_NAME));
+                fence.setRadius(rs.getFloat(FenceDao.COL_NAME_RADIUS));
+                fence.setLat(rs.getFloat(FenceDao.COL_NAME_LAT));
+                fence.setLon(rs.getFloat(FenceDao.COL_NAME_LON));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return fence;
     }
 
 
@@ -49,7 +77,7 @@ public class FenceDaoTest extends LocalDatabaseTest{
 
         int fenceId = spyFenceDao.createFence(mockFence);
 
-        Fence f = spyFenceDao.findById(fenceId);//get the insterted from the database
+        Fence f = this.findById(fenceId);//get the insterted from the database
         assertNotNull("The fence should not be null", f);
 
         assertEquals("Address", f.getAddress(), "QUT Gardens point");
@@ -59,6 +87,32 @@ public class FenceDaoTest extends LocalDatabaseTest{
         assertEquals("Latitude", f.getLat(), 110.50, 0.0);
         assertEquals("Fence Radius", f.getRadius(), 5.01, 0.01);
 
+    }
+
+    /**
+     * Test updateFenceById method()
+     */
+    @Test
+    public void testUpdateFenceById() {
+        int fenceId = 6;
+        double lat = 200;
+        double lon = 300;
+        int id = spyFenceDao.updateFenceById(fenceId, lat, lon);
+        Fence fence = this.findById(fenceId);
+        assertThat("Fence ID", id, is(fenceId));
+        assertThat("Latitude", lat, is(lat));
+        assertThat("Longitude", lon, is(lon));
+    }
+
+
+    /**
+     * Test deleteFenceById method()
+     */
+    @Test
+    public void testDeleteFenceById() {
+        int fenceId = 6;
+        int code = spyFenceDao.deleteFenceById(fenceId);
+        assertThat("Success", code, is(FenceEndpoint.CODE_SUCCESS));
     }
 }
 
