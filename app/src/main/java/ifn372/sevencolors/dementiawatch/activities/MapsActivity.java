@@ -36,6 +36,8 @@ import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferen
 import ifn372.sevencolors.dementiawatch.CreateFenceActivity;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
+import ifn372.sevencolors.dementiawatch.backgroundservices.LocationAutoTracker;
+import ifn372.sevencolors.dementiawatch.backgroundservices.UpdateCurrentLocationReceiver;
 import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReciever;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
@@ -47,6 +49,9 @@ public class MapsActivity extends AppCompatActivity {
 
     public long updatePatientsListInterval = 6*1000; //seconds
     public long outOfBoundCheckInterval = 3*1000; // seconds
+
+    public long autoUpdateCurrentLocationInterval = 15*1000;//10s
+    public long locationTrackerInterval = 10*1000;//10s
 
     public static PatientManager patientManager = new PatientManager();
 
@@ -166,6 +171,8 @@ public class MapsActivity extends AppCompatActivity {
         scheduleAutoUpdatePatientsList();
 //        scheduleAutoCheckPatientLost();
 //        scheduleAutoCheckPatientsOutOfBound();
+        scheduleAutoLocationTrackerAlarm();
+        scheduleAutoUpdateCurrentLocationAlarm();
     }
 
     public void setUpDummyData() {
@@ -308,5 +315,22 @@ public class MapsActivity extends AppCompatActivity {
 //            alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
 //                    interval, pendingIntent);
 //        }
+    }
+
+    public void scheduleAutoLocationTrackerAlarm() {
+        Intent intent = new Intent(getApplicationContext(), LocationAutoTracker.class);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this,
+                0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        scheduleAutoTask(pIntent, locationTrackerInterval);
+    }
+
+    public void scheduleAutoUpdateCurrentLocationAlarm() {
+        Intent intent = new Intent(getApplicationContext(), UpdateCurrentLocationReceiver.class);
+        PendingIntent pIntent =
+                PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        scheduleAutoTask(pIntent, autoUpdateCurrentLocationInterval);
     }
 }
