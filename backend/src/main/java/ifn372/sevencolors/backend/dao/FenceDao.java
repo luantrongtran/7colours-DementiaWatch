@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import ifn372.sevencolors.backend.entities.Fence;
+import ifn372.sevencolors.backend.webservices.FenceEndpoint;
 
 /**
  * Created by Kirti on 31/8/2015.
@@ -27,6 +28,8 @@ public class FenceDao extends DAOBase {
     public static String COL_NAME_LON = "lon";
     public static String COL_NAME_FENCE_NAME = "fence_name";
 
+    /*
+    // Moved to FenceDaoTest class because this is used only for testing.
     public Fence findById(int id) {
         Connection con = getConnection();
         Fence fence = null;
@@ -55,6 +58,9 @@ public class FenceDao extends DAOBase {
 
         return fence;
     }
+    */
+
+
     public int createFence(Fence info)
     {
         logger.info("FenceDao class createFence() method starts.....");
@@ -142,5 +148,83 @@ public class FenceDao extends DAOBase {
             logger.info("FenceDao class getFence() method end.");
         }
         return fences;
+    }
+
+    /**
+     * Author: Koji
+     * Update the latitude and the longitude of the fence by ID
+     * @param fenceId
+     * @param lat
+     * @param lon
+     * @return
+     */
+    public int updateFenceById(int fenceId, double lat, double lon)
+    {
+        logger.info("FenceDao class updateFenceById() method starts.....");
+        Connection con = null;
+        PreparedStatement ps = null;
+        int ret = FenceEndpoint.CODE_ERR_UPDATE_FENCE_FAILED;
+        try
+        {
+            con = getConnection();
+            StringBuffer sql = new StringBuffer("update " + TABLE_NAME + " set " + COL_NAME_LAT + " = ?, " + COL_NAME_LON + " = ? ");
+            sql.append("where " + COL_NAME_ID + " = ?");
+            ps = con.prepareStatement(sql.toString());
+            ps.setDouble(1, lat);
+            ps.setDouble(2, lon);
+            ps.setInt(3, fenceId);
+            int count = ps.executeUpdate();
+            if(count != 1)
+            {
+                throw new Exception("Manually generated message: The number of updated record is " + count + ". It is supposed to be 1.");
+            }
+            ret = fenceId;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            logger.info("FenceDao class getFence() method end.");
+        }
+        return ret;
+    }
+
+
+    /**
+     * Author: Koji
+     * Delete the fence by fence ID
+     * @param fenceId
+     * @return
+     */
+    public int deleteFenceById(int fenceId)
+    {
+        logger.info("FenceDao class updateFenceById() method starts.....");
+        Connection con = null;
+        PreparedStatement ps = null;
+        int ret = FenceEndpoint.CODE_ERR_DELETE_FENCE_FAILED;
+        try
+        {
+            con = getConnection();
+            String sql = "delete from " + TABLE_NAME + " where " + COL_NAME_ID + " = ?";
+            ps = con.prepareStatement(sql.toString());
+            ps.setInt(1, fenceId);
+            int count = ps.executeUpdate();
+            if(count != 1)
+            {
+                throw new Exception("Manually generated message: The number of deleted record is " + count + ". It is supposed to be 1.");
+            }
+            ret = FenceEndpoint.CODE_SUCCESS;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            logger.info("FenceDao class getFence() method end.");
+        }
+        return ret;
     }
 }
