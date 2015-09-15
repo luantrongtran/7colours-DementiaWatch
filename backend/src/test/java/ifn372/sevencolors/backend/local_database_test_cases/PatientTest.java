@@ -41,9 +41,11 @@ public class PatientTest extends LocalDatabaseTest{
         Patient mockPatient = mock(Patient.class);
         when(mockPatient.getId()).thenReturn(2);
 
-        Location location = new Location(128.76d, 110.50d);
+        Location mockLocation = mock(Location.class);
+        when(mockLocation.getLat()).thenReturn(128.76d);
+        when(mockLocation.getLon()).thenReturn(110.50d);
 
-        mockPatient.setCurrentLocation(location);
+        when(mockPatient.getCurrentLocation()).thenReturn(mockLocation);
 
         spyPatientDao.updateCurrentLocation(mockPatient);
 
@@ -56,34 +58,41 @@ public class PatientTest extends LocalDatabaseTest{
 
     @Test
     public void testGetPatientsListByCarer(){
-        Patient mockPatient = mock(Patient.class);
+       /* Patient mockPatient = mock(Patient.class);
         when(mockPatient.getId()).thenReturn(2);
         when(mockPatient.getFullName()).thenReturn("KIRTi");
         when(mockPatient.getRole()).thenReturn(1);
+*/
+        /*Location mockLocation = mock(Location.class);
+        when(mockLocation.getLat()).thenReturn(128.76d);
+        when(mockLocation.getLon()).thenReturn(110.50d);*/
 
-        Location location = new Location(128.76d, 110.50d);
-        mockPatient.setCurrentLocation(location);
 
         Vector<Patient> patientVector = spyPatientDao.getPatientsListByCarer(2);
 
-     //   Patient f = spyPatientDao.findById(patientVector);//get the insterted from the database
-     //   assertNotNull("The fence should not be null", f);
+        assertEquals("Patiet Id", patientVector.get(0).getId(), 2);
+        assertEquals("Full Name", patientVector.get(0).getFullName(), "kirti");
+        assertEquals("Get Role",patientVector.get(0).getRole(), 1);
+        assertEquals("Latitude",patientVector.get(0).getCurrentLocation().getLat(), 128.76, 0.001);
+        assertEquals("Longitude",patientVector.get(0).getCurrentLocation().getLon(), 110.50, 0.0);
 
-        assertEquals("Patiet Id",patientVector.get(0), 2);
 
     }
 
     @Test
     public void testGetPatientLocation(){
-        Patient mockPatient = mock(Patient.class);
+        /*Patient mockPatient = mock(Patient.class);
+
         Location mockLocation = mock(Location.class);
         when(mockLocation.getLat()).thenReturn(128.76d);
         when(mockLocation.getLon()).thenReturn(110.50d);
 
+        when(mockPatient.getCurrentLocation()).thenReturn(mockLocation);*/
 
+        Location l = spyPatientDao.getPatientLocation(2);
 
-    //    assertEquals("Latitude", f.getCurrentLocation().getLat(),128.76, 0.001 );
-
+        assertEquals("Longitude", l.getLat(), 128.76, 0.001);
+        assertEquals("Latitude", l.getLon(), 110.50, 0.0);
 
     }
 }

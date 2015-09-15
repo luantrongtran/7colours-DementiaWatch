@@ -16,6 +16,7 @@ import ifn372.sevencolors.backend.entities.Carer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -42,18 +43,13 @@ public class CarerTest extends LocalDatabaseTest {
        // int CarerDao.id;
         Carer mockCarer = mock(Carer.class);
         when(mockCarer.getId()).thenReturn(2);
-        //when(mockPatient.getFullName()).thenReturn("KIRTi");
-        //when(mockPatient.getRole()).thenReturn(1);
-
-        //Location location = new Location(128.76d, 110.50d);
-        //mockPatient.setCurrentLocation(location);
 
         List<String> carerList = spyCarerDao.getPatientIds(2);
+
 
         //   Patient f = spyPatientDao.findById(patientVector);//get the insterted from the database
         //   assertNotNull("The fence should not be null", f);
 
-        assertEquals("Patient Id", carerList.get(0), 2);
-
-    }
+        assertEquals("Patient Id", carerList.get(0),String.valueOf(2) );
+            }
 }
