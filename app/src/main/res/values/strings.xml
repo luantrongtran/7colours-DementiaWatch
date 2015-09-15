@@ -15,4 +15,6 @@
 
     <string name="create_fence_success">Fence created successfully</string>
     <string name="create_fence_failed">Could not create fence</string>
+    <string name="update_fence_success">Fence updated successfully</string>
+    <string name="update_fence_failed">Could not update fence</string>
 </resources>

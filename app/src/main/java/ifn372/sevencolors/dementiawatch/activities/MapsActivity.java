@@ -41,11 +41,15 @@ import ifn372.sevencolors.dementiawatch.R;
 import ifn372.sevencolors.dementiawatch.backgroundservices.LocationAutoTracker;
 import ifn372.sevencolors.dementiawatch.backgroundservices.UpdateCurrentLocationReceiver;
 import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
+import ifn372.sevencolors.dementiawatch.webservices.IFenceService;
+import ifn372.sevencolors.dementiawatch.webservices.IUpdateFenceService;
+import ifn372.sevencolors.dementiawatch.webservices.FenceService;
+import ifn372.sevencolors.dementiawatch.webservices.UpdateFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReciever;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
 
-public class MapsActivity extends AppCompatActivity {
+public class MapsActivity extends AppCompatActivity implements IUpdateFenceService {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -381,6 +385,46 @@ public class MapsActivity extends AppCompatActivity {
         // Store the LatLng object for the current location
         mcurLatLng = new LatLng(mcurLat, mcurLng);
 
-        Toast.makeText(MapsActivity.this, "current location: " + mcurLatLng , Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MapsActivity.this, "current location: " + mcurLatLng , Toast.LENGTH_SHORT).show();
+    }
+
+    public void updateFence()
+    {
+        // We can get the location stored in the SharedPreferences
+        CurrentLocationPreferences currentLocationPreferences
+                = new CurrentLocationPreferences(getApplicationContext());
+
+        mcurLat = currentLocationPreferences.getLat();
+        mcurLng = currentLocationPreferences.getLon();
+
+        // Store the LatLng object for the current location
+        mcurLatLng = new LatLng(mcurLat, mcurLng);
+
+        UpdateFenceService updateFenceService = new UpdateFenceService(this);
+//        showProgressBar();
+        updateFenceService.execute(
+                Integer.toString(myFenceID),
+                Double.toString(mcurLat),
+                Double.toString(mcurLng));
+    }
+
+    @Override
+    public void processAfterUpdatingFence(boolean isSuccess) {
+        if(isSuccess == false)
+        {
+//            this.showMessage(getResources().getString(R.string.dialog_title_error),
+//                    getResources().getString(R.string.update_fence_failed));
+            Toast.makeText(MapsActivity.this,
+                    getResources().getString(R.string.update_fence_failed),
+                    Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+//            this.showMessage(getResources().getString(R.string.dialog_title_success),
+//                    getResources().getString(R.string.update_fence_success));
+            Toast.makeText(MapsActivity.this,
+                    getResources().getString(R.string.update_fence_success),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 }
