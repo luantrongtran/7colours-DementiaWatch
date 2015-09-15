@@ -3,6 +3,7 @@ package ifn372.sevencolors.dementiawatch.activities;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 
 import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.dementiawatch.Constants;
+import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.CurrentLocationPreferences;
 import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferences;
 import ifn372.sevencolors.dementiawatch.CreateFenceActivity;
 import ifn372.sevencolors.dementiawatch.PatientManager;
@@ -69,6 +71,15 @@ public class MapsActivity extends AppCompatActivity {
 
     ActionBarDrawerToggle mDrawerToggle;
     //end navigation menu
+
+    // Updating Fence Variables
+    public int myFenceID;
+    public float myFenceRadius;
+    // End Updating Fence Variables
+
+    public double mcurLat;  // my current location Latitude
+    public double mcurLng;  // my current location Longitude
+    public LatLng mcurLatLng;   // my current location
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,6 +191,11 @@ public class MapsActivity extends AppCompatActivity {
         UserInfoPreferences userPrefs = new UserInfoPreferences(getApplicationContext());
         userPrefs.setUserId(3);
         userPrefs.setRole(2);
+
+        SharedPreferences userInfoSharedPref = getApplicationContext().getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
+        SharedPreferences.Editor editor = userInfoSharedPref.edit();
+        editor.putInt(Constants.sharedPreferences_user_info_id, 1);
+        editor.commit();
     }
 
     //    @Override
@@ -332,5 +348,39 @@ public class MapsActivity extends AppCompatActivity {
                 PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         scheduleAutoTask(pIntent, autoUpdateCurrentLocationInterval);
+    }
+
+    public void retrieveMyCurrentLocation()
+    {
+//        // We could get the location with the LocationManager
+//        // Get LocationManager object from System Service LOCATION_SERVICE
+//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//
+//        // Create a criteria object to retrieve provider
+//        Criteria criteria = new Criteria();
+//
+//        // Get the name of the best provider
+//        String provider = locationManager.getBestProvider(criteria, true);
+//
+//        // Get Current Location
+//        Location myLocation = locationManager.getLastKnownLocation(provider);
+//
+//        // Get latitude of the current location
+//        mcurLat = myLocation.getLatitude();
+//
+//        // Get longitude of the current location
+//        mcurLng = myLocation.getLongitude();
+
+        // Or we could also get the location stored in the SharedPreferences
+        CurrentLocationPreferences currentLocationPreferences
+                = new CurrentLocationPreferences(getApplicationContext());
+
+        mcurLat = currentLocationPreferences.getLat();
+        mcurLng = currentLocationPreferences.getLon();
+
+        // Store the LatLng object for the current location
+        mcurLatLng = new LatLng(mcurLat, mcurLng);
+
+        Toast.makeText(MapsActivity.this, "current location: " + mcurLatLng , Toast.LENGTH_SHORT).show();
     }
 }
