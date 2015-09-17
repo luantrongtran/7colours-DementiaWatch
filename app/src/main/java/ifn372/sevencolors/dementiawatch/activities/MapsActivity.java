@@ -391,7 +391,6 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
         // Store the LatLng object for the current location
         mcurLatLng = new LatLng(mcurLat, mcurLng);
 
-//        Toast.makeText(MapsActivity.this, "current location: " + mcurLatLng , Toast.LENGTH_SHORT).show();
     }
 
     public void updateFence()
@@ -399,7 +398,6 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
         retrieveMyCurrentLocation();
 
         UpdateFenceService updateFenceService = new UpdateFenceService(this);
-//        showProgressBar();
         updateFenceService.execute(
                 Integer.toString(myFenceID),
                 Double.toString(mcurLat),
@@ -424,7 +422,6 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
 
     @Override
     public void processAfterCreatingFence(boolean isSuccess, int fid) {
-//        progressDialog.dismiss();
         if(isSuccess == false)
         {
             Toast.makeText(MapsActivity.this,
@@ -444,9 +441,9 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
         startService(intent);
 
         myFenceID = fid;
-        Toast.makeText(MapsActivity.this,
-                "fenceID: " + fid,
-                Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MapsActivity.this,
+//                "fenceID: " + fid,
+//                Toast.LENGTH_SHORT).show();
     }
 
     public void tbtnAutoFenceHandler(View view)
