@@ -29,7 +29,9 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.dementiawatch.Constants;
@@ -41,6 +43,8 @@ import ifn372.sevencolors.dementiawatch.R;
 import ifn372.sevencolors.dementiawatch.backgroundservices.LocationAutoTracker;
 import ifn372.sevencolors.dementiawatch.backgroundservices.UpdateCurrentLocationReceiver;
 import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
+import ifn372.sevencolors.dementiawatch.webservices.DeleteFenceService;
+import ifn372.sevencolors.dementiawatch.webservices.IDeleteFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.IFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.IUpdateFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.FenceService;
@@ -49,14 +53,14 @@ import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReciever;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
 
-public class MapsActivity extends AppCompatActivity implements IUpdateFenceService {
+public class MapsActivity extends AppCompatActivity implements IUpdateFenceService , IDeleteFenceService, IFenceService {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     public long updatePatientsListInterval = 6*1000; //seconds
     public long outOfBoundCheckInterval = 3*1000; // seconds
 
-    public long autoUpdateCurrentLocationInterval = 15*1000;//10s
+    public long autoUpdateCurrentLocationInterval = 15*1000;//15s
     public long locationTrackerInterval = 10*1000;//10s
 
     public static PatientManager patientManager = new PatientManager();
@@ -77,13 +81,15 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
     //end navigation menu
 
     // Updating Fence Variables
-    public int myFenceID;
+    public int myFenceID = -1;
     public float myFenceRadius;
     // End Updating Fence Variables
 
+    // Current location variables
     public double mcurLat;  // my current location Latitude
     public double mcurLng;  // my current location Longitude
     public LatLng mcurLatLng;   // my current location
+    // End current location variables
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,8 +192,8 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
         scheduleAutoUpdatePatientsList();
 //        scheduleAutoCheckPatientLost();
 //        scheduleAutoCheckPatientsOutOfBound();
-        scheduleAutoLocationTrackerAlarm();
-        scheduleAutoUpdateCurrentLocationAlarm();
+//        scheduleAutoLocationTrackerAlarm();
+//        scheduleAutoUpdateCurrentLocationAlarm();
     }
 
     public void setUpDummyData() {
@@ -196,10 +202,10 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
         userPrefs.setUserId(3);
         userPrefs.setRole(2);
 
-        SharedPreferences userInfoSharedPref = getApplicationContext().getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
-        SharedPreferences.Editor editor = userInfoSharedPref.edit();
-        editor.putInt(Constants.sharedPreferences_user_info_id, 1);
-        editor.commit();
+//        SharedPreferences userInfoSharedPref = getApplicationContext().getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
+//        SharedPreferences.Editor editor = userInfoSharedPref.edit();
+//        editor.putInt(Constants.sharedPreferences_user_info_id, 1);
+//        editor.commit();
     }
 
     //    @Override
@@ -356,31 +362,31 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
 
     public void retrieveMyCurrentLocation()
     {
-//        // We could get the location with the LocationManager
-//        // Get LocationManager object from System Service LOCATION_SERVICE
-//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//
-//        // Create a criteria object to retrieve provider
-//        Criteria criteria = new Criteria();
-//
-//        // Get the name of the best provider
-//        String provider = locationManager.getBestProvider(criteria, true);
-//
-//        // Get Current Location
-//        Location myLocation = locationManager.getLastKnownLocation(provider);
-//
-//        // Get latitude of the current location
-//        mcurLat = myLocation.getLatitude();
-//
-//        // Get longitude of the current location
-//        mcurLng = myLocation.getLongitude();
+        // We could get the location with the LocationManager
+        // Get LocationManager object from System Service LOCATION_SERVICE
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        // Or we could also get the location stored in the SharedPreferences
-        CurrentLocationPreferences currentLocationPreferences
-                = new CurrentLocationPreferences(getApplicationContext());
+        // Create a criteria object to retrieve provider
+        Criteria criteria = new Criteria();
 
-        mcurLat = currentLocationPreferences.getLat();
-        mcurLng = currentLocationPreferences.getLon();
+        // Get the name of the best provider
+        String provider = locationManager.getBestProvider(criteria, true);
+
+        // Get Current Location
+        Location myLocation = locationManager.getLastKnownLocation(provider);
+
+        // Get latitude of the current location
+        mcurLat = myLocation.getLatitude();
+
+        // Get longitude of the current location
+        mcurLng = myLocation.getLongitude();
+
+//        // Or we could also get the location stored in the SharedPreferences
+//        CurrentLocationPreferences currentLocationPreferences
+//                = new CurrentLocationPreferences(getApplicationContext());
+//
+//        mcurLat = currentLocationPreferences.getLat();
+//        mcurLng = currentLocationPreferences.getLon();
 
         // Store the LatLng object for the current location
         mcurLatLng = new LatLng(mcurLat, mcurLng);
@@ -390,15 +396,7 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
 
     public void updateFence()
     {
-        // We can get the location stored in the SharedPreferences
-        CurrentLocationPreferences currentLocationPreferences
-                = new CurrentLocationPreferences(getApplicationContext());
-
-        mcurLat = currentLocationPreferences.getLat();
-        mcurLng = currentLocationPreferences.getLon();
-
-        // Store the LatLng object for the current location
-        mcurLatLng = new LatLng(mcurLat, mcurLng);
+        retrieveMyCurrentLocation();
 
         UpdateFenceService updateFenceService = new UpdateFenceService(this);
 //        showProgressBar();
@@ -412,18 +410,93 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
     public void processAfterUpdatingFence(boolean isSuccess) {
         if(isSuccess == false)
         {
-//            this.showMessage(getResources().getString(R.string.dialog_title_error),
-//                    getResources().getString(R.string.update_fence_failed));
             Toast.makeText(MapsActivity.this,
                     getResources().getString(R.string.update_fence_failed),
                     Toast.LENGTH_SHORT).show();
         }
         else
         {
-//            this.showMessage(getResources().getString(R.string.dialog_title_success),
-//                    getResources().getString(R.string.update_fence_success));
             Toast.makeText(MapsActivity.this,
                     getResources().getString(R.string.update_fence_success),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void processAfterCreatingFence(boolean isSuccess, int fid) {
+//        progressDialog.dismiss();
+        if(isSuccess == false)
+        {
+            Toast.makeText(MapsActivity.this,
+                    getResources().getString(R.string.create_fence_failed),
+                    Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(MapsActivity.this,
+                    getResources().getString(R.string.create_fence_success),
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        //Update patient list
+        Intent intent = new Intent(getApplicationContext(),
+                UpdatePatientsListService.class);
+        startService(intent);
+
+        myFenceID = fid;
+        Toast.makeText(MapsActivity.this,
+                "fenceID: " + fid,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public void tbtnAutoFenceHandler(View view)
+    {
+        ToggleButton tbtnAutoFence = (ToggleButton) findViewById(R.id.tbtnAutoFence);
+        tbtnAutoFence.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+                    retrieveMyCurrentLocation();
+                    FenceService fenceService = new FenceService(MapsActivity.this);
+                    fenceService.execute(
+                            "1",                // Hardcoded PatientID for testing
+                            "Family_Fence",     // Fence Name
+                            Double.toString(mcurLat), Double.toString(mcurLng),
+                            "200",              // Fence Radius
+                            "fake_adr");        // Fake address for testing
+                } else {
+                    // The toggle is disabled
+                    if (myFenceID==-1)
+                    {
+                        return;
+                    } else
+                    {
+                        DeleteFenceService deleteFenceService = new DeleteFenceService(MapsActivity.this);
+                        deleteFenceService.execute(
+                                Integer.toString(myFenceID));
+                    }
+                }
+            }
+        });
+    }
+
+    public void btnUpdateFenceHandler(View view)
+    {
+        updateFence();
+    }
+
+    @Override
+    public void processAfterDeletingFence(boolean isSuccess) {
+        if(isSuccess == false)
+        {
+            Toast.makeText(MapsActivity.this,
+                    getResources().getString(R.string.delete_fence_failed),
+                    Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(MapsActivity.this,
+                    getResources().getString(R.string.delete_fence_success),
                     Toast.LENGTH_SHORT).show();
         }
     }

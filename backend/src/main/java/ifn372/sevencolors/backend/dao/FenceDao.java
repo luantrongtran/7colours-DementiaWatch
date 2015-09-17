@@ -178,7 +178,8 @@ public class FenceDao extends DAOBase {
             {
                 throw new Exception("Manually generated message: The number of updated record is " + count + ". It is supposed to be 1.");
             }
-            ret = fenceId;
+//            ret = fenceId;
+            ret = FenceEndpoint.CODE_SUCCESS;
         }
         catch (Exception e)
         {

@@ -84,7 +84,20 @@ public class FenceEndpoint {
     {
         logger.info("FenceEndpoint updateFenceById() method called");
         Fence info = new Fence();
-        info.setFenceId(new FenceDao().updateFenceById(fenceId, lat, lon));
+//        info.setFenceId(new FenceDao().updateFenceById(fenceId, lat, lon));
+//        return info;
+
+        try
+        {
+            FenceDao fdao = new FenceDao();
+            int ufs = fdao.updateFenceById(fenceId, lat, lon);
+            info.setSuccess(ufs != CODE_ERR_UPDATE_FENCE_FAILED ? true : false);
+            info.setFenceId(fenceId);
+        }
+        catch(Exception exp)
+        {
+            exp.printStackTrace();
+        }
         return info;
     }
 

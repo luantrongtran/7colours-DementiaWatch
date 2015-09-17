@@ -31,7 +31,7 @@ import ifn372.sevencolors.watch_app.backgroundservices.UpdateCurrentLocationRece
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    public long autoUpdateCurrentLocationInterval = 15*1000;//10s
+    public long autoUpdateCurrentLocationInterval = 15*1000;//15s
     public long locationTrackerInterval = 10*1000;//10s
 
     @Override
