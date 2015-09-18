@@ -199,7 +199,7 @@ public class CreateFenceActivity extends AppCompatActivity implements IFenceServ
     }
 
     @Override
-    public void processAfterCreatingFence(boolean isSuccess) {
+    public void processAfterCreatingFence(boolean isSuccess, int fid) {
         progressDialog.dismiss();
         if(isSuccess == false)
         {

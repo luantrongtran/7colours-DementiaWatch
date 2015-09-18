@@ -97,9 +97,11 @@ public class FenceDaoTest extends LocalDatabaseTest{
         int fenceId = 6;
         double lat = 200;
         double lon = 300;
-        int id = spyFenceDao.updateFenceById(fenceId, lat, lon);
+//        int id = spyFenceDao.updateFenceById(fenceId, lat, lon);
+        int ufs = spyFenceDao.updateFenceById(fenceId, lat, lon);
         Fence fence = this.findById(fenceId);
-        assertThat("Fence ID", id, is(fenceId));
+//        assertThat("Fence ID", id, is(fenceId));
+        assertThat("Success", ufs, is(FenceEndpoint.CODE_SUCCESS));
         assertThat("Latitude", lat, is(lat));
         assertThat("Longitude", lon, is(lon));
     }

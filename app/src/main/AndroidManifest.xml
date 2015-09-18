@@ -45,6 +45,12 @@
         <receiver android:name=".webservices.UpdatePatientsListReciever" />
         <service android:name=".webservices.UpdatePatientsListService" />
 
+        <receiver android:name=".backgroundservices.LocationAutoTracker"/>
+        <service android:name=".backgroundservices.LocationTrackerService"/>
+
+        <receiver android:name=".backgroundservices.UpdateCurrentLocationReceiver"/>
+        <service android:name=".backgroundservices.UpdateCurrentLocationService" />
+
         <activity
             android:name=".CreateFenceActivity"
             android:label="@string/title_activity_create_fence"
