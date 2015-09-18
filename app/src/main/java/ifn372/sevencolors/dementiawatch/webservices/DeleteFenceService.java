@@ -48,7 +48,9 @@ public class DeleteFenceService extends AsyncTask <String, Void, Fence> {
 
     @Override
     protected void onPostExecute(Fence myFence) {
-        idfs.processAfterDeletingFence(myFence.getSuccess());
+        if(idfs != null) {
+            idfs.processAfterDeletingFence(myFence.getSuccess());
+        }
     }
 
 }

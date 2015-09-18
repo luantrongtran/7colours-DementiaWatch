@@ -1,17 +1,27 @@
+/**
+ * References:
+ * http://android-developers.blogspot.com.au/2011/06/deep-dive-into-location.html
+ */
+
 package ifn372.sevencolors.dementiawatch.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -29,6 +39,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -41,6 +52,7 @@ import ifn372.sevencolors.dementiawatch.CreateFenceActivity;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
 import ifn372.sevencolors.dementiawatch.backgroundservices.LocationAutoTracker;
+import ifn372.sevencolors.dementiawatch.backgroundservices.LocationTrackerService;
 import ifn372.sevencolors.dementiawatch.backgroundservices.UpdateCurrentLocationReceiver;
 import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
 import ifn372.sevencolors.dementiawatch.webservices.DeleteFenceService;
@@ -53,7 +65,7 @@ import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReciever;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
 
-public class MapsActivity extends AppCompatActivity implements IUpdateFenceService , IDeleteFenceService, IFenceService {
+public class MapsActivity extends AppCompatActivity implements IUpdateFenceService , IDeleteFenceService, IFenceService, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -64,6 +76,9 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
     public long locationTrackerInterval = 10*1000;//10s
 
     public static PatientManager patientManager = new PatientManager();
+
+    GoogleApiClient googleApiClient;
+    LocationRequest mLocationRequest;
 
     //Navigation menu
     String NAME = "Carer 1";
@@ -99,7 +114,11 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
                 .findFragmentById(R.id.map);
         // mapFragment.getMapAsync(this);
 
+        setUpGoogleApiClient();
+
         setUpDummyData();
+
+        registerReceiver();
 
         scheduleAlarm();
 
@@ -108,6 +127,25 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
                 .registerReceiver(onPatientsListUpdateReceiver, intentFilter);
 
         setUpNavigationMenu();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        googleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        googleApiClient.disconnect();
+        super.onStop();
+    }
+
+    /**
+     * Register all necessary receivers
+     */
+    public void registerReceiver() {
+        registerCurrentLocationUpdatedReceiver();
     }
 
     private void setUpNavigationMenu() {
@@ -119,8 +157,7 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
 
         mRecyclerView.setHasFixedSize(true);
 
-        mLeftMenuAdapter = new LeftMenuAdapter(NAME,EMAIL,PROFILE,
-                getResources().getDrawable(R.drawable.ic_room_black_24dp));
+        mLeftMenuAdapter = new LeftMenuAdapter(this);
 
         mRecyclerView.setAdapter(mLeftMenuAdapter);
 
@@ -140,21 +177,7 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
 
                 if (view != null && oneTouchGesture.onTouchEvent(e)) {
                     drawer.closeDrawers();
-                    int clickedIndex = rv.getChildAdapterPosition(view);
-                    if (clickedIndex == 0) {
-                        //If the header was clicked
-                        return false;
-                    }
-
-                    int index = clickedIndex - 1;
-                    Intent intent = new Intent(MapsActivity.this, CreateFenceActivity.class);
-                    intent.putExtra(Constants.create_new_fence_intent_data, index);
-                    startActivity(intent);
-
-
-                    return true;
                 }
-
                 return false;
             }
 
@@ -188,6 +211,18 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
         mDrawerToggle.syncState();
     }
 
+    public void setUpGoogleApiClient() {
+        createLocationRequest();//set up for location request
+
+        googleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.PLACE_DETECTION_API)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+    }
+
     public void scheduleAlarm() {
         scheduleAutoUpdatePatientsList();
 //        scheduleAutoCheckPatientLost();
@@ -202,19 +237,11 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
         userPrefs.setUserId(3);
         userPrefs.setRole(2);
 
-//        SharedPreferences userInfoSharedPref = getApplicationContext().getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
-//        SharedPreferences.Editor editor = userInfoSharedPref.edit();
-//        editor.putInt(Constants.sharedPreferences_user_info_id, 1);
-//        editor.commit();
+        userPrefs.setFullName("Carer");
+        userPrefs.setEmail("Carer@gmail.com");
+//        userPrefs.setProfilePicture("");
     }
 
-    //    @Override
-//    public void onMapReady(GoogleMap map) {
-//        // Add a marker in Sydney, Australia, and move the camera.
-//        LatLng sydney = new LatLng(-34, 151);
-//        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -334,13 +361,6 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
                 interval, pendingIntent);
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-//            // only for KITKAT and newer versions
-//            alarm.setExact(AlarmManager.RTC_WAKEUP, interval, pendingIntent);
-//        } else {
-//            alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-//                    interval, pendingIntent);
-//        }
     }
 
     public void scheduleAutoLocationTrackerAlarm() {
@@ -463,11 +483,9 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
                             "fake_adr");        // Fake address for testing
                 } else {
                     // The toggle is disabled
-                    if (myFenceID==-1)
-                    {
+                    if (myFenceID == -1) {
                         return;
-                    } else
-                    {
+                    } else {
                         DeleteFenceService deleteFenceService = new DeleteFenceService(MapsActivity.this);
                         deleteFenceService.execute(
                                 Integer.toString(myFenceID));
@@ -496,5 +514,84 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
                     getResources().getString(R.string.delete_fence_success),
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void registerCurrentLocationUpdatedReceiver() {
+        IntentFilter onCurrentLocationUpdatedFilter
+                = new IntentFilter(LocationTrackerService.ACTION);
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(onCurrentLocationUpdated, onCurrentLocationUpdatedFilter);
+    }
+
+    private BroadcastReceiver onCurrentLocationUpdated = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            CurrentLocationPreferences currLocPrefs
+                    = new CurrentLocationPreferences(getApplicationContext());
+            Log.i(Constants.application_id, "Receive current location updated:" +
+                    currLocPrefs.getLat() + ", " + currLocPrefs.getLon());
+
+            patientManager.updateTemporaryFence(getApplicationContext());
+            patientManager.updatePatientFenceOnMap(mMap);
+        }
+    };
+
+    //Google Api clients callback methods
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.e(Constants.application_id, "Google API client connected");
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.e(Constants.application_id, "Google API client suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(Constants.application_id, "Google API client failed");
+    }
+
+    protected void startLocationUpdates() {
+        Intent intent = new Intent(getApplicationContext(), LocationAutoTracker.class);
+        PendingIntent pIntent = PendingIntent.
+                getBroadcast(getApplicationContext(), 0
+                        , intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                googleApiClient, mLocationRequest, pIntent);
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(2000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+    //End google Api clients callback methods
+
+    public void panToLatLng(LatLng latLng, boolean zoom) {
+        if (zoom) {
+            mMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(getCameraPosition(latLng)));
+        } else {
+            mMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(getCameraPositionWithoutZoom(latLng)));
+        }
+    }
+
+    public CameraPosition getCameraPosition(LatLng latLng) {
+        return new CameraPosition.Builder()
+                .target(latLng)
+                .zoom(17)                   // Sets the zoom
+                .build();                   // Creates a CameraPosition from the builder
+    }
+
+    public CameraPosition getCameraPositionWithoutZoom(LatLng latLng) {
+        return new CameraPosition.Builder()
+                .target(latLng)
+                .zoom(mMap.getCameraPosition().zoom)
+                .build();
     }
 }

@@ -22,6 +22,10 @@ import ifn372.sevencolors.dementiawatch.webservices.FenceService;
 import ifn372.sevencolors.dementiawatch.webservices.IFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
+/**
+ * This activity is called from another activity, and the extra information passed into
+ * this activity should be patient id
+ */
 public class CreateFenceActivity extends AppCompatActivity implements IFenceService
 {
     Patient patient;
@@ -34,12 +38,15 @@ public class CreateFenceActivity extends AppCompatActivity implements IFenceServ
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
-        Intent intent = getIntent();
-        int index = intent.getIntExtra(Constants.create_new_fence_intent_data,
-                Constants.sharedPreferences_integer_default_value);
-        this.patient = MapsActivity.patientManager.getPatientList().getItems().get(index);
 
-        setTitle(patient.getFullName());
+        Intent intent = getIntent();
+        int patientId = intent.getIntExtra(Constants.create_new_fence_intent_data,
+                Constants.sharedPreferences_integer_default_value);
+        this.patient = MapsActivity.patientManager.getPatientById(patientId);
+
+        if(patient != null) {
+            setTitle(patient.getFullName());
+        }
     }
 
     @Override

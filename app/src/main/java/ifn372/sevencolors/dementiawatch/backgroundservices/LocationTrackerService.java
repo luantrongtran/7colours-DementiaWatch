@@ -2,6 +2,7 @@ package ifn372.sevencolors.dementiawatch.backgroundservices;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import ifn372.sevencolors.dementiawatch.Constants;
@@ -13,24 +14,17 @@ import ifn372.sevencolors.dementiawatch.GPSTracker;
  * SharedPreferences
  */
 public class LocationTrackerService extends IntentService  {
+    public static String ACTION = LocationTrackerService.class.getCanonicalName();
+
     public LocationTrackerService(){
         super("UpdateLocationService");
     }
 
-
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.e(Constants.application_id, "update location service");
-        GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
 
-        CurrentLocationPreferences currentLocationPreferences
-                = new CurrentLocationPreferences(getApplicationContext());
-
-        double lat = gpsTracker.getLatitude();
-        double lon = gpsTracker.getLongitude();
-        Log.e(Constants.application_id, lat + ", " + lon);
-
-        currentLocationPreferences.setLat(lat);
-        currentLocationPreferences.setLon(lon);
+        Intent broadcastIntent = new Intent(ACTION);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
     }
 }

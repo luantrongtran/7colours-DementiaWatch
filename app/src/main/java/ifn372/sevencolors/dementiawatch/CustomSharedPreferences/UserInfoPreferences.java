@@ -35,4 +35,34 @@ public class UserInfoPreferences {
         return sharedPreferences.getInt(Constants.sharedPreferences_user_info_role,
                 Constants.sharedPreferences_integer_default_value);
     }
+
+    public void setFullName(String fullName) {
+        sharedPreferences.edit().putString(Constants.sharedPreferences_user_info_fullname,
+                fullName).apply();
+    }
+
+    public String getFullName() {
+        return sharedPreferences.getString(Constants.sharedPreferences_user_info_fullname,
+                Constants.sharedPreferences_string_default_value);
+    }
+
+    public void setEmail(String email) {
+        sharedPreferences.edit().putString(Constants.sharedPreferences_user_info_email,
+                email).apply();
+    }
+
+    public String getEmail() {
+        return sharedPreferences.getString(Constants.sharedPreferences_user_info_email,
+                Constants.sharedPreferences_string_default_value);
+    }
+
+    public void setProfilePicture(String url) {
+        sharedPreferences.edit().putString(Constants.sharedPreferences_user_info_profile_picture,
+                url).apply();
+    }
+
+    public String getProfilePicture() {
+        return sharedPreferences.getString(Constants.sharedPreferences_user_info_profile_picture,
+                Constants.sharedPreferences_string_default_value);
+    }
 }

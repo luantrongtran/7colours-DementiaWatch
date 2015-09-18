@@ -48,7 +48,8 @@ public class UpdateFenceService extends AsyncTask<String, Void, Fence> {
 
     @Override
     protected void onPostExecute(Fence myFence) {
-        iufs.processAfterUpdatingFence(myFence.getSuccess());
+        if (iufs != null) {
+            iufs.processAfterUpdatingFence(myFence.getSuccess());
+        }
     }
-
 }

@@ -35,28 +35,33 @@
         <activity
             android:name=".activities.MapsActivity"
             android:label="@string/app_name" >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <receiver android:name=".webservices.UpdatePatientsListReciever" />
+
         <service android:name=".webservices.UpdatePatientsListService" />
 
-        <receiver android:name=".backgroundservices.LocationAutoTracker"/>
-        <service android:name=".backgroundservices.LocationTrackerService"/>
+        <receiver android:name=".backgroundservices.LocationAutoTracker" />
 
-        <receiver android:name=".backgroundservices.UpdateCurrentLocationReceiver"/>
+        <service android:name=".backgroundservices.LocationTrackerService" />
+
+        <receiver android:name=".backgroundservices.UpdateCurrentLocationReceiver" />
+
         <service android:name=".backgroundservices.UpdateCurrentLocationService" />
 
         <activity
             android:name=".CreateFenceActivity"
-            android:label="@string/title_activity_create_fence"
-            >
+            android:label="@string/title_activity_create_fence" >
         </activity>
-
+        <activity
+            android:name=".activities.PatientSettingActivity"
+            android:label="@string/title_activity_patient_setting" >
+        </activity>
     </application>
 
 </manifest>
