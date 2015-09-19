@@ -7,13 +7,13 @@ public class Fence {
 
     //Return value (creation successful/fail)
     boolean success;
-
     int userId;
     String fenceName;
     double lon;
     double lat;
     float radius;
     String address;
+    private int fenceId;
 
     public Fence() {
     }
@@ -31,6 +31,13 @@ public class Fence {
         this.success = success;
     }
 
+    public int getFenceId() {
+        return fenceId;
+    }
+
+    public void setFenceId(int fenceId) {
+        this.fenceId = fenceId;
+    }
 
     public int  getUserId() {
         return userId;
