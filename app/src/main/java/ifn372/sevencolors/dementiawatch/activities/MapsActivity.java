@@ -65,7 +65,7 @@ import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReciever;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
 
-public class MapsActivity extends AppCompatActivity implements IUpdateFenceService , IDeleteFenceService, IFenceService, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MapsActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -331,7 +331,7 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
     private BroadcastReceiver onPatientsListUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(Constants.application_id, "Maps Activity received patient list update event");
+            Log.i(Constants.application_id, "Maps Activity received patient list updated event");
             PatientListParcelable p = intent.getParcelableExtra("patientList");
             patientManager.setPatientList(p.getPatientList());
             notifyPatientsLost();
@@ -413,109 +413,6 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
 
     }
 
-    public void updateFence()
-    {
-        retrieveMyCurrentLocation();
-
-        UpdateFenceService updateFenceService = new UpdateFenceService(this);
-        updateFenceService.execute(
-                Integer.toString(myFenceID),
-                Double.toString(mcurLat),
-                Double.toString(mcurLng));
-    }
-
-    @Override
-    public void processAfterUpdatingFence(boolean isSuccess) {
-        if(isSuccess == false)
-        {
-            Toast.makeText(MapsActivity.this,
-                    getResources().getString(R.string.update_fence_failed),
-                    Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            Toast.makeText(MapsActivity.this,
-                    getResources().getString(R.string.update_fence_success),
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void processAfterCreatingFence(boolean isSuccess, int fid) {
-        if(isSuccess == false)
-        {
-            Toast.makeText(MapsActivity.this,
-                    getResources().getString(R.string.create_fence_failed),
-                    Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            Toast.makeText(MapsActivity.this,
-                    getResources().getString(R.string.create_fence_success),
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        //Update patient list
-        Intent intent = new Intent(getApplicationContext(),
-                UpdatePatientsListService.class);
-        startService(intent);
-
-        myFenceID = fid;
-//        Toast.makeText(MapsActivity.this,
-//                "fenceID: " + fid,
-//                Toast.LENGTH_SHORT).show();
-    }
-
-    public void tbtnAutoFenceHandler(View view)
-    {
-        ToggleButton tbtnAutoFence = (ToggleButton) findViewById(R.id.tbtnAutoFence);
-        tbtnAutoFence.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    // The toggle is enabled
-                    retrieveMyCurrentLocation();
-                    FenceService fenceService = new FenceService(MapsActivity.this);
-                    fenceService.execute(
-                            "1",                // Hardcoded PatientID for testing
-                            "Family_Fence",     // Fence Name
-                            Double.toString(mcurLat), Double.toString(mcurLng),
-                            "200",              // Fence Radius
-                            "fake_adr");        // Fake address for testing
-                } else {
-                    // The toggle is disabled
-                    if (myFenceID == -1) {
-                        return;
-                    } else {
-                        DeleteFenceService deleteFenceService = new DeleteFenceService(MapsActivity.this);
-                        deleteFenceService.execute(
-                                Integer.toString(myFenceID));
-                    }
-                }
-            }
-        });
-    }
-
-    public void btnUpdateFenceHandler(View view)
-    {
-        updateFence();
-    }
-
-    @Override
-    public void processAfterDeletingFence(boolean isSuccess) {
-        if(isSuccess == false)
-        {
-            Toast.makeText(MapsActivity.this,
-                    getResources().getString(R.string.delete_fence_failed),
-                    Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            Toast.makeText(MapsActivity.this,
-                    getResources().getString(R.string.delete_fence_success),
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
     public void registerCurrentLocationUpdatedReceiver() {
         IntentFilter onCurrentLocationUpdatedFilter
                 = new IntentFilter(LocationTrackerService.ACTION);
@@ -531,8 +428,7 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
             Log.i(Constants.application_id, "Receive current location updated:" +
                     currLocPrefs.getLat() + ", " + currLocPrefs.getLon());
 
-            patientManager.updateTemporaryFence(getApplicationContext());
-            patientManager.updatePatientFenceOnMap(mMap);
+            patientManager.updateTemporaryFence(mMap, getApplicationContext());
         }
     };
 
@@ -565,8 +461,8 @@ public class MapsActivity extends AppCompatActivity implements IUpdateFenceServi
 
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(2000);
+        mLocationRequest.setInterval(1000);
+        mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
     //End google Api clients callback methods

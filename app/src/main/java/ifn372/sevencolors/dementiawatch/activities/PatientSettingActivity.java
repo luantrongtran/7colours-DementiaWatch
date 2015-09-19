@@ -40,6 +40,8 @@ public class PatientSettingActivity extends AppCompatActivity {
                 + getResources().getString(R.string.patient_setting_activity_title));
 
         ToggleButton pickedUpModeButton = (ToggleButton)findViewById(R.id.pickedUpModeToggleButton);
+        pickedUpModeButton.setChecked(MapsActivity.patientManager.isPickedUpModeEnabled(patientId));
+
         pickedUpModeButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -48,7 +50,7 @@ public class PatientSettingActivity extends AppCompatActivity {
                     boolean isEnabled = MapsActivity.patientManager
                             .enablePickedUpMode(patientId, getApplicationContext());
 
-                    if(isEnabled == true) {
+                    if (isEnabled == true) {
                         Toast.makeText(PatientSettingActivity.this,
                                 R.string.patient_setting_enable_picked_up_mode_success,
                                 Toast.LENGTH_SHORT).show();
@@ -62,7 +64,7 @@ public class PatientSettingActivity extends AppCompatActivity {
                     boolean isDisabled = MapsActivity.patientManager
                             .disablePickedUpMode(patientId);
 
-                    if(isDisabled == true) {
+                    if (isDisabled == true) {
                         Toast.makeText(PatientSettingActivity.this,
                                 R.string.patient_setting_disable_picked_up_mode_success,
                                 Toast.LENGTH_SHORT).show();

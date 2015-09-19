@@ -135,6 +135,8 @@ public class FenceDao extends DAOBase {
                 fence.setLon(rs.getDouble("lon"));
                 fence.setRadius(rs.getFloat("fence_radius"));
                 fence.setAddress(rs.getString("address"));
+                fence.setFenceId(rs.getInt(COL_NAME_ID));
+                fence.setUserId(rs.getInt(COL_NAME_USER_ID));
 
                 fences.add(fence); // add fence to the list
             }

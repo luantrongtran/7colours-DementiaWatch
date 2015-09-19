@@ -50,11 +50,21 @@ public class PatientManager {
 
     Vector<Circle> patientFences;
 
+    Circle temporaryFence;
+    CircleOptions temporaryFenceOptions;
+
     /**
      * patients picked up with the carer/family member
      * Key: patient id, Value: temporary fence id
      */
     Map<Integer, Integer> pickedUpPatients;
+
+    /**
+     * because the information window of a marker will be removed after each refresh. Store
+     * the patient id of patient to show the info window of corresponding marker of that patient
+     * after refreshing the map.
+     */
+    int patientIdShowingInfoWindow = -1;
 
     public PatientManager() {
         patientList = new PatientList();
@@ -62,6 +72,11 @@ public class PatientManager {
         patientMarkers = new Vector<Marker>();
         patientFences = new Vector<>();
         pickedUpPatients = new HashMap<>();
+
+        temporaryFenceOptions = new CircleOptions()
+                .fillColor(0x4D000000)
+                .strokeColor(0x4D000000)
+                .radius(50);
     }
 
     public PatientList getPatientList() {
@@ -86,21 +101,42 @@ public class PatientManager {
         return null;
     }
 
+    /**
+     * Get the index position of the given patient id within patientList
+     * @param id
+     * @return -1 if couldn't find the given patient id, return the index if found.
+     */
+    public int getPatientIndexById(int id) {
+        for(int i = 0; i < patientList.getItems().size(); i++) {
+            Patient p = patientList.getItems().get(i);
+            if(p.getId() == id) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     public void updatePatientsMarkerOnMap(GoogleMap gMap, Context context) {
         Log.i(Constants.application_id, "Update map according to patient list");
-        gMap.clear();
-//        for(Marker marker : patientMarkers) {
-//            marker.remove();
-//        }
+//        gMap.clear();
+        patientIdShowingInfoWindow = -1;
+        for (int i = 0; i < patientMarkers.size(); i++) {
+            Marker marker = patientMarkers.get(i);
+            if (marker.isInfoWindowShown()) {
+                patientIdShowingInfoWindow = patientList.getItems().get(i).getId();
+            }
+            marker.remove();
+        }
         patientMarkers.clear();
 
         List<Patient> patients = patientList.getItems();
         MarkerOptions markerOptions = new MarkerOptions();
-        Drawable drawable  = context.getResources()
+        Drawable drawable = context.getResources()
                 .getDrawable(R.drawable.ic_room_black_24dp);
 
 
-        for(int i = 0; i < patients.size(); i++) {
+        for (int i = 0; i < patients.size(); i++) {
             Patient p = patients.get(i);
             Location loc = p.getCurrentLocation();
             LatLng location = new LatLng(loc.getLat(), loc.getLon());
@@ -114,10 +150,20 @@ public class PatientManager {
             patientMarkers.add(marker);
         }
 
-        updatePatientFenceOnMap(gMap);
-    }
+        updatePatientFenceOnMap(gMap, context);
 
-    public void updatePatientFenceOnMap(GoogleMap gMap){
+        //Show the info window after refreshing the map
+        // if there was a marker showing the info window
+
+        int index = getPatientIndexById(patientIdShowingInfoWindow);
+        if (index != -1) {
+            patientMarkers.get(index).showInfoWindow();
+        }
+    }
+    public void updatePatientFenceOnMap(GoogleMap gMap, Context context){
+        for(Circle c : patientFences) {
+            c.remove();
+        }
         patientFences.clear();
 
         for(int j = 0; j < patientList.getItems().size() ; j++) {
@@ -130,6 +176,9 @@ public class PatientManager {
                 continue;
             }
 
+
+            Integer temporaryFenceId = pickedUpPatients.get(patient.getId());
+            Log.e(Constants.application_id, "Temporary fence id: " + temporaryFenceId);
             for(int i = 0; i < fences.size() ; i++) {
                 Fence fence = fences.get(i);
                 CircleOptions circleOptions = new CircleOptions()
@@ -138,8 +187,25 @@ public class PatientManager {
                         .fillColor(fenceColors[j])//(patientColors[j])
                         .radius(fence.getRadius());
 
-                patientFences.add(gMap.addCircle(circleOptions));
+                if(temporaryFenceId != null){
+                    boolean b = temporaryFenceId.intValue() == fence.getFenceId();
+                    Log.e(Constants.application_id, fence.getFenceId() + "="
+                            + temporaryFenceId.intValue() + ": " + b);
+                    if(b) {
+                        //If the fence id is the temporary fence id created by the current user
+                        if(temporaryFence != null) {
+                            patientFences.add(temporaryFence);
+                        }
+                        continue;
+                    }
+                }
+                Circle circle = gMap.addCircle(circleOptions);
+                patientFences.add(circle);
             }
+        }
+
+        if(temporaryFence != null) {
+            drawTemporaryFence(gMap, context);
         }
     }
 
@@ -162,7 +228,7 @@ public class PatientManager {
         try {
             temporaryFence = fenceService.execute(
                     Integer.toString(patient.getId()),
-                    "",     // Fence Name
+                    "temporary_fence",     // Fence Name
                     Double.toString(currentLocationPreferences.getLat()),
                     Double.toString(currentLocationPreferences.getLon()),
                     Float.toString(temporaryFenceRadius),
@@ -175,7 +241,9 @@ public class PatientManager {
         }
 
         //Store the temporary fence corresponding to patient id
-        pickedUpPatients.put(patientId, temporaryFence.getFenceId());
+        if(!pickedUpPatients.containsKey(patientId)) {
+            pickedUpPatients.put(patientId, temporaryFence.getFenceId());
+        }
 
         return true;
     }
@@ -204,6 +272,9 @@ public class PatientManager {
 
         pickedUpPatients.remove(patientId);
 
+        //temporaryFence should be null after disabling the picked up mode
+        temporaryFence = null;
+
         return true;
     }
 
@@ -211,21 +282,49 @@ public class PatientManager {
      * Temporary fences are fences surrounded the current location of the carer/family member and
      * will be updated based on the current location of the carer/family member
      */
-    public void updateTemporaryFence(Context context) {
+    public void updateTemporaryFence(GoogleMap gMap, Context context) {
         if(pickedUpPatients == null || pickedUpPatients.size() == 0) {
             return;
         }
 
         CurrentLocationPreferences currentLocationPreferences
                 = new CurrentLocationPreferences(context);
-        UpdateFenceService updateFenceService = new UpdateFenceService(null);
+        final LatLng curLocation = new LatLng(currentLocationPreferences.getLat(),
+                currentLocationPreferences.getLon());
 
+        drawTemporaryFence(gMap, context);
+
+        //Update temporary fence to server
+        UpdateFenceService updateFenceService = new UpdateFenceService(null);
         for (Map.Entry<Integer, Integer> entry : pickedUpPatients.entrySet())
         {
             int fenceId = entry.getValue().intValue();
             updateFenceService.execute(Integer.toString(fenceId),
-                    Double.toString(currentLocationPreferences.getLat()),
-                    Double.toString(currentLocationPreferences.getLon()));
+                    Double.toString(curLocation.latitude),
+                    Double.toString(curLocation.longitude));
         }
+    }
+
+    public void drawTemporaryFence(GoogleMap gMap, Context context) {
+        //Update on map
+        CurrentLocationPreferences currentLocationPreferences
+                = new CurrentLocationPreferences(context);
+        final LatLng curLocation = new LatLng(currentLocationPreferences.getLat(),
+                currentLocationPreferences.getLon());
+
+        if(temporaryFence != null) {
+            temporaryFence.remove();
+        }
+        temporaryFenceOptions = temporaryFenceOptions.center(curLocation);
+        temporaryFence = gMap.addCircle(temporaryFenceOptions);
+    }
+
+    /**
+     * Check if the given patient is enabled for picked up mode
+     * @param patientId the patient Id
+     * @return true if the picked up mode is enabled
+     */
+    public boolean isPickedUpModeEnabled(int patientId) {
+        return pickedUpPatients.containsKey(patientId);
     }
 }
