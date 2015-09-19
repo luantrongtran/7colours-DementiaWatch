@@ -1,9 +1,16 @@
 package ifn372.sevencolors.dementiawatch.webservices;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -15,7 +22,11 @@ import ifn372.sevencolors.backend.myApi.model.FenceList;
 import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.backend.myApi.model.PatientList;
 import ifn372.sevencolors.dementiawatch.BackendApiProvider;
+import ifn372.sevencolors.dementiawatch.BitMapUtils;
 import ifn372.sevencolors.dementiawatch.Constants;
+import ifn372.sevencolors.dementiawatch.PatientManager;
+import ifn372.sevencolors.dementiawatch.R;
+import ifn372.sevencolors.dementiawatch.activities.MapsActivity;
 import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
 
 /**
@@ -24,6 +35,7 @@ import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
 public class UpdatePatientsListService extends IntentService {
 
     public static String ACTION = UpdatePatientsListService.class.getCanonicalName();
+    public static int PATIENT_LOST_NOTIFICATION_ID = 1;
 
     public UpdatePatientsListService() {
         super("UpdatePatientsListService");
@@ -56,6 +68,7 @@ public class UpdatePatientsListService extends IntentService {
     }
 
     public void checkPatientsLost(PatientList patientList) {
+        int numOfLostPatients = 0;
         for(Patient patient : patientList.getItems()) {
             FenceList fenceList = patient.getFenceList();
             if(fenceList == null || fenceList.getItems() == null){
@@ -80,6 +93,49 @@ public class UpdatePatientsListService extends IntentService {
                 Log.i(Constants.application_id, "Distance: " + distance[0]);
             }
             patient.setSafety(isSafe);
+            if(!isSafe) {
+                numOfLostPatients++;
+            }
         }
+
+        if(numOfLostPatients > 0) {
+            sendPatientLostNotification("!Alert", numOfLostPatients + " Patient(s) lost");
+        }
+    }
+
+    public void sendPatientLostNotification(String title, String content) {
+//        Drawable warningIcon = this.getResources().getDrawable(R.drawable.ic_warning_black_24dp);
+//        Bitmap bm = BitMapUtils
+//                .getMutableBitmapFromResourceFromResource(warningIcon,
+//                        0x00FF0000);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setPriority(2)
+                        .setSmallIcon(R.drawable.ic_warning_black_24dp)
+                        .setContentTitle(title)
+                        .setContentText(content)
+                        .setDefaults(Notification.DEFAULT_SOUND);
+        // Creates an explicit intent for an Activity in your app
+                Intent resultIntent = new Intent(this, MapsActivity.class);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MapsActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(PATIENT_LOST_NOTIFICATION_ID, mBuilder.build());
     }
 }

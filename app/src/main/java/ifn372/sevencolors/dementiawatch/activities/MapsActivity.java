@@ -350,29 +350,13 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         public void onReceive(Context context, Intent intent) {
             Log.i(Constants.application_id, "Maps Activity received patient list updated event");
             PatientListParcelable p = intent.getParcelableExtra("patientList");
+
             patientManager.setPatientList(p.getPatientList());
-            notifyPatientsLost();
-            updateMap();
+            patientManager.updatePatientsMarkerOnMap(mMap, getApplicationContext());
+
             mLeftMenuAdapter.notifyDataSetChanged(); //update patient list on left menu
         }
     };
-
-    public void updateMap() {
-        patientManager.updatePatientsMarkerOnMap(mMap, getApplicationContext());
-    }
-
-    public void notifyPatientsLost() {
-        String names = "";
-        for(Patient patient : patientManager.getPatientList().getItems()) {
-            if(patient.getSafety() == false) {
-                names += patient.getFullName() + " ";
-            }
-        }
-
-        if(names.isEmpty() == false) {
-            Toast.makeText(MapsActivity.this, names + " outside fence", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     public void scheduleAutoTask(PendingIntent pendingIntent, long interval) {
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);

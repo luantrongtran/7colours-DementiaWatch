@@ -66,7 +66,7 @@ public class PatientSettingActivity extends AppCompatActivity {
                 } else {
                     // The toggle is disabled
                     boolean isDisabled = MapsActivity.patientManager
-                            .disablePickedUpMode(patientId);
+                            .disablePickedUpMode(patientId, getApplicationContext());
 
                     if (isDisabled == true) {
                         Toast.makeText(PatientSettingActivity.this,

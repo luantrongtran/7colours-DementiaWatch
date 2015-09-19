@@ -26,9 +26,9 @@ import ifn372.sevencolors.backend.myApi.model.Location;
 import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.backend.myApi.model.PatientList;
 import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.CurrentLocationPreferences;
+import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.TemporaryFenceSharedPreferences;
 import ifn372.sevencolors.dementiawatch.webservices.DeleteFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.FenceService;
-import ifn372.sevencolors.dementiawatch.webservices.UpdateFenceService;
 
 /**
  * Created by lua on 28/08/2015.
@@ -243,12 +243,18 @@ public class PatientManager {
         //Store the temporary fence corresponding to patient id
         if(!pickedUpPatients.containsKey(patientId)) {
             pickedUpPatients.put(patientId, temporaryFence.getFenceId());
+
+            //add temporary fence into SharedPreferences
+            TemporaryFenceSharedPreferences temporaryFenceSharedPreferences
+                    = new TemporaryFenceSharedPreferences(context);
+            temporaryFenceSharedPreferences.addANewTemporaryFence(patientId,
+                    temporaryFence.getFenceId());
         }
 
         return true;
     }
 
-    public boolean disablePickedUpMode(int patientId) {
+    public boolean disablePickedUpMode(int patientId, Context context) {
         Patient patient = getPatientById(patientId);
         if(patient == null) {
             return false;
@@ -271,6 +277,10 @@ public class PatientManager {
         }
 
         pickedUpPatients.remove(patientId);
+        //Remove in SharedPreferences
+        TemporaryFenceSharedPreferences temporaryFenceSharedPreferences
+                = new TemporaryFenceSharedPreferences(context);
+        temporaryFenceSharedPreferences.removeTemporaryFence(patientId);
 
         if(temporaryFence != null) {
             temporaryFence.remove();
@@ -283,7 +293,8 @@ public class PatientManager {
 
     /**
      * Temporary fences are fences surrounded the current location of the carer/family member and
-     * will be updated based on the current location of the carer/family member
+     * will be updated based on the current location of the carer/family member.
+     * This function updates the fences' position only
      */
     public void updateTemporaryFence(GoogleMap gMap, Context context) {
         if(pickedUpPatients == null || pickedUpPatients.size() == 0) {
@@ -298,14 +309,14 @@ public class PatientManager {
         drawTemporaryFence(gMap, context);
 
         //Update temporary fence to server
-        UpdateFenceService updateFenceService = new UpdateFenceService(null);
-        for (Map.Entry<Integer, Integer> entry : pickedUpPatients.entrySet())
-        {
-            int fenceId = entry.getValue().intValue();
-            updateFenceService.execute(Integer.toString(fenceId),
-                    Double.toString(curLocation.latitude),
-                    Double.toString(curLocation.longitude));
-        }
+//        UpdateFenceService updateFenceService = new UpdateFenceService(null);
+//        for (Map.Entry<Integer, Integer> entry : pickedUpPatients.entrySet())
+//        {
+//            int fenceId = entry.getValue().intValue();
+//            updateFenceService.execute(Integer.toString(fenceId),
+//                    Double.toString(curLocation.latitude),
+//                    Double.toString(curLocation.longitude));
+//        }
     }
 
     public void drawTemporaryFence(GoogleMap gMap, Context context) {
@@ -331,10 +342,10 @@ public class PatientManager {
         return pickedUpPatients.containsKey(patientId);
     }
 
-    public void disableAllTemporaryFences() {
+    public void disableAllTemporaryFences(Context context) {
         for (Map.Entry<Integer, Integer> entry : pickedUpPatients.entrySet()){
             int patientId = entry.getKey();
-            disablePickedUpMode(patientId);
+            disablePickedUpMode(patientId, context);
         }
     }
 }
