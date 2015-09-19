@@ -272,6 +272,9 @@ public class PatientManager {
 
         pickedUpPatients.remove(patientId);
 
+        if(temporaryFence != null) {
+            temporaryFence.remove();
+        }
         //temporaryFence should be null after disabling the picked up mode
         temporaryFence = null;
 
@@ -326,5 +329,12 @@ public class PatientManager {
      */
     public boolean isPickedUpModeEnabled(int patientId) {
         return pickedUpPatients.containsKey(patientId);
+    }
+
+    public void disableAllTemporaryFences() {
+        for (Map.Entry<Integer, Integer> entry : pickedUpPatients.entrySet()){
+            int patientId = entry.getKey();
+            disablePickedUpMode(patientId);
+        }
     }
 }

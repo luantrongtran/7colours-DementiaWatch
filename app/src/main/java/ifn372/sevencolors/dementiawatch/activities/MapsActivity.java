@@ -66,6 +66,7 @@ import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
 
 public class MapsActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    public static int PATIENT_SETTING_REQUEST_CODE = 1;
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -139,6 +140,22 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onStop() {
         googleApiClient.disconnect();
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+//        patientManager.disableAllTemporaryFences();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == PATIENT_SETTING_REQUEST_CODE) {
+            if(resultCode == RESULT_OK) {
+                patientManager.updateTemporaryFence(mMap, getApplicationContext());
+            }
+            Log.i(Constants.application_id, "Return from patient setting activity");
+        }
     }
 
     /**

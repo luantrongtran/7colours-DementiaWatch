@@ -88,7 +88,7 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
                 public boolean onTouch(View v, MotionEvent event) {
                     Intent intent = new Intent(context, PatientSettingActivity.class);
                     intent.putExtra(Constants.create_new_fence_intent_data, patient.getId());
-                    context.startActivity(intent);
+                    context.startActivityForResult(intent, MapsActivity.PATIENT_SETTING_REQUEST_CODE);
                     return false;
                 }
             };
