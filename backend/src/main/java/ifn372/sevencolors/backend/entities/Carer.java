@@ -10,6 +10,16 @@ import ifn372.sevencolors.backend.dao.CarerDao;
  */
 public class Carer extends User {
 
+    String gcmId;
+
+    public String getGCMId() {
+        return gcmId;
+    }
+
+    public void setGCMId(String gcmId) {
+        this.gcmId = gcmId;
+    }
+
     boolean patientSafety;
 
     private List<String> patientIds;

@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -18,6 +19,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -44,7 +46,12 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.io.IOException;
+
+import ifn372.sevencolors.backend.myApi.MyApi;
+import ifn372.sevencolors.backend.myApi.model.Carer;
 import ifn372.sevencolors.backend.myApi.model.Patient;
+import ifn372.sevencolors.dementiawatch.BackendApiProvider;
 import ifn372.sevencolors.dementiawatch.Constants;
 import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.CurrentLocationPreferences;
 import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferences;
@@ -61,6 +68,7 @@ import ifn372.sevencolors.dementiawatch.webservices.IFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.IUpdateFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.FenceService;
 import ifn372.sevencolors.dementiawatch.webservices.UpdateFenceService;
+import ifn372.sevencolors.dementiawatch.webservices.RegistrationIntentService;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReciever;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
@@ -116,6 +124,9 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         // mapFragment.getMapAsync(this);
 
         setUpGoogleApiClient();
+        // get GCM token
+        Intent regIntent = new Intent(this, RegistrationIntentService.class);
+        startService(regIntent);
 
         setUpDummyData();
 
@@ -128,6 +139,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
                 .registerReceiver(onPatientsListUpdateReceiver, intentFilter);
 
         setUpNavigationMenu();
+
     }
 
     @Override
