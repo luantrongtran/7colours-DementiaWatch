@@ -1,7 +1,9 @@
 package ifn372.sevencolors.watch_app.activities;
 
 import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
@@ -10,6 +12,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -20,17 +27,23 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import ifn372.sevencolors.watch_app.Constants;
+import ifn372.sevencolors.watch_app.CustomSharedPreferences.CurrentLocationPreferences;
 import ifn372.sevencolors.watch_app.R;
 import ifn372.sevencolors.watch_app.backgroundservices.LocationAutoTracker;
+import ifn372.sevencolors.watch_app.backgroundservices.LocationTrackerService;
 import ifn372.sevencolors.watch_app.backgroundservices.UpdateCurrentLocationReceiver;
 
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    GoogleApiClient googleApiClient;
+    LocationRequest mLocationRequest;
+
     public long autoUpdateCurrentLocationInterval = 15*1000;//15s
     public long locationTrackerInterval = 10*1000;//10s
 
@@ -43,11 +56,25 @@ public class MapsActivity extends FragmentActivity {
         // mapFragment.getMapAsync(this);
         setUpDummyData();
         scheduleAlarm();
+
+        setUpGoogleApiClient();
     }
 
     public void scheduleAlarm() {
-        scheduleAutoLocationTrackerAlarm();
-        scheduleAutoUpdateCurrentLocationAlarm();
+//        scheduleAutoLocationTrackerAlarm();
+//        scheduleAutoUpdateCurrentLocationAlarm();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        googleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        googleApiClient.disconnect();
+        super.onStop();
     }
 
     public void setUpDummyData() {
@@ -142,22 +169,22 @@ public class MapsActivity extends FragmentActivity {
         mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").snippet("Consider yourself located"));
     }
 
-    public void scheduleAutoLocationTrackerAlarm() {
-        Intent intent = new Intent(getApplicationContext(), LocationAutoTracker.class);
-        PendingIntent pIntent = PendingIntent.getBroadcast(this,
-                0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        scheduleAutoTask(pIntent, locationTrackerInterval);
-    }
-
-    public void scheduleAutoUpdateCurrentLocationAlarm() {
-        Intent intent = new Intent(getApplicationContext(), UpdateCurrentLocationReceiver.class);
-        PendingIntent pIntent =
-                PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        scheduleAutoTask(pIntent, autoUpdateCurrentLocationInterval);
-    }
+//    public void scheduleAutoLocationTrackerAlarm() {
+//        Intent intent = new Intent(getApplicationContext(), LocationAutoTracker.class);
+//        PendingIntent pIntent = PendingIntent.getBroadcast(this,
+//                0, intent,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//        scheduleAutoTask(pIntent, locationTrackerInterval);
+//    }
+//
+//    public void scheduleAutoUpdateCurrentLocationAlarm() {
+//        Intent intent = new Intent(getApplicationContext(), UpdateCurrentLocationReceiver.class);
+//        PendingIntent pIntent =
+//                PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//        scheduleAutoTask(pIntent, autoUpdateCurrentLocationInterval);
+//    }
 
     public void scheduleAutoTask(PendingIntent pendingIntent, long interval) {
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
@@ -171,5 +198,69 @@ public class MapsActivity extends FragmentActivity {
 //        }
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
                 interval, pendingIntent);
+    }
+
+    public void registerCurrentLocationUpdatedReceiver() {
+        IntentFilter onCurrentLocationUpdatedFilter
+                = new IntentFilter(LocationTrackerService.ACTION);
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(onCurrentLocationUpdated, onCurrentLocationUpdatedFilter);
+    }
+
+    private BroadcastReceiver onCurrentLocationUpdated = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            CurrentLocationPreferences currLocPrefs
+                    = new CurrentLocationPreferences(getApplicationContext());
+            Log.i(Constants.application_id, "Receive current location updated:" +
+                    currLocPrefs.getLat() + ", " + currLocPrefs.getLon());
+        }
+    };
+
+    //Google Api clients callback methods
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.e(Constants.application_id, "Google API client connected");
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.e(Constants.application_id, "Google API client suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(Constants.application_id, "Google API client failed");
+    }
+
+    protected void startLocationUpdates() {
+        Intent intent = new Intent(getApplicationContext(), LocationAutoTracker.class);
+        PendingIntent pIntent = PendingIntent.
+                getBroadcast(getApplicationContext(), 0
+                        , intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                googleApiClient, mLocationRequest, pIntent);
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(3000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+    //End google Api clients callback methods
+
+    public void setUpGoogleApiClient() {
+        createLocationRequest();//set up for location request
+
+        googleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.PLACE_DETECTION_API)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
     }
 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -23,6 +24,8 @@ import ifn372.sevencolors.watch_app.SharedPreferencesUtitlies;
  * SharedPreferences
  */
 public class LocationTrackerService extends IntentService  {
+    public static String ACTION = LocationTrackerService.class.getCanonicalName();
+
     public LocationTrackerService(){
         super("UpdateLocationService");
     }
@@ -31,16 +34,11 @@ public class LocationTrackerService extends IntentService  {
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.e(Constants.application_id, "update location service");
-        GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
 
-        CurrentLocationPreferences currentLocationPreferences
-                = new CurrentLocationPreferences(getApplicationContext());
+        Intent updateLocation = new Intent(this, UpdateCurrentLocationService.class);
+        startService(updateLocation);
 
-        double lat = gpsTracker.getLatitude();
-        double lon = gpsTracker.getLongitude();
-        Log.e(Constants.application_id, lat + ", " + lon);
-
-        currentLocationPreferences.setLat(lat);
-        currentLocationPreferences.setLon(lon);
+        Intent broadcastIntent = new Intent(ACTION);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
     }
 }
