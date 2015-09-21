@@ -21,11 +21,14 @@ import android.app.PendingIntent;
 import android.content.Intent;
 
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import ifn372.sevencolors.watch_app.Constants;
 import ifn372.sevencolors.watch_app.R;
 import ifn372.sevencolors.watch_app.backgroundservices.LocationAutoTracker;
 import ifn372.sevencolors.watch_app.backgroundservices.UpdateCurrentLocationReceiver;
+import ifn372.sevencolors.watch_app.webservices.PanicButtonService;
 
 
 public class MapsActivity extends FragmentActivity {
@@ -37,12 +40,37 @@ public class MapsActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        setContentView(R.layout.home_screen);
+        View.OnClickListener handler = new View.OnClickListener(){
+            public void onClick(View v) {
+
+                switch (v.getId()) {
+
+                    case R.id.showMapBtn:
+                        setContentView(R.layout.activity_maps);
+                        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                                .findFragmentById(R.id.map);
+                        setUpMapIfNeeded();
+                        break;
+                    case R.id.panicBtn:
+                        sendPanicAlert();
+                        break;
+                }
+            }
+        };
+        findViewById(R.id.showMapBtn).setOnClickListener(handler);
+        findViewById(R.id.panicBtn).setOnClickListener(handler);
+
         // mapFragment.getMapAsync(this);
         setUpDummyData();
         scheduleAlarm();
+
+        //sendPanicAlert();
+    }
+
+    public void sendPanicAlert() {
+        Intent regIntent = new Intent(this, PanicButtonService.class);
+        startService(regIntent);
     }
 
     public void scheduleAlarm() {
@@ -67,7 +95,26 @@ public class MapsActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setUpMapIfNeeded();
+        setContentView(R.layout.home_screen);
+        View.OnClickListener handler = new View.OnClickListener(){
+            public void onClick(View v) {
+
+                switch (v.getId()) {
+
+                    case R.id.showMapBtn:
+                        setContentView(R.layout.activity_maps);
+                        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                                .findFragmentById(R.id.map);
+                        setUpMapIfNeeded();
+                        break;
+                    case R.id.panicBtn:
+                        sendPanicAlert();
+                        break;
+                }
+            }
+        };
+        findViewById(R.id.showMapBtn).setOnClickListener(handler);
+        findViewById(R.id.panicBtn).setOnClickListener(handler);
     }
 
     /**
