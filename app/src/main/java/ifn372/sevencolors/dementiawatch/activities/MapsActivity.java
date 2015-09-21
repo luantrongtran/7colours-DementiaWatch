@@ -6,8 +6,10 @@ import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -30,13 +32,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.IOException;
+
+import ifn372.sevencolors.backend.myApi.MyApi;
+import ifn372.sevencolors.backend.myApi.model.Carer;
 import ifn372.sevencolors.backend.myApi.model.Patient;
+import ifn372.sevencolors.dementiawatch.BackendApiProvider;
 import ifn372.sevencolors.dementiawatch.Constants;
 import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferences;
 import ifn372.sevencolors.dementiawatch.CreateFenceActivity;
 import ifn372.sevencolors.dementiawatch.PatientManager;
 import ifn372.sevencolors.dementiawatch.R;
 import ifn372.sevencolors.dementiawatch.parcelable.PatientListParcelable;
+import ifn372.sevencolors.dementiawatch.webservices.RegistrationIntentService;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReciever;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListService;
 
@@ -73,6 +81,10 @@ public class MapsActivity extends AppCompatActivity {
                 .findFragmentById(R.id.map);
         // mapFragment.getMapAsync(this);
 
+        // get GCM token
+        Intent regIntent = new Intent(this, RegistrationIntentService.class);
+        startService(regIntent);
+
         setUpDummyData();
 
         scheduleAlarm();
@@ -82,6 +94,7 @@ public class MapsActivity extends AppCompatActivity {
                 .registerReceiver(onPatientsListUpdateReceiver, intentFilter);
 
         setUpNavigationMenu();
+
     }
 
     private void setUpNavigationMenu() {

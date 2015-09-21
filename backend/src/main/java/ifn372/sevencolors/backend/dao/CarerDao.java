@@ -1,6 +1,7 @@
 package ifn372.sevencolors.backend.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -62,5 +63,38 @@ public class CarerDao extends DAOBase {
             logger.info("CarerDao class getPatients() method end.");
         }
         return patientIds;
+    }
+
+    /**
+     * Created by Zachary Tang
+     * @param carer The carer to update GCM ID
+     * @param ID The GCM ID
+     * @return ID The GCM ID inserted into the database
+     */
+    public String updateGCMId(Carer carer, String ID) {
+        logger.info("CarerDao class updateGCMId() method starts.....");
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try
+        {
+            conn = getConnection();
+            logger.info("CarerDao class updateGCMId() method RegID: " + ID);
+            String query = "UPDATE user SET reg_id = ? WHERE id = ?";
+            PreparedStatement preparedStmt = conn.prepareStatement(query);
+            preparedStmt.setString(1, ID);
+            preparedStmt.setInt(2, carer.getId());
+
+            preparedStmt.executeUpdate();
+            logger.info("CarerDao class updateGCMId() method updated successfully.");
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            logger.info("CarerDao class updateGCMId() method end.");
+        }
+        return ID;
     }
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import ifn372.sevencolors.backend.entities.Carer;
 import ifn372.sevencolors.backend.entities.Fence;
 import ifn372.sevencolors.backend.entities.FenceList;
 import ifn372.sevencolors.backend.entities.Location;
@@ -238,5 +239,78 @@ public class PatientDao extends DAOBase {
             fenceList.setItems(fences);
             p.setFenceList(fenceList);
         }
+    }
+
+    /**
+     * Created by Zachary Tang
+     * @param patientId The user ID of the patient
+     * @return carer The carer object for the specific patient
+     */
+    public Carer getCarerByPatientId(int patientId) {
+        Connection con = null;
+        Statement stmt = null;
+        Carer carer = new Carer();
+        int carerId = -1;
+        try
+        {
+            con = getConnection();
+
+            // get carer ID
+            stmt = con.createStatement();
+            String sql = "SELECT * FROM user WHERE id=" + String.valueOf(patientId);
+            ResultSet rst = stmt.executeQuery(sql);
+
+            while(rst.next()) {
+                carerId = rst.getInt("carer_id");
+            }
+
+            // get carer data
+            if (carerId != -1) {
+                stmt = con.createStatement();
+                sql = "SELECT * FROM user WHERE id=" + String.valueOf(carerId);
+                ResultSet rs = stmt.executeQuery(sql);
+
+                // set carer data
+                while(rs.next()) {
+                    carer.setId(rs.getInt("id"));
+                    carer.setFullName(rs.getString("fullname"));
+                    carer.setRole(rs.getInt("roles"));
+                    carer.setGCMId(rs.getString("reg_id"));
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return carer;
+    }
+
+    public Patient getPatientById(int id) {
+        Connection con = null;
+        Statement stmt = null;
+        Patient patient = new Patient();
+        patient.setId(id);
+        try
+        {
+            con = getConnection();
+
+            // get carer ID
+            stmt = con.createStatement();
+            String sql = "SELECT * FROM user WHERE id=" + String.valueOf(id);
+            ResultSet rst = stmt.executeQuery(sql);
+
+            while(rst.next()) {
+                patient.setCarer_id(rst.getInt("carer_id"));
+                patient.setRole(rst.getInt("roles"));
+                patient.setFullName(rst.getString("fullname"));
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return  patient;
     }
 }

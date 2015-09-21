@@ -12,6 +12,8 @@ import com.google.api.server.spi.config.ApiNamespace;
 
 import javax.inject.Named;
 
+import ifn372.sevencolors.backend.dao.CarerDao;
+import ifn372.sevencolors.backend.entities.Carer;
 import ifn372.sevencolors.backend.entities.MyBean;
 import ifn372.sevencolors.backend.connection.ConnectionProvider;
 
