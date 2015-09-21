@@ -28,4 +28,7 @@ public class Constants {
     public static String sharedPreferences_current_location_lon = "current_location_lon";
 
     public static String sharedPreferences_temporary_fences = "temporary_fences";
+
+    public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
+    public static final String REGISTRATION_COMPLETE = "registrationComplete";
 }
