@@ -55,4 +55,34 @@ public class UserInfoPreferences {
         return sharedPreferences.getString(Constants.sharedPreferences_user_info_email,
                 Constants.sharedPreferences_string_default_value);
     }
+
+    public void setSafe(boolean isSafe) {
+        sharedPreferences.edit().putBoolean(Constants.sharedPreferences_user_info_is_safe, isSafe)
+        .apply();
+    }
+
+    public boolean isSafe() {
+        return sharedPreferences.getBoolean(Constants.sharedPreferences_user_info_is_safe,
+                true);
+    }
+
+    public void setFirstMomentOutside(long millisecond) {
+        sharedPreferences.edit().putLong(Constants.sharedPreferences_user_info_first_moment_outside_fences,
+                millisecond).apply();
+    }
+
+    public long getFirstMomentOutside() {
+        return sharedPreferences
+                .getLong(Constants.sharedPreferences_user_info_first_moment_outside_fences, 0);
+    }
+
+    public boolean getUpdateLocationToServer() {
+        return sharedPreferences.getBoolean(Constants.sharedPreferences_user_info_update_location_to_server,
+                true);
+    }
+
+    public void setUpdateLocationToServer(boolean value) {
+        sharedPreferences.edit().putBoolean(Constants
+                        .sharedPreferences_user_info_update_location_to_server, value).apply();
+    }
 }

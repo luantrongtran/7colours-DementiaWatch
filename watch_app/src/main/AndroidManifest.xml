@@ -39,6 +39,9 @@
         <receiver android:name=".backgroundservices.UpdateCurrentLocationReceiver"/>
         <service android:name=".backgroundservices.UpdateCurrentLocationService" />
 
+        <receiver android:name=".backgroundservices.AlertPatientLostReceiver"/>
+        <service android:name=".backgroundservices.AlertPatientLostService"/>
+
         <service android:name=".webservices.GetFencesService"/>
 
         <meta-data

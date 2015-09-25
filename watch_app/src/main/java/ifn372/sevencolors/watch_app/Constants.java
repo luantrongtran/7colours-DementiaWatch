@@ -10,6 +10,7 @@ public class Constants {
     public static float sharedPreferences_float_default_value = -1f;
     public static long sharedPreferences_long_default_value = -1l;
     public static String sharedPreferences_string_default_value = "";
+    public static boolean sharedPreferences_boolean_default_value = false;
 
     public static String webServiceUrl = "http://192.168.0.106:8080/_ah/api/";//"https://dementiawatch-7colors.appspot.com/_ah/api/";//
     public static String sharedPreferences_current_location = "current_location";
@@ -23,4 +24,12 @@ public class Constants {
     public static String sharedPreferences_user_info_role = "user_role";
     public static String sharedPreferences_user_info_fullname = "user_fullname";
     public static String sharedPreferences_user_info_email = "user_email";
+
+    public static String sharedPreferences_user_info_is_safe = "user_safety";
+    public static String sharedPreferences_user_info_first_moment_outside_fences
+            = "first_moment_outside_the_fences";
+    public static String sharedPreferences_user_info_update_location_to_server
+            = "update_current_location_to_server";
+
+    public static int timeout_before_sending_alert_to_carer = 20000;
 }
