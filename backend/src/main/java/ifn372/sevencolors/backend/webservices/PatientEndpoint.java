@@ -22,6 +22,7 @@ import ifn372.sevencolors.backend.dao.PatientDao;
 
 import ifn372.sevencolors.backend.entities.Carer;
 import ifn372.sevencolors.backend.entities.Fence;
+import ifn372.sevencolors.backend.entities.FenceList;
 import ifn372.sevencolors.backend.entities.Location;
 import ifn372.sevencolors.backend.entities.Patient;
 import ifn372.sevencolors.backend.entities.PatientList;
@@ -160,5 +161,16 @@ public class PatientEndpoint {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @ApiMethod(name = "getFenceByPatientId")
+    public FenceList getFenceByPatientId(@Named("patientId") int patientId){
+        FenceList fenceList = new FenceList();
+
+        FenceDao fenceDao = new FenceDao();
+        List<Fence> lstFence = fenceDao.getFences(patientId);
+        fenceList.setItems(lstFence);
+
+        return fenceList;
     }
 }

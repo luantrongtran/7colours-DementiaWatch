@@ -39,6 +39,8 @@
         <receiver android:name=".backgroundservices.UpdateCurrentLocationReceiver"/>
         <service android:name=".backgroundservices.UpdateCurrentLocationService" />
 
+        <service android:name=".webservices.GetFencesService"/>
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
