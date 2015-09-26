@@ -27,14 +27,12 @@ public class AlertPatientLostService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:ss");
-
         UserInfoPreferences userInfoPreferences = new UserInfoPreferences(this);
         long firstMoment = userInfoPreferences.getFirstMomentOutside();
         long interval =  System.currentTimeMillis() - firstMoment;
         long timeRemaining = Constants.timeout_before_sending_alert_to_carer - interval;
 
-        String timeRemainingText = String.format("%2d:%2d",
+        String timeRemainingText = String.format("%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(timeRemaining),
                 TimeUnit.MILLISECONDS.toSeconds(timeRemaining) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeRemaining))
