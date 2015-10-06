@@ -4,6 +4,17 @@ package ifn372.sevencolors.backend.entities;
  * Created by lua on 15/08/2015.
  */
 public class Location {
+    private double lat;
+    private double lon;
+    private String time;
+
+    public Location(){}
+
+    public Location(double lat, double lon) {
+        this.lat = lat;
+        this.lon = lon;
+    }
+
     public double getLat() {
         return lat;
     }
@@ -20,14 +31,12 @@ public class Location {
         this.lon = lon;
     }
 
-    private double lat;
-    private double lon;
+    public String getTime() {
+        return time;
+    }
 
-    public Location(){}
-
-    public Location(double lat, double lon) {
-        this.lat = lat;
-        this.lon = lon;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     @Override

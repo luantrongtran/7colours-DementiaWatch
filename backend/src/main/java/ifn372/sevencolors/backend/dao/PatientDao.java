@@ -3,13 +3,13 @@ package ifn372.sevencolors.backend.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -39,6 +39,13 @@ public class PatientDao extends DAOBase {
 
     public static String patientView = "patient_view";
 
+    public static final String cl_arias_closest_to_interval = "closest_to_interval";
+    private static final int MAX_OFFSET_HOURS_OF_LOCATION_HISTORY = -24;
+    private static final int INTERVAL_OF_HISTORY = 1;
+
+    private static final String TABLE_NAME_PATIENT_RELATIVE = "patient_relative";
+    private static final String COL_NAME_PATIENT_ID = "patient_id";
+    private static final String COL_NAME_RELATIVE_ID = "relative_id";
     /**
      *
      * @param id
@@ -313,4 +320,110 @@ public class PatientDao extends DAOBase {
         }
         return  patient;
     }
+
+
+    /**
+     * Created by Koji
+     * Get location history
+     *   Old locations are retrieved depending on OLDEST_HOURS_OF_LOCATION_HISTORY and INTERVAL_OF_HISTORY.
+     *   The oldest location is (Current hour - MAX_OFFSET_HOURS_OF_LOCATION_HISTORY) + 1.
+     *   E.g. Current time: 27/09/2015 21:22:35 -> The oldest location: 26/09/2015 22:00:00
+     *
+     * @param patientId Patient ID
+     * @return TreeMap object that contains locations of the patient. The return value is sorted by time asc (Older location first).
+     */
+    public TreeMap<String, Location> getLocationHistory(int patientId)
+    {
+        TreeMap<String, Location> history = new TreeMap<>();
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        try
+        {
+            // The oldest date time of location history to retrieve
+            Calendar oldest = Calendar.getInstance();
+            oldest.add(Calendar.HOUR_OF_DAY, MAX_OFFSET_HOURS_OF_LOCATION_HISTORY);
+            // Interval of time (every hour)
+            Calendar interval = Calendar.getInstance();
+            interval.add(Calendar.HOUR_OF_DAY, MAX_OFFSET_HOURS_OF_LOCATION_HISTORY);
+            int hour = interval.get(Calendar.HOUR_OF_DAY);
+            interval.set(Calendar.HOUR_OF_DAY, (hour + INTERVAL_OF_HISTORY));
+            interval.set(Calendar.MINUTE, 0);
+            interval.set(Calendar.SECOND, 0);
+            interval.set(Calendar.MILLISECOND, 0);
+            //Format for interval
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            con = getConnection();
+            StringBuffer selectSql = new StringBuffer();
+            selectSql.append("select " + cl_colId + ", " + cl_colPatientId + ", max(" + cl_colUpdateTime + ") as " + cl_arias_closest_to_interval + ", ");
+            selectSql.append(cl_colLat + ", " + cl_colLon);
+            selectSql.append(" from " + currentLocationTableName);
+            StringBuffer countSql = new StringBuffer("select count(*) from " + currentLocationTableName);
+            StringBuffer whereSql = new StringBuffer(" where patient_id = ? and ( " + cl_colUpdateTime + " >= ? and " + cl_colUpdateTime + " <= ? )");
+
+            countSql.append(whereSql);
+            selectSql.append(whereSql);
+            //debug code
+            //long start = System.currentTimeMillis();
+            for(int i = 0; i < Math.abs(MAX_OFFSET_HOURS_OF_LOCATION_HISTORY); i++)
+            {
+                ps = con.prepareStatement(countSql.toString());
+                ps.setInt(1, patientId);
+                ps.setString(2, sdf.format(oldest.getTime()));
+                ps.setString(3, sdf.format(interval.getTime()));
+                ResultSet rs = ps.executeQuery();
+                boolean exist = false;
+                if (rs.next())
+                {
+                    exist = rs.getInt(1) == 0 ? false : true;
+                    //System.out.println(ps);
+                    //System.out.println("The number of result: " + rs.getInt(1));
+                }
+                if(!exist)
+                {
+                    //Increment interval
+                    hour = interval.get(Calendar.HOUR_OF_DAY);
+                    interval.set(Calendar.HOUR_OF_DAY, ++hour);
+                    continue;
+                }
+
+                ps = con.prepareStatement(selectSql.toString());
+                ps.setInt(1, patientId);
+                ps.setString(2, sdf.format(oldest.getTime()));
+                ps.setString(3, sdf.format(interval.getTime()));
+                rs = ps.executeQuery();
+                Location loc = null;
+                while(rs.next())
+                {
+                    //System.out.println(ps);
+                    loc = new Location();
+                    loc.setLon(rs.getDouble(cl_colLon));
+                    loc.setLat(rs.getDouble(cl_colLat));
+                    loc.setTime(sdf.format(rs.getTimestamp(cl_arias_closest_to_interval)));
+                    Patient patient = new Patient();
+                    patient.setId(rs.getInt(cl_colPatientId));
+                    patient.setCurrentLocation(loc);
+                    //Add location to history
+                    history.put(sdf.format(interval.getTime()), loc);
+                }
+                //Add location to history
+                //history.put(sdf.format(interval.getTime()), loc);
+                //Increment interval
+                hour = interval.get(Calendar.HOUR_OF_DAY);
+                interval.set(Calendar.HOUR_OF_DAY, ++hour);
+            }
+//            //debug code
+//            long end = System.currentTimeMillis();
+//            long time = end - start;
+//            System.out.println("running time: " + time);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return history;
+    }
+
 }
