@@ -10,6 +10,8 @@ public abstract class User {
     private int id;
     private int role;
     private String fullName;
+    private String userName;
+    private String password;
 
     public static int PATIENT_ROLE = 1;
     public static int CARER_ROLE = 2;
@@ -37,5 +39,19 @@ public abstract class User {
 
     public void setRole(int role) {
         this.role = role;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserName() { return userName; }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
