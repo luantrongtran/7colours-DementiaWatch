@@ -13,6 +13,7 @@ import ifn372.sevencolors.backend.myApi.model.Location;
 import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.watch_app.BackendApiProvider;
 import ifn372.sevencolors.watch_app.Constants;
+import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
 import ifn372.sevencolors.watch_app.SharedPreferencesUtitlies;
 
 /**
@@ -40,23 +41,24 @@ public class UpdateCurrentLocationService extends IntentService {
         currentLocation.setLat(lat);
         currentLocation.setLon(lon);
 
-        SharedPreferences userInfoSharedPref = getApplicationContext()
-                .getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
-        
+        UserInfoPreferences userInfoPreferences = new UserInfoPreferences(this);
+
         Patient patient = new Patient();
-        patient.setId(userInfoSharedPref.getInt(Constants.sharedPreferences_user_info_id, -1));
+        patient.setId(userInfoPreferences.getUserId());
 
         patient.setCurrentLocation(currentLocation);
 
-        MyApi patientApi = BackendApiProvider.getPatientApiBuilder();
+        Log.e(Constants.application_id, userInfoPreferences.getUpdateLocationToServer()+"");
+        if (userInfoPreferences.getUpdateLocationToServer()) {
+            MyApi patientApi = BackendApiProvider.getPatientApiBuilder();
+            try {
+                patientApi.updatePatientCurrentLocation(patient).execute();
+                Log.e(Constants.application_id, "Update location to backend");
 
-        try {
-            patientApi.updatePatientCurrentLocation(patient).execute();
-            Log.e("MyAPI", "Update location to backend");
-
-        } catch (IOException e) {
-            Log.e("MyAPI", "Failed update location to backend");
-            e.printStackTrace();
+            } catch (IOException e) {
+                Log.e(Constants.application_id, "Failed update location to backend");
+                e.printStackTrace();
+            }
         }
     }
 }

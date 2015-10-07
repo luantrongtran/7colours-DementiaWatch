@@ -78,7 +78,7 @@ public class MyGcmListenerService extends GcmListenerService {
                             .setContentTitle("Your patient need your help!")
                             .setContentText(message)
                             .setContentIntent(pi)
-                            .setAutoCancel(false)
+                            .setAutoCancel(true)
                             .setVisibility(1)
                             .setSound(defaultSoundUri)
                             .build();

@@ -83,7 +83,6 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
             final Patient patient = MapsActivity.patientManager
                     .getPatientList().getItems().get(itemIndex);
             View.OnTouchListener onTouchListener = new View.OnTouchListener(){
-
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     Intent intent = new Intent(context, PatientSettingActivity.class);

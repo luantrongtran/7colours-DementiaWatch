@@ -34,10 +34,13 @@ import android.widget.Button;
 
 import ifn372.sevencolors.watch_app.Constants;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.CurrentLocationPreferences;
+import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
+import ifn372.sevencolors.watch_app.FenceManager;
 import ifn372.sevencolors.watch_app.R;
 import ifn372.sevencolors.watch_app.backgroundservices.LocationAutoTracker;
 import ifn372.sevencolors.watch_app.backgroundservices.LocationTrackerService;
 import ifn372.sevencolors.watch_app.backgroundservices.UpdateCurrentLocationReceiver;
+import ifn372.sevencolors.watch_app.webservices.GetFencesService;
 import ifn372.sevencolors.watch_app.webservices.PanicButtonService;
 
 
@@ -46,6 +49,8 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     GoogleApiClient googleApiClient;
     LocationRequest mLocationRequest;
+
+    FenceManager fenceManager;
 
     public long autoUpdateCurrentLocationInterval = 15*1000;//15s
     public long locationTrackerInterval = 10*1000;//10s
@@ -80,6 +85,8 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 
         setUpGoogleApiClient();
         //sendPanicAlert();
+
+        registerOnFencesUpdated();
     }
 
     public void sendPanicAlert() {
@@ -105,10 +112,8 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     }
 
     public void setUpDummyData() {
-        SharedPreferences userInfoSharedPref = getApplicationContext().getSharedPreferences(Constants.sharedPreferences_user_info, MODE_PRIVATE);
-        SharedPreferences.Editor editor = userInfoSharedPref.edit();
-        editor.putInt(Constants.sharedPreferences_user_info_id, 1);
-        editor.commit();
+        UserInfoPreferences userInfoPreferences = new UserInfoPreferences(getApplicationContext());
+        userInfoPreferences.setUserId(1);
     }
 
     //    @Override
@@ -212,36 +217,15 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 
         // Zoom in the Google Map
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").snippet("Consider yourself located"));
-    }
+//        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").snippet("Consider yourself located"));
 
-//    public void scheduleAutoLocationTrackerAlarm() {
-//        Intent intent = new Intent(getApplicationContext(), LocationAutoTracker.class);
-//        PendingIntent pIntent = PendingIntent.getBroadcast(this,
-//                0, intent,
-//                PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//        scheduleAutoTask(pIntent, locationTrackerInterval);
-//    }
-//
-//    public void scheduleAutoUpdateCurrentLocationAlarm() {
-//        Intent intent = new Intent(getApplicationContext(), UpdateCurrentLocationReceiver.class);
-//        PendingIntent pIntent =
-//                PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//        scheduleAutoTask(pIntent, autoUpdateCurrentLocationInterval);
-//    }
+        //Update again the list of fences when resumes activity.
+        updateFenceList();
+        fenceManager = new FenceManager(getApplicationContext(), mMap);
+    }
 
     public void scheduleAutoTask(PendingIntent pendingIntent, long interval) {
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-//            // only for KITKAT and newer versions
-//            alarm.setExact(AlarmManager.RTC_WAKEUP, interval, pendingIntent);
-//        } else {
-//            alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-//                    interval, pendingIntent);
-//        }
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
                 interval, pendingIntent);
     }
@@ -309,4 +293,22 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
                 .addOnConnectionFailedListener(this)
                 .build();
     }
+
+    public void updateFenceList() {
+        Log.i(Constants.application_id, "update Fence list");
+        Intent intent = new Intent(getApplicationContext(), GetFencesService.class);
+        startService(intent);
+    }
+
+    private void registerOnFencesUpdated() {
+        IntentFilter intentFilter = new IntentFilter(GetFencesService.ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onFencesUpdated, intentFilter);
+    }
+
+    private BroadcastReceiver onFencesUpdated = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            fenceManager.updateFences();
+        }
+    };
 }

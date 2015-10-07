@@ -89,11 +89,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     GoogleApiClient googleApiClient;
     LocationRequest mLocationRequest;
 
-    //Navigation menu
-    String NAME = "Carer 1";
-    String EMAIL = "carer1@gmail.com";
-    int PROFILE = R.drawable.profile;
-
     private Toolbar toolbar;
 
     RecyclerView mRecyclerView;

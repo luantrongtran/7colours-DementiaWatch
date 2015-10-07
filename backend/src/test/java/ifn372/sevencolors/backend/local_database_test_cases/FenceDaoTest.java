@@ -37,7 +37,6 @@ public class FenceDaoTest extends LocalDatabaseTest{
         doReturn(getSpiedConnectionProvider()).when(spyFenceDao).getConnection();
     }
 
-
     public Fence findById(int id) {
         Connection con = spyFenceDao.getConnection();
         Fence fence = null;
