@@ -54,6 +54,7 @@ public class UpdatePatientsListService extends IntentService {
 
         try {
             PatientList patientList = patientApi.getPatientListByCarerOrRelative(userId, role).execute();
+            Log.i(Constants.application_id, patientList.toString());
             checkPatientsLost(patientList);
             Log.i(Constants.application_id, patientList.toString());
 
