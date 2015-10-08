@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DementiaWatch</string>
+    <string name="app_name">Dementia\'s Partner</string>
     <string name="notification_title">Out of Bound Alert</string>
     <string name="notification_text">Your patient has step out of the fence!</string>
     <string name="hello_world">Hello world!</string>
@@ -28,4 +28,36 @@
     <string name="patient_setting_enable_picked_up_mode_failed">Cannot enable picked up mode</string>
     <string name="patient_setting_disable_picked_up_mode_success">Picked up mode disabled</string>
     <string name="patient_setting_disable_picked_up_mode_failed">Cannot disabled Picked up mode</string>
+    <string name="title_activity_registration">RegistrationActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+
+    <string name="create_account"><u>Create New Account</u></string>
+    <string name="already_a_member">Already A Member</string>
+    <string name="fullname_hint">Full Name</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="confirm_password_hint">Confirm password</string>
+    <string name="login_button_text">Login</string>
+    <string name="create_button_text">Create</string>
+
+    <string name="fullname_input_empty_error">Please enter your full name</string>
+    <string name="username_input_empty_error">Please enter username</string>
+    <string name="username_input_length_error">Username must have at least 6 characters</string>
+    <string name="password_input_empty_error">Please enter password</string>
+    <string name="confirm_password_wrong">Retyped password is not matched</string>
+    <string name="role_select_error">Please select role</string>
+
+    <string name="registration_failed">Couldn\'t create new account</string>
+    <string name="registration_success">Account created</string>
+
+    <string name="login_failed">Login failed</string>
+    <string name="login_successful">Login successful</string>
+
+    <string name="signout">Sign out</string>
+
+    <string-array name="roles_array">
+        <item>Select Role</item>
+        <item>Carer</item>
+        <item>Patient\'s Relative</item>
+    </string-array>
 </resources>

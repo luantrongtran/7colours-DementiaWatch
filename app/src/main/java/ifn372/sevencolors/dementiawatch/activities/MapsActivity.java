@@ -83,6 +83,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public long autoUpdateCurrentLocationInterval = 15*1000;//15s
     public long locationTrackerInterval = 10*1000;//10s
+    UserInfoPreferences userPrefs;
 
     public static PatientManager patientManager = new PatientManager();
 
@@ -117,13 +118,13 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         // mapFragment.getMapAsync(this);
-
+        userPrefs = new UserInfoPreferences(getApplicationContext());
         setUpGoogleApiClient();
         // get GCM token
         Intent regIntent = new Intent(this, RegistrationIntentService.class);
         startService(regIntent);
 
-        setUpDummyData();
+        //setUpDummyData();
 
         registerReceiver();
 
@@ -201,6 +202,14 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 if (view != null && oneTouchGesture.onTouchEvent(e)) {
                     drawer.closeDrawers();
+
+//                    int clickedIndex = rv.getChildAdapterPosition(view);
+//                    if (clickedIndex == 0) {
+//                        //If the header was clicked
+//                        View header = rv.getChildAt(clickedIndex);
+//
+//                        return true;
+//                    }
                 }
                 return false;
             }
@@ -255,22 +264,22 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 //        scheduleAutoUpdateCurrentLocationAlarm();
     }
 
-    public void setUpDummyData() {
-        //The user, a carer, information
-        UserInfoPreferences userPrefs = new UserInfoPreferences(getApplicationContext());
-        userPrefs.setUserId(3);
-        userPrefs.setRole(2);
-
-        userPrefs.setFullName("Carer");
-        userPrefs.setEmail("Carer@gmail.com");
-//        userPrefs.setProfilePicture("");
-    }
+//    public void setUpDummyData() {
+//        //The user, a carer, information
+//        UserInfoPreferences userPrefs = new UserInfoPreferences(getApplicationContext());
+//        userPrefs.setUserId(3);
+//        userPrefs.setRole(2);
+//
+//        userPrefs.setFullName("Carer");
+//        userPrefs.setEmail("Carer@gmail.com");
+////        userPrefs.setProfilePicture("");
+//    }
 
     @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-    }
+}
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
@@ -497,5 +506,13 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
                 .target(latLng)
                 .zoom(mMap.getCameraPosition().zoom)
                 .build();
+    }
+
+    public void signOut(View view){
+        userPrefs.signOut();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

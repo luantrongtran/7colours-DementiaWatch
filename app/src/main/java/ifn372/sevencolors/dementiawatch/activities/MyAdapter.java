@@ -100,7 +100,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 Holderid = 1;
             } else {
                 Name = (TextView) itemView.findViewById(R.id.name);
-                email = (TextView) itemView.findViewById(R.id.email);
+//                email = (TextView) itemView.findViewById(R.id.email);
                 profile = (ImageView) itemView.findViewById(R.id.circleView);
                 Holderid = 0;
             }

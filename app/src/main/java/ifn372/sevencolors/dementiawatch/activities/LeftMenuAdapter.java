@@ -34,14 +34,14 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
 
     private String name;
     private int profile;
-    private String email;
+//    private String email;
 
     LeftMenuAdapter(Activity context) {
         this.context = context;
 
         UserInfoPreferences userInfoPreferences = new UserInfoPreferences(context);
         name = userInfoPreferences.getFullName();
-        email = userInfoPreferences.getEmail();
+//        email = userInfoPreferences.getEmail();
 
         //Modify later, should be url string not R.drawable.*
         profile = R.drawable.profile;//userInfoPreferences.getProfilePicture();
@@ -116,7 +116,7 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
         } else {
             holder.profile.setImageResource(profile);
             holder.Name.setText(name);
-            holder.email.setText(email);
+//            holder.email.setText(email);
         }
     }
 
@@ -151,7 +151,7 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
         //For header
         ImageView profile;
         TextView Name;
-        TextView email;
+//        TextView email;
 
         public LeftMenuViewHolder(View itemView, int ViewType) {
             super(itemView);
@@ -164,7 +164,7 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
                 Holderid = 1;
             } else {
                 Name = (TextView) itemView.findViewById(R.id.name);
-                email = (TextView) itemView.findViewById(R.id.email);
+//                email = (TextView) itemView.findViewById(R.id.email);
                 profile = (ImageView) itemView.findViewById(R.id.circleView);
                 Holderid = 0;
             }

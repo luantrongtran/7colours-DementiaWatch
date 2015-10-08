@@ -28,17 +28,29 @@
 
             />
 
+        <!--<TextView-->
+            <!--android:id="@+id/email"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="#ffffff"-->
+            <!--android:layout_marginLeft="16dp"-->
+            <!--android:layout_marginTop="5dp"-->
+            <!--android:text=""-->
+            <!--android:textSize="14sp"-->
+            <!--android:textStyle="normal"-->
+            <!--/>-->
+
         <TextView
-            android:id="@+id/email"
+            android:id="@+id/signout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#ffffff"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="5dp"
-            android:text="carer1@gmail.com"
+            android:text="@string/signout"
             android:textSize="14sp"
-            android:textStyle="normal"
-
+            android:textStyle=""
+            android:onClick="signOut"
             />
     </LinearLayout>
 

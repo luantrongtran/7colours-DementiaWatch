@@ -22,7 +22,7 @@ public class UserDao extends DAOBase {
     public static String tableName = "user";
     public static String colId = "id";
     public static String colFullName = "fullname";
-    public static String colRoes = "roles";
+    public static String colRoles = "roles";
     public static String colCarer = "carer_id";
     public static String colRegId = "reg_id";
     public static String colUserName = "username";
@@ -107,12 +107,12 @@ public class UserDao extends DAOBase {
         } else {
             try {
                 rs.next();
-                if (password.equals(rs.getString("password"))) {
-                    carer.setId(rs.getInt("id"));
-                    carer.setFullName(rs.getString("fullName"));
-                    carer.setRole(rs.getInt("role"));
-                    carer.setGCMId(rs.getString("reg_id"));
-                    carer.setUserName(rs.getString("username"));
+                if (password.equals(rs.getString(colPassword))) {
+                    carer.setId(rs.getInt(colId));
+                    carer.setFullName(rs.getString(colFullName));
+                    carer.setRole(rs.getInt(colRoles));
+                    carer.setGCMId(rs.getString(colRegId));
+                    carer.setUserName(rs.getString(colUserName));
                 } else {
                     logger.info("Failed to retrieve user: invalid password.");
                     return null;
@@ -136,12 +136,12 @@ public class UserDao extends DAOBase {
         } else {
             try {
                 rs.next();
-                if (password.equals(rs.getString("password"))) {
-                    patient.setId(rs.getInt("id"));
-                    patient.setFullName(rs.getString("fullName"));
-                    patient.setRole(rs.getInt("role"));
-                    patient.setCarer_id(rs.getInt("carer_id"));
-                    patient.setUserName(rs.getString("username"));
+                if (password.equals(rs.getString(colPassword))) {
+                    patient.setId(rs.getInt(colId));
+                    patient.setFullName(rs.getString(colFullName));
+                    patient.setRole(rs.getInt(colRoles));
+                    patient.setCarer_id(rs.getInt(colCarer));
+                    patient.setUserName(rs.getString(colUserName));
                 } else {
                     logger.info("Failed to retrieve user: invalid password.");
                     return null;
@@ -194,7 +194,7 @@ public class UserDao extends DAOBase {
             PreparedStatement ps = null;
             StringBuffer sql = new StringBuffer();
             sql.append("insert into " + tableName);
-            sql.append(" (" + colFullName + ", " + colRoes + ", " + colCarer + ", " + colRegId + ", " + colUserName + ", " + colPassword + ")");
+            sql.append(" (" + colFullName + ", " + colRoles + ", " + colCarer + ", " + colRegId + ", " + colUserName + ", " + colPassword + ")");
             sql.append(" values (?, ?, ?, ?, ?, ?) ");
             try {
                 con = getConnection();

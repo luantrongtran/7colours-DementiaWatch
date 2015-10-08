@@ -18,6 +18,7 @@ public class Constants {
     public static String sharedPreferences_user_info_fullname = "user_fullname";
     public static String sharedPreferences_user_info_email = "user_email";
     public static String sharedPreferences_user_info_profile_picture = "user_profile_picture";
+    public static String sharedPreferences_user_info_is_logged_in = "is_logged_in";
 
     public static String create_new_fence_intent_data = "create_new_fence_intent_data";
 
