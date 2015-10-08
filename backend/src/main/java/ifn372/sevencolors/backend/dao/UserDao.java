@@ -339,12 +339,11 @@ public class UserDao extends DAOBase {
             }
             ps.setInt(index, userId);
 
-            int num = ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if(rs != null && rs.next())
+            if(ps.executeUpdate() != 1)
             {
-                updatedUserId = rs.getInt(1);
+                throw new Exception("Update of the user has been failed.");
             }
+            updatedUserId = userId;
         } catch (Exception e) {
             e.printStackTrace();
             System.err.print("Exception has occurred in updateUser() method. Update User ID = " + userId);
@@ -375,11 +374,7 @@ public class UserDao extends DAOBase {
             {
                 throw new Exception("Deletion of the user has been failed.");
             }
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs != null && rs.next())
-            {
-                deletedUserId = rs.getInt(1);
-            }
+            deletedUserId = userId;
         }
         catch (Exception exp)
         {
