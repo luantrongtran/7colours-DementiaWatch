@@ -12,7 +12,7 @@ public class Constants {
     public static String sharedPreferences_string_default_value = "";
     public static boolean sharedPreferences_boolean_default_value = false;
 
-    public static String webServiceUrl = "http://192.168.0.104:8080/_ah/api/";//"https://dementiawatch-7colors.appspot.com/_ah/api/";//
+    public static String webServiceUrl = "http://172.19.35.232:8080/_ah/api/";//"https://dementiawatch-7colors.appspot.com/_ah/api/";//
     public static String sharedPreferences_current_location = "current_location";
     public static String sharedPreferences_current_location_lat = "current_location_lat";
     public static String sharedPreferences_current_location_lon = "current_location_lon";

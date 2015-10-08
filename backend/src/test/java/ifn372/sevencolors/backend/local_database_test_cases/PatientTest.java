@@ -3,10 +3,23 @@ package ifn372.sevencolors.backend.local_database_test_cases;
 /**
  * Created by Kirti on 3/9/2015.
  */
+
 import org.junit.Before;
 import org.junit.Test;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import ifn372.sevencolors.backend.dao.PatientDao;
@@ -14,8 +27,6 @@ import ifn372.sevencolors.backend.entities.Location;
 import ifn372.sevencolors.backend.entities.Patient;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -86,4 +97,113 @@ public class PatientTest extends LocalDatabaseTest{
 
 
     }
+
+
+    @Test
+    public void testGetLocationHistory()
+    {
+        //create dummy user to complete the test.
+        int dummyUserId = this.createNewUser("Dummy user ", 1);
+        int interval = -1;
+        int sec = 5;
+        double lat = 100000;
+        double lon = 200000;
+        Timestamp timestamp = null;
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, sec);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<String> dateList = new ArrayList<String>();
+        for(int i = 0; i < 24; i++)
+        {
+            cal.add(Calendar.HOUR_OF_DAY, interval);
+            this.updateCurrentLocationWithTimestamp(
+                    this.createDummyPatientLocation(dummyUserId, lat++, lon++),
+                    new Timestamp(cal.getTimeInMillis()));
+            dateList.add(sdf.format(cal.getTime()).toString());
+        }
+
+        //System.out.println("===== Original date =====");
+        int index = 0;
+        Collections.reverse(dateList);
+//        for(String date : dateList)
+//        {
+//            System.out.println(date);
+//        }
+
+        TreeMap<String, Location> history = spyPatientDao.getLocationHistory(dummyUserId);
+        for(Map.Entry<String, Location> item : history.entrySet())
+        {
+            System.out.print("Key = " + item.getKey());
+            if(item != null && item.getValue() != null)
+            {
+                System.out.println(
+                        ", Lat = " + item.getValue().getLat()
+                                + ", Lon = " + item.getValue().getLon()
+                                + ", time = " + item.getValue().getTime());
+                System.out.println(dateList.get(index));
+                assertEquals("time: ", item.getValue().getTime(), dateList.get(index++));
+            }
+            else {
+                System.out.println("Time has not been found.");
+            }
+        }
+
+    }
+
+
+    private void updateCurrentLocationWithTimestamp(Patient patient, Timestamp stamp) {
+        Connection con = spyPatientDao.getConnection();
+        String sql = "INSERT INTO current_location (patient_id, lat, lon, time) VALUES (?,?,?,?)";
+        PreparedStatement ps = null;
+        try {
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, patient.getId());
+            ps.setDouble(2, patient.getCurrentLocation().getLat());
+            ps.setDouble(3, patient.getCurrentLocation().getLon());
+            ps.setTimestamp(4, stamp);
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private int createNewUser(String fullName, int role)
+    {
+        int userId = -1;
+        Connection con = null;
+        PreparedStatement ps = null;
+        StringBuffer sql = new StringBuffer("insert into " + PatientDao.tableName);
+        sql.append(" (" + PatientDao.colFullName + ", " + PatientDao.colRoes + ") values (?, ?) ");
+        try
+        {
+            con = spyPatientDao.getConnection();
+            ps = con.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, fullName);
+            ps.setInt(2, role);
+            int num = ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if(rs != null && rs.next())
+            {
+                userId = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userId;
+    }
+
+    private Patient createDummyPatientLocation(int patientId, double lat, double lon)
+    {
+        Patient patient = new Patient();
+        patient.setId(patientId);
+        Location loc = new Location(lat, lon);
+        patient.setCurrentLocation(loc);
+        return patient;
+    }
+
+
 }
