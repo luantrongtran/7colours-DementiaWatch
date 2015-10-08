@@ -46,6 +46,10 @@ public class Carer extends User {
         patientIds = carerDao.getPatientIds(this.getId());
     }
 
+    public void setPatientIds(List<String> patientIds) {
+        this.patientIds = patientIds;
+    }
+
     public List<String> getPatientIds()
     {
         return patientIds;

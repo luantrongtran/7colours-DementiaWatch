@@ -68,6 +68,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void navigateToMapActivity() {
         Intent intent = new Intent(this, MapsActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,0);
     }
 }

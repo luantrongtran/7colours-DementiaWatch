@@ -9,6 +9,7 @@
                 ifn372.sevencolors.backend.webservices.PatientEndpoint,
                 ifn372.sevencolors.backend.webservices.CarerEndpoint,
                 ifn372.sevencolors.backend.webservices.FenceEndpoint,
+                ifn372.sevencolors.backend.webservices.UserEndpoint,
             </param-value>
         </init-param>
     </servlet>
