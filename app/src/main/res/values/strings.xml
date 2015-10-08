@@ -28,4 +28,9 @@
     <string name="patient_setting_enable_picked_up_mode_failed">Cannot enable picked up mode</string>
     <string name="patient_setting_disable_picked_up_mode_success">Picked up mode disabled</string>
     <string name="patient_setting_disable_picked_up_mode_failed">Cannot disabled Picked up mode</string>
+    <string name="patient_setting_enable_location_history">Location History mode</string>
+    <string name="patient_setting_enable_location_history_success">Location History enabled</string>
+    <string name="patient_setting_enable_location_history_failed">Cannot enable Location History</string>
+    <string name="patient_setting_disable_location_history_success">Location History disabled</string>
+    <string name="patient_setting_disable_location_history_failed">Cannot disabled Location History</string>
 </resources>

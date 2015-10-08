@@ -36,7 +36,7 @@ public class PatientSettingActivity extends AppCompatActivity {
                 Constants.sharedPreferences_integer_default_value);
         this.patient = MapsActivity.patientManager.getPatientById(patientId);
 
-        setTitle(patient.getFullName() +"'s "
+        setTitle(patient.getFullName() + "'s "
                 + getResources().getString(R.string.patient_setting_activity_title));
 
         ToggleButton pickedUpModeButton = (ToggleButton)findViewById(R.id.pickedUpModeToggleButton);
@@ -56,7 +56,7 @@ public class PatientSettingActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show();
 
                         Intent returnIntent = new Intent();
-                        setResult(RESULT_OK,returnIntent);
+                        setResult(RESULT_OK, returnIntent);
                         finish();
                     } else {
                         Toast.makeText(PatientSettingActivity.this,
@@ -71,6 +71,48 @@ public class PatientSettingActivity extends AppCompatActivity {
                     if (isDisabled == true) {
                         Toast.makeText(PatientSettingActivity.this,
                                 R.string.patient_setting_disable_picked_up_mode_success,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        ToggleButton locationHistoryButton = (ToggleButton)findViewById(R.id.locationHistoryToggleButton);
+        locationHistoryButton.setChecked(MapsActivity.patientManager.isShowingLocHis(patientId));
+
+        locationHistoryButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+                    boolean isEnabled = MapsActivity.patientManager
+                            .enableLocationHistory(patientId, getApplicationContext());
+
+                    if (isEnabled == true) {
+                        Toast.makeText(PatientSettingActivity.this,
+                                R.string.patient_setting_enable_location_history_success,
+                                Toast.LENGTH_SHORT).show();
+
+                        Intent returnIntent = new Intent();
+                        setResult(RESULT_OK,returnIntent);
+                        finish();
+                    } else {
+                        Toast.makeText(PatientSettingActivity.this,
+                                R.string.patient_setting_enable_location_history_failed,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    // The toggle is disabled
+                    boolean isDisabled = MapsActivity.patientManager
+                            .disablePickedUpMode(patientId, getApplicationContext());
+
+                    if (isDisabled == true) {
+                        Toast.makeText(PatientSettingActivity.this,
+                                R.string.patient_setting_disable_location_history_success,
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(PatientSettingActivity.this,
+                                R.string.patient_setting_disable_location_history_failed,
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
