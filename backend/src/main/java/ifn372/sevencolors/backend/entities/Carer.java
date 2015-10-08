@@ -1,6 +1,5 @@
 package ifn372.sevencolors.backend.entities;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ifn372.sevencolors.backend.dao.CarerDao;
@@ -44,6 +43,10 @@ public class Carer extends User {
     {
         CarerDao carerDao = new CarerDao();
         patientIds = carerDao.getPatientIds(this.getId());
+    }
+
+    public void setPatientIds(List<String> patientIds) {
+        this.patientIds = patientIds;
     }
 
     public List<String> getPatientIds()
