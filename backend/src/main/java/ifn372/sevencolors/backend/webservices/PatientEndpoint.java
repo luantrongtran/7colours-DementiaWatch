@@ -8,10 +8,10 @@ import com.google.gson.Gson;
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -19,7 +19,6 @@ import javax.inject.Named;
 
 import ifn372.sevencolors.backend.dao.FenceDao;
 import ifn372.sevencolors.backend.dao.PatientDao;
-
 import ifn372.sevencolors.backend.entities.Carer;
 import ifn372.sevencolors.backend.entities.Fence;
 import ifn372.sevencolors.backend.entities.FenceList;
@@ -172,5 +171,22 @@ public class PatientEndpoint {
         fenceList.setItems(lstFence);
 
         return fenceList;
+    }
+
+
+    /**
+     * Created by Koji Nishimoto
+     * Get location history of a user
+     * @param patientId Patient ID
+     * @return TreeMap object that contains locations of the patient. The return value is sorted by time asc (Older location first).
+     */
+    @ApiMethod (name = "getLocationHistory")
+    public TreeMap<String, Location> getLocationHistory(@Named("patientId") int patientId)
+    {
+        logger.info("getLocationHistory() method started");
+        PatientDao dao = new PatientDao();
+        TreeMap history = dao.getLocationHistory(patientId);
+        logger.info("getLocationHistory() method end");
+        return history;
     }
 }
