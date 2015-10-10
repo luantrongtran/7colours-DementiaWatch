@@ -108,11 +108,16 @@ public class UserDao extends DAOBase {
             try {
                 rs.next();
                 if (password.equals(rs.getString(colPassword))) {
-                    carer.setId(rs.getInt(colId));
-                    carer.setFullName(rs.getString(colFullName));
-                    carer.setRole(rs.getInt(colRoles));
-                    carer.setGCMId(rs.getString(colRegId));
-                    carer.setUserName(rs.getString(colUserName));
+                    if (rs.getInt(colRoles) == 2) {
+                        carer.setId(rs.getInt(colId));
+                        carer.setFullName(rs.getString(colFullName));
+                        carer.setRole(rs.getInt(colRoles));
+                        carer.setGCMId(rs.getString(colRegId));
+                        carer.setUserName(rs.getString(colUserName));
+                    } else {
+                        logger.info("Failed to retrieve user: wrong role.");
+                        return null;
+                    }
                 } else {
                     logger.info("Failed to retrieve user: invalid password.");
                     return null;
@@ -137,11 +142,16 @@ public class UserDao extends DAOBase {
             try {
                 rs.next();
                 if (password.equals(rs.getString(colPassword))) {
-                    patient.setId(rs.getInt(colId));
-                    patient.setFullName(rs.getString(colFullName));
-                    patient.setRole(rs.getInt(colRoles));
-                    patient.setCarer_id(rs.getInt(colCarer));
-                    patient.setUserName(rs.getString(colUserName));
+                    if (rs.getInt(colRoles) == 1) {
+                        patient.setId(rs.getInt(colId));
+                        patient.setFullName(rs.getString(colFullName));
+                        patient.setRole(rs.getInt(colRoles));
+                        patient.setCarer_id(rs.getInt(colCarer));
+                        patient.setUserName(rs.getString(colUserName));
+                    } else {
+                        logger.info("Failed to retrieve user: wrong role.");
+                        return null;
+                    }
                 } else {
                     logger.info("Failed to retrieve user: invalid password.");
                     return null;

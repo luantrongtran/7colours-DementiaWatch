@@ -41,9 +41,15 @@ public class UserEndpoint {
         return patient;
     }
 
-    @ApiMethod(name = "authenticateUser")
-    public Carer authenticateUser(Carer carer) {
+    @ApiMethod(name = "authenticateCarer")
+    public Carer authenticateCarer(Carer carer) {
         UserDao userDao = new UserDao();
         return userDao.carerAuthentication(carer.getUserName(), carer.getPassword());
+    }
+
+    @ApiMethod(name = "authenticatePatient")
+    public Patient authenticatePatient(Patient patient) {
+        UserDao userDao = new UserDao();
+        return userDao.patientAuthentication(patient.getUserName(), patient.getPassword());
     }
 }
