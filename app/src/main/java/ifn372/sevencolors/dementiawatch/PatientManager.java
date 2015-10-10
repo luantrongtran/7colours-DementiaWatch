@@ -394,6 +394,7 @@ public class PatientManager {
             {
                 continue;
             }
+            // yolo comment
 
             for (Map.Entry<String, Object> entry : mLocationHistory.entrySet()) {
 //                Patient p = patients.get(i);
