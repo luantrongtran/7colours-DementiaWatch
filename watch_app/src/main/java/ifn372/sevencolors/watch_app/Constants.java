@@ -31,5 +31,7 @@ public class Constants {
     public static String sharedPreferences_user_info_update_location_to_server
             = "update_current_location_to_server";
 
+    public static String sharedPreferences_user_info_is_logged_in = "is_logged_in";
+
     public static int timeout_before_sending_alert_to_carer = 20000;
 }

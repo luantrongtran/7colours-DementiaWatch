@@ -1,5 +1,4 @@
-package ifn372.sevencolors.dementiawatch.activities;
-
+package ifn372.sevencolors.watch_app.activities;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,10 +9,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import ifn372.sevencolors.backend.myApi.model.Carer;
-import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferences;
-import ifn372.sevencolors.dementiawatch.R;
-import ifn372.sevencolors.dementiawatch.webservices.ILoginService;
-import ifn372.sevencolors.dementiawatch.webservices.LoginService;
+import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
+import ifn372.sevencolors.watch_app.R;
+import ifn372.sevencolors.watch_app.webservices.ILoginService;
+import ifn372.sevencolors.watch_app.webservices.LoginService;
 
 public class LoginActivity extends AppCompatActivity implements ILoginService {
 
@@ -123,4 +122,5 @@ public class LoginActivity extends AppCompatActivity implements ILoginService {
         startActivity(intent);
         finish();
     }
+
 }

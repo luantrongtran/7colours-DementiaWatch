@@ -7,4 +7,17 @@
     <string name="notification_title">You are outside the safe zone</string>
     <string name="notification_text">You have stepped out of the fence! Please go back.</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+
+    <string name="login_button_text">Login</string>
+    <string name="login_failed">Login failed</string>
+    <string name="login_successful">Login successful</string>
+
+    <string name="signout">Sign out</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+
+    <string name="username_input_empty_error">Please enter username</string>
+    <string name="username_input_length_error">Username must have at least 6 characters</string>
+    <string name="password_input_empty_error">Please enter password</string>
 </resources>
