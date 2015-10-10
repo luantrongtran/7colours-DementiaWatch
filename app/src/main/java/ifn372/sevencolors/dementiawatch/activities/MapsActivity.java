@@ -264,6 +264,15 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 //        scheduleAutoUpdateCurrentLocationAlarm();
     }
 
+    public void stopAllScheduleAlarm(){
+        Intent intent = new Intent(getApplicationContext(), UpdatePatientsListReciever.class);
+        PendingIntent autoUpdatePatientsListPendingIntent =
+                PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+
+        alarm.cancel(autoUpdatePatientsListPendingIntent);
+    }
+
 //    public void setUpDummyData() {
 //        //The user, a carer, information
 //        UserInfoPreferences userPrefs = new UserInfoPreferences(getApplicationContext());
@@ -476,6 +485,14 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
                 googleApiClient, mLocationRequest, pIntent);
     }
 
+    protected void stopLocationUpdates(){
+        Intent intent = new Intent(getApplicationContext(), LocationAutoTracker.class);
+        PendingIntent pIntent = PendingIntent.
+                getBroadcast(getApplicationContext(), 0
+                        , intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, pIntent);
+    }
+
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
@@ -509,6 +526,9 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void signOut(View view){
+        stopLocationUpdates();
+        stopAllScheduleAlarm();
+
         userPrefs.signOut();
 
         Intent intent = new Intent(this, LoginActivity.class);

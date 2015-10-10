@@ -83,7 +83,7 @@ public class UserInfoPreferences {
     }
 
     public void signOut() {
-        sharedPreferences.edit().clear();
+        sharedPreferences.edit().clear().apply();
     }
 
     public void setUserInfo(Carer carer){
