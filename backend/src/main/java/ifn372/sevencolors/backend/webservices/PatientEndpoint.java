@@ -188,8 +188,6 @@ public class PatientEndpoint {
         PatientDao dao = new PatientDao();
         TreeMap history = dao.getLocationHistory(patientId);
         logger.info("getLocationHistory() method end");
-//        LocationList lst = new LocationList();
-//        lst.setLocationList(history);
         return history;
     }
 }
