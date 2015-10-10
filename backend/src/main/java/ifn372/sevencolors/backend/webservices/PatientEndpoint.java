@@ -23,6 +23,7 @@ import ifn372.sevencolors.backend.entities.Carer;
 import ifn372.sevencolors.backend.entities.Fence;
 import ifn372.sevencolors.backend.entities.FenceList;
 import ifn372.sevencolors.backend.entities.Location;
+import ifn372.sevencolors.backend.entities.LocationList;
 import ifn372.sevencolors.backend.entities.Patient;
 import ifn372.sevencolors.backend.entities.PatientList;
 import ifn372.sevencolors.backend.entities.User;
@@ -187,6 +188,8 @@ public class PatientEndpoint {
         PatientDao dao = new PatientDao();
         TreeMap history = dao.getLocationHistory(patientId);
         logger.info("getLocationHistory() method end");
+//        LocationList lst = new LocationList();
+//        lst.setLocationList(history);
         return history;
     }
 }

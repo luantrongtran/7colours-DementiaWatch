@@ -28,9 +28,6 @@ public class LocationHistoryService extends AsyncTask<String, Void, JsonMap> {
 
         logger.info("LocationHistoryService class doInBackground() method called");
         int patientId = Integer.parseInt(params[0]);
-//        String patientId = params[0];
-//        double lat = Double.parseDouble(params[1]);
-//        double lon = Double.parseDouble(params[2]);
 
         logger.info("req params:" + "patientId");
 

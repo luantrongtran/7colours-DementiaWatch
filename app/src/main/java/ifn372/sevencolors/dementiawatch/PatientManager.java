@@ -3,7 +3,6 @@ package ifn372.sevencolors.dementiawatch;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -13,6 +12,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.api.client.util.ArrayMap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -399,12 +399,17 @@ public class PatientManager {
 //                Patient p = patients.get(i);
 //                Location loc = p.getCurrentLocation();
                 String sdf = entry.getKey();
-                Location loc = (Location) entry.getValue();
-                LatLng location = new LatLng(loc.getLat(), loc.getLon());
+//                System.out.print("sdf = " + sdf);
+                ArrayMap map = (ArrayMap) entry.getValue();
+                String mlat = map.get("lat").toString();
+                String mlon = map.get("lon").toString();
+//                Location loc = (Location) entry.getValue();
+                LatLng location = new LatLng( Double.valueOf(mlat),Double.valueOf(mlon) );
+//                LatLng location = new LatLng(mlat, ((Location) mlon).getLon() );
 
                 markerOptions.position(location);
-                markerOptions.title(p.getFullName());
-//                markerOptions.title(sdf);
+//                markerOptions.title(p.getFullName());
+                markerOptions.title(sdf);
                 Bitmap b = BitMapUtils.getMutableBitmapFromResourceFromResource(drawable, patientColors[1]);
                 markerOptions.icon(BitmapDescriptorFactory.fromBitmap(b));
                 Marker marker = gMap.addMarker(markerOptions);
@@ -430,18 +435,19 @@ public class PatientManager {
 
         //Create new location history
         LocationHistoryService locationHistoryService = new LocationHistoryService(null);
-        AsyncTask<String, Void, JsonMap> locHis = null;     // This should be just JsonMap!!!!
+        JsonMap locHis = null;
         try {
             locHis = locationHistoryService.execute(
-                    Integer.toString(patient.getId()) );    // the execute won't return the Map!!!
-        } catch (Exception e) {
+                    Integer.toString(patient.getId()) )
+                    .get(createTemporaryFenceTimeOut, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
         }
         if(locHis == null){
             return false;
         }
 
-//        mLocationHistory = locHis;
+        mLocationHistory = locHis;
 
         if(!mShowingLocHisPatients.containsKey(patientId)) {
             mShowingLocHisPatients.put(patientId, true);
@@ -465,7 +471,9 @@ public class PatientManager {
 
         mShowingLocHisPatients.remove(patientId);
 
-        //mLocationHistory should be null after disabling the picked up mode
+        mLocationHistory.clear();
+
+        //mLocationHistory should be null after disabling the location history
         mLocationHistory = null;
 
         return true;

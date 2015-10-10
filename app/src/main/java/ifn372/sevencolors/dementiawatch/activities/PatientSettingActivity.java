@@ -104,12 +104,16 @@ public class PatientSettingActivity extends AppCompatActivity {
                 } else {
                     // The toggle is disabled
                     boolean isDisabled = MapsActivity.patientManager
-                            .disablePickedUpMode(patientId, getApplicationContext());
+                            .disableLocationHistory(patientId, getApplicationContext());
 
                     if (isDisabled == true) {
                         Toast.makeText(PatientSettingActivity.this,
                                 R.string.patient_setting_disable_location_history_success,
                                 Toast.LENGTH_SHORT).show();
+
+                        Intent returnIntent = new Intent();
+                        setResult(RESULT_OK,returnIntent);
+                        finish();
                     } else {
                         Toast.makeText(PatientSettingActivity.this,
                                 R.string.patient_setting_disable_location_history_failed,

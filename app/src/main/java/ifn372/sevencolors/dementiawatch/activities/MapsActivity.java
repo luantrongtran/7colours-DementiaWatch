@@ -160,6 +160,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         if(requestCode == PATIENT_SETTING_REQUEST_CODE) {
             if(resultCode == RESULT_OK) {
                 patientManager.updateTemporaryFence(mMap, getApplicationContext());
+                patientManager.updateLocationHistory(mMap, getApplicationContext());
             }
             Log.i(Constants.application_id, "Return from patient setting activity");
         }
