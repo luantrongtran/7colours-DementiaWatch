@@ -72,15 +72,15 @@ public class PatientManager {
 
     Vector<Marker> mLocationHistoryMarkers ;
 
-    public JsonMap mLocationHistory;
+//    public JsonMap mLocationHistory;
     Map<Integer, JsonMap> mLocationHistoryMap;
 
 //    public boolean mIsShowingLocHis;
 
     Map<Integer, Boolean> mShowingLocHisPatients;
 
-    Map<Integer, ArrayList<String>> mlats;
-    Map<Integer, ArrayList<String>> mlons;
+//    Map<Integer, ArrayList<String>> mlats;
+//    Map<Integer, ArrayList<String>> mlons;
 //    ArrayList<String> mlats;
 //    ArrayList<String> mlons;
 
@@ -93,10 +93,10 @@ public class PatientManager {
 
         mLocationHistoryMarkers = new Vector<Marker>();
         mShowingLocHisPatients = new HashMap<>();
-        mLocationHistory = new JsonMap();
+//        mLocationHistory = new JsonMap();
         mLocationHistoryMap = new HashMap<>();
-        mlats = new HashMap<>();
-        mlons = new HashMap<>();
+//        mlats = new HashMap<>();
+//        mlons = new HashMap<>();
 //        mlats = new ArrayList<String>();
 //        mlons = new ArrayList<String>();
 
@@ -407,7 +407,7 @@ public class PatientManager {
                 continue;
             }
 
-            int c = 0;
+//            int c = 0;
             for (Map.Entry<String, Object> entry : mLocationHistoryMap.get(p.getId()).entrySet()){ // mLocationHistory.entrySet()) {
 //                Patient p = patients.get(i);
 //                Location loc = p.getCurrentLocation();
@@ -465,21 +465,21 @@ public class PatientManager {
 
         if(!mLocationHistoryMap.containsKey(patientId)) {
             mLocationHistoryMap.put(patientId, locHis);
-            mlats.put(patientId,new ArrayList<String>());
-            mlons.put(patientId,new ArrayList<String>());
+//            mlats.put(patientId,new ArrayList<String>());
+//            mlons.put(patientId,new ArrayList<String>());
         }
 
         // The following makes fake location data so I can see different markers on map
-        int j = 0;
-        for (Map.Entry<String, Object> entry : mLocationHistoryMap.get(patientId).entrySet()) // mLocationHistory.entrySet())
-        {
-            ArrayMap map = (ArrayMap) entry.getValue();
-            String mlat = map.get("lat").toString();
-            String mlon = map.get("lon").toString();
-            mlats.get(patientId).add(mlat + Integer.toString(patientId));
-            mlons.get(patientId).add(mlon + Integer.toString(j));
-            j++;
-        }
+//        int j = 0;
+//        for (Map.Entry<String, Object> entry : mLocationHistoryMap.get(patientId).entrySet()) // mLocationHistory.entrySet())
+//        {
+//            ArrayMap map = (ArrayMap) entry.getValue();
+//            String mlat = map.get("lat").toString();
+//            String mlon = map.get("lon").toString();
+//            mlats.get(patientId).add(mlat + Integer.toString(patientId));
+//            mlons.get(patientId).add(mlon + Integer.toString(j));
+//            j++;
+//        }
 
         if(!mShowingLocHisPatients.containsKey(patientId)) {
             mShowingLocHisPatients.put(patientId, true);
@@ -504,8 +504,8 @@ public class PatientManager {
         mShowingLocHisPatients.remove(patientId);
         mLocationHistoryMap.remove(patientId);
 
-        mlats.remove(patientId);
-        mlons.remove(patientId);
+//        mlats.remove(patientId);
+//        mlons.remove(patientId);
 
 //        mLocationHistory.clear();
 
