@@ -72,11 +72,25 @@ public class PatientManager {
         patientMarkers = new Vector<Marker>();
         patientFences = new Vector<>();
         pickedUpPatients = new HashMap<>();
+    }
 
-        temporaryFenceOptions = new CircleOptions()
-                .fillColor(0x4D000000)
-                .strokeColor(0x4D000000)
-                .radius(50);
+    /**
+     * Resuming the patient manager when the application resumes
+     */
+    public void resume(Context context) {
+        //Resume pickedUpPatients from SharedPreferences
+        TemporaryFenceSharedPreferences sharedPreferences
+                = new TemporaryFenceSharedPreferences(context);
+        Map<String, ?> temporaryFences = sharedPreferences.getAllTemporaryFences();
+
+        for(Map.Entry<String, ?> entry : temporaryFences.entrySet()){
+            int patientId = Integer.valueOf(entry.getKey());
+            int fenceId = Integer.valueOf(entry.getValue().toString());
+
+            if(!pickedUpPatients.containsKey(patientId)) {
+                pickedUpPatients.put(patientId, fenceId);
+            }
+        }
     }
 
     public PatientList getPatientList() {
@@ -329,6 +343,10 @@ public class PatientManager {
         if(temporaryFence != null) {
             temporaryFence.remove();
         }
+        temporaryFenceOptions = new CircleOptions()
+                .fillColor(0x4D000000)
+                .strokeColor(0x4D000000)
+                .radius(50);
         temporaryFenceOptions = temporaryFenceOptions.center(curLocation);
         temporaryFence = gMap.addCircle(temporaryFenceOptions);
     }
@@ -347,5 +365,9 @@ public class PatientManager {
             int patientId = entry.getKey();
             disablePickedUpMode(patientId, context);
         }
+    }
+
+    public void signOut(Context context) {
+        disableAllTemporaryFences(context);
     }
 }

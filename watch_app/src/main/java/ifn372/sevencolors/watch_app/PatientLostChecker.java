@@ -1,57 +1,30 @@
-package ifn372.sevencolors.watch_app.backgroundservices;
+package ifn372.sevencolors.watch_app;
 
 import android.app.AlarmManager;
-import android.app.IntentService;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import ifn372.sevencolors.backend.myApi.model.Fence;
 import ifn372.sevencolors.backend.myApi.model.FenceList;
-import ifn372.sevencolors.watch_app.Constants;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.CurrentLocationPreferences;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.FenceSharedPreferences;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
-import ifn372.sevencolors.watch_app.PatientLostChecker;
+import ifn372.sevencolors.watch_app.backgroundservices.AlertPatientLostReceiver;
+import ifn372.sevencolors.watch_app.backgroundservices.UpdateCurrentLocationService;
 
 /**
- * This service will be called by LocationAutooTracker and stores current location into
- * SharedPreferences. Also, this service will check if the patient is safe ( the patient is inside
- * one of the fences), and store the value indicating if the patient
- * is safe or not is stored into SharedPreferences so that the AlertPatientLostService will
- * start the alarm according to the value being set.
+ * Created by lua on 11/10/2015.
  */
-public class LocationTrackerService extends IntentService  {
-    public static String ACTION = LocationTrackerService.class.getCanonicalName();
+public class PatientLostChecker {
     public static int alarm_interval = 2*1000;//second
 
-
-    public LocationTrackerService(){
-        super("UpdateLocationService");
-    }
-
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        Log.e(Constants.application_id, "update location service");
-
-        Intent updateLocation = new Intent(this, UpdateCurrentLocationService.class);
-        startService(updateLocation);
-
-        PatientLostChecker.checkPatientOutOfFences(this);
-
-        Intent broadcastIntent = new Intent(ACTION);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
-    }
-
-    public void checkIsOutOfFences() {
-
+    public static void checkPatientOutOfFences(Context context){
         CurrentLocationPreferences currentLocationPreferences
-                = new CurrentLocationPreferences(this);
-        FenceSharedPreferences fenceSharedPreferences = new FenceSharedPreferences(this);
+                = new CurrentLocationPreferences(context);
+        FenceSharedPreferences fenceSharedPreferences = new FenceSharedPreferences(context);
         FenceList fenceList = fenceSharedPreferences.getFences();
         if(fenceList == null || fenceList.getItems()==null) {
             Log.e(Constants.application_id, "Cannot connect to the server");
@@ -72,7 +45,7 @@ public class LocationTrackerService extends IntentService  {
             }
         }
 
-        UserInfoPreferences userInfoPreferences = new UserInfoPreferences(this);
+        UserInfoPreferences userInfoPreferences = new UserInfoPreferences(context);
         boolean previousSafetyStatus = userInfoPreferences.isSafe();
 
         Log.e(Constants.application_id, isSafe + ", " + previousSafetyStatus);
@@ -88,11 +61,11 @@ public class LocationTrackerService extends IntentService  {
                 //to one of the fences
                 userInfoPreferences.setUpdateLocationToServer(false);
 
-                startAlarm();//start alarm
+                startAlarm(context);//start alarm
             } else {
                 //If the patient has been back to one of the fences.
 
-                cancelAlarm();//Cancel alarm
+                cancelAlarm(context);//Cancel alarm
                 //update current location to the server as normal
                 userInfoPreferences.setUpdateLocationToServer(true);
             }
@@ -102,6 +75,10 @@ public class LocationTrackerService extends IntentService  {
                 long interval = System.currentTimeMillis() - firstMoment;
                 if(interval > Constants.timeout_before_sending_alert_to_carer) {
                     userInfoPreferences.setUpdateLocationToServer(true);
+
+                    //Update current location to server immediately after the time remaining had run out
+                    Intent intent = new Intent(context, UpdateCurrentLocationService.class);
+                    context.startService(intent);
                 }
             }
         }
@@ -112,10 +89,10 @@ public class LocationTrackerService extends IntentService  {
     /**
      * Start alarm if the patient is not safe
      */
-    public void startAlarm() {
-        PendingIntent pendingIntent = createPendingIntentForAlarm();
+    private static void startAlarm(Context context) {
+        PendingIntent pendingIntent = createPendingIntentForAlarm(context);
 
-        AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
                 alarm_interval, pendingIntent);
     }
@@ -123,16 +100,16 @@ public class LocationTrackerService extends IntentService  {
     /**
      * Cancel alarm if the patient goes back to one of the fences.
      */
-    public void cancelAlarm() {
-        PendingIntent pendingIntent = createPendingIntentForAlarm();
+    private static void cancelAlarm(Context context) {
+        PendingIntent pendingIntent = createPendingIntentForAlarm(context);
 
-        AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
     }
 
-    public PendingIntent createPendingIntentForAlarm() {
-        Intent intent = new Intent(this, AlertPatientLostReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent,
+    private static PendingIntent createPendingIntentForAlarm(Context context) {
+        Intent intent = new Intent(context, AlertPatientLostReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         return pendingIntent;

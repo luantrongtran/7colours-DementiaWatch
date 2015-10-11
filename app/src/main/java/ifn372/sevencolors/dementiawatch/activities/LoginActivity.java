@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import ifn372.sevencolors.backend.myApi.model.Carer;
 import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferences;
+import ifn372.sevencolors.dementiawatch.MainActivity;
 import ifn372.sevencolors.dementiawatch.R;
 import ifn372.sevencolors.dementiawatch.webservices.ILoginService;
 import ifn372.sevencolors.dementiawatch.webservices.LoginService;

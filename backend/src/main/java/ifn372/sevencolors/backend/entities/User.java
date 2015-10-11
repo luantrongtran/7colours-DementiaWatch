@@ -1,12 +1,15 @@
 package ifn372.sevencolors.backend.entities;
 
 /**
+ * Deleted "abstract" declaration since the class does not have any abstract methods.(Koji)
+ */
+/**
  * Assuming that the role id is as following:
  * 1: is patient
  * 2: is carer
  * 3: is relative
  */
-public abstract class User {
+public class User {
     private int id;
     private int role;
     private String fullName;

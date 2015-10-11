@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import ifn372.sevencolors.backend.myApi.model.Carer;
+import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.watch_app.Constants;
 
 /**
@@ -92,15 +93,15 @@ public class UserInfoPreferences {
                 false);
     }
 
-    public void signIn(Carer carer) {
-        setUserInfo(carer);
+    public void signIn(Patient patient) {
+        setUserInfo(patient);
         sharedPreferences.edit().putBoolean(Constants.sharedPreferences_user_info_is_logged_in,
                 true).apply();
     }
 
-    public void setUserInfo(Carer carer){
-        setFullName(carer.getFullName());
-        setUserId(carer.getId());
-        setRole(carer.getRole());
+    public void setUserInfo(Patient patient){
+        setFullName(patient.getFullName());
+        setUserId(patient.getId());
+        setRole(patient.getRole());
     }
 }

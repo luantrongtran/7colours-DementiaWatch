@@ -1,6 +1,5 @@
 package ifn372.sevencolors.backend.entities;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ifn372.sevencolors.backend.dao.CarerDao;

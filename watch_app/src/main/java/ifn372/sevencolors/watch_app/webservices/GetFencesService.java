@@ -13,6 +13,7 @@ import ifn372.sevencolors.watch_app.BackendApiProvider;
 import ifn372.sevencolors.watch_app.Constants;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.FenceSharedPreferences;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
+import ifn372.sevencolors.watch_app.PatientLostChecker;
 
 /**
  * Get fences of the current user which is the current patient
@@ -44,6 +45,8 @@ public class GetFencesService extends IntentService {
 
         FenceSharedPreferences fenceSharedPreferences = new FenceSharedPreferences(this);
         fenceSharedPreferences.setFences(fenceList);
+
+        PatientLostChecker.checkPatientOutOfFences(this);
 
         //Sends broadcast for interested Activity objects.
         Intent broadcastIntent = new Intent(ACTION);

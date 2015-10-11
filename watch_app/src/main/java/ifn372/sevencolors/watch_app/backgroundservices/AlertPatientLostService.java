@@ -28,8 +28,8 @@ public class AlertPatientLostService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         UserInfoPreferences userInfoPreferences = new UserInfoPreferences(this);
-        long firstMoment = userInfoPreferences.getFirstMomentOutside();
-        long interval =  System.currentTimeMillis() - firstMoment;
+        long firstMomentWhenPatientOutsideFences = userInfoPreferences.getFirstMomentOutside();
+        long interval =  System.currentTimeMillis() - firstMomentWhenPatientOutsideFences;
         long timeRemaining = Constants.timeout_before_sending_alert_to_carer - interval;
 
         String timeRemainingText = String.format("%02d:%02d",

@@ -236,4 +236,163 @@ public class UserDao extends DAOBase {
             return createdUserId;
         }
     }
+
+    /**
+     * Update a patient
+     * @param patient
+     * @return
+     */
+    public Patient updatePatient(Patient patient) {
+        logger.info("UserDao class updatePatient() method started.");
+        try
+        {
+            if(updateUser(patient.getId(), patient.getFullName(), patient.getRole(),
+                patient.getUserName(), patient.getPassword(), patient.getCarer_id()) == UserEndpoint.CODE_ERR_UPDATE_USER_FAILED)
+            {
+                throw new Exception("Patient update has been failed.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        logger.info("UserDao class updatePatient() method ends.");
+        return patient;
+    }
+
+    /**
+     * Update a carer.
+     * @param carer
+     * @return
+     */
+    public Carer updateCarer(Carer carer)
+    {
+        logger.info("UserDao class createCarer() method started.");
+        try
+        {
+            if(updateUser(carer.getId(), carer.getFullName(), carer.getRole(),
+                    carer.getUserName(), carer.getPassword(), -1) == UserEndpoint.CODE_ERR_UPDATE_USER_FAILED)
+            {
+                throw new Exception("Carer update has been failed.");
+            }
+            if(!updateUserAssignment(carer.getId(), carer.getPatientIds()))
+            {
+                throw new Exception("Carer update has been failed.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return carer;
+    }
+
+
+
+    /**
+     * Update the user information.
+     * @param userId        Target user's ID
+     * @param fullName      User's full name
+     * @param role          User's role
+     * @param userName      User's user name
+     * @param password      User's password
+     * @param assignCarer   Carer ID assigned to the user(patient)
+     * @return
+     */
+    public int updateUser(int userId, String fullName, int role, String userName, String password, int assignCarer)
+    {
+        logger.info("UserDao class updateUser() method started");
+        int updatedUserId= UserEndpoint.CODE_ERR_UPDATE_USER_FAILED;
+        Connection con = null;
+        PreparedStatement ps = null;
+        StringBuffer sql = new StringBuffer("update " + tableName + " set ");
+        if(fullName != null && !fullName.isEmpty())
+        {
+            sql.append(colFullName + " = ?, ");
+        }
+        if(role != -1)
+        {
+            sql.append(colRoles + " = ?,");
+        }
+        if(userName != null && !userName.isEmpty())
+        {
+            sql.append(colUserName + " = ?, ");
+        }
+        if(password != null && !password.isEmpty())
+        {
+            sql.append(colPassword + " = ?, ");
+        }
+        if(assignCarer != -1)
+        {
+            sql.append(colCarer + " = ?");
+        }
+        String whereSql = " where id = ?";
+
+        try {
+            con = getConnection();
+            ps = con.prepareStatement(sql.append(whereSql).toString(), Statement.RETURN_GENERATED_KEYS);
+            int index = 1;
+            if(fullName != null && !fullName.isEmpty())
+            {
+                ps.setString(index++, fullName);
+            }
+            if(role != -1)
+            {
+                ps.setInt(index++, role);
+            }
+            if(userName != null && !userName.isEmpty())
+            {
+                ps.setString(index++, userName);
+            }
+            if(password != null && !password.isEmpty())
+            {
+                ps.setString(index++, new HashProvider().encrypt(password));
+            }
+            if(assignCarer != -1)
+            {
+                ps.setInt(index++, assignCarer);
+            }
+            ps.setInt(index, userId);
+
+            if(ps.executeUpdate() != 1)
+            {
+                throw new Exception("Update of the user has been failed.");
+            }
+            updatedUserId = userId;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.print("Exception has occurred in updateUser() method. Update User ID = " + userId);
+        }
+        logger.info("UserDao class updateUser() method ended");
+        return updatedUserId;
+    }
+
+    /**
+     * Delete the user from user table.
+     * Related records in other tables will be automatically deleted due to the cascade setting.
+     * @param userId
+     * @return
+     */
+    public int deleteUser(int userId)
+    {
+        logger.info("UserDao class deleteUser() method started");
+        Connection con = null;
+        PreparedStatement ps = null;
+        int deletedUserId = UserEndpoint.CODE_ERR_DELETE_USER_FAILED;
+        try
+        {
+            StringBuffer sql = new StringBuffer("delete from " + tableName + " where " + colId + " = ?");
+            con = getConnection();
+            ps = con.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, userId);
+            if(ps.executeUpdate() != 1)
+            {
+                throw new Exception("Deletion of the user has been failed.");
+            }
+            deletedUserId = userId;
+        }
+        catch (Exception exp)
+        {
+            System.err.print("Exception has occurred in deleteUser() method. Created User ID = " + userId);
+            exp.printStackTrace();
+        }
+        logger.info("UserDao class deleteUser() method ended");
+        return deletedUserId;
+    }
 }

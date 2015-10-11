@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import ifn372.sevencolors.backend.myApi.model.Carer;
+import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
 import ifn372.sevencolors.watch_app.R;
 import ifn372.sevencolors.watch_app.webservices.ILoginService;
@@ -19,7 +19,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginService {
     EditText txtUsername;
     EditText txtPassword;
 
-    Carer carer = new Carer();
+    Patient patient = new Patient();
     UserInfoPreferences userInfoPreferences;
 
     private boolean isLoggedIn() {
@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginService {
         super.onResume();
         if(isLoggedIn()){
             //if the user is logged in
-            goToMapsActivity();
+            goToMainActivity();
         }
     }
 
@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginService {
         }
 
         LoginService loginService = new LoginService(this);
-        loginService.execute(carer);
+        loginService.execute(patient);
     }
 
     private String validateForm() {
@@ -92,15 +92,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginService {
             errorMsg += getString(R.string.password_input_empty_error) + "\n";
         }
 
-        carer.setUserName(username);
-        carer.setPassword(password);
+        patient.setUserName(username);
+        patient.setPassword(password);
 
         return errorMsg;
     }
 
     @Override
-    public void OnLoginServiceFinished(Carer carer) {
-        if(carer == null){
+    public void OnLoginServiceFinished(Patient patient) {
+        if(patient == null){
             //Login failed
             Toast.makeText(LoginActivity.this, getString(R.string.login_failed),
                     Toast.LENGTH_SHORT).show();
@@ -110,15 +110,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginService {
                     Toast.LENGTH_SHORT).show();
 
             //Store user info into SharedPreferences
-            userInfoPreferences.signIn(carer);
+            userInfoPreferences.signIn(patient);
 
             //Start MapsActivity
-            goToMapsActivity();
+            goToMainActivity();
         }
     }
 
-    public void goToMapsActivity() {
-        Intent intent = new Intent(this, MapsActivity.class);
+    public void goToMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }

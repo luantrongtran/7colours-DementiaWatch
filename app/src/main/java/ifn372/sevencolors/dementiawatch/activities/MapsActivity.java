@@ -152,7 +152,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     protected void onDestroy() {
-//        patientManager.disableAllTemporaryFences();
+        patientManager.disableAllTemporaryFences(getApplicationContext());
         super.onDestroy();
     }
 
@@ -288,7 +288,8 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-}
+        patientManager.resume(this);
+    }
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly

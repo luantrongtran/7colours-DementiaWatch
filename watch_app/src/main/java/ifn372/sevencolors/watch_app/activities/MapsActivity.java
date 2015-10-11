@@ -1,14 +1,11 @@
 package ifn372.sevencolors.watch_app.activities;
 
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
@@ -29,17 +26,15 @@ import android.content.Intent;
 
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+
 
 import ifn372.sevencolors.watch_app.Constants;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.CurrentLocationPreferences;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
 import ifn372.sevencolors.watch_app.FenceManager;
 import ifn372.sevencolors.watch_app.R;
+import ifn372.sevencolors.watch_app.backgroundservices.AutoUpdateFenceReceiver;
 import ifn372.sevencolors.watch_app.backgroundservices.LocationAutoTracker;
-import ifn372.sevencolors.watch_app.backgroundservices.LocationTrackerService;
-import ifn372.sevencolors.watch_app.backgroundservices.UpdateCurrentLocationReceiver;
 import ifn372.sevencolors.watch_app.webservices.GetFencesService;
 import ifn372.sevencolors.watch_app.webservices.PanicButtonService;
 
@@ -55,13 +50,15 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     public long autoUpdateCurrentLocationInterval = 15*1000;//15s
     public long locationTrackerInterval = 10*1000;//10s
 
+    public long autoUpdateFenceInterval = 6*1000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
         // mapFragment.getMapAsync(this);
-        setUpDummyData();
+//        setUpDummyData();
         scheduleAlarm();
 
         setUpGoogleApiClient();
@@ -70,14 +67,8 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         registerOnFencesUpdated();
     }
 
-    public void sendPanicAlert() {
-        Intent regIntent = new Intent(this, PanicButtonService.class);
-        startService(regIntent);
-    }
-
     public void scheduleAlarm() {
-//        scheduleAutoLocationTrackerAlarm();
-//        scheduleAutoUpdateCurrentLocationAlarm();
+        scheduleAutoUpdateFence();
     }
 
     @Override
@@ -92,18 +83,6 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         super.onStop();
     }
 
-    public void setUpDummyData() {
-        UserInfoPreferences userInfoPreferences = new UserInfoPreferences(getApplicationContext());
-        userInfoPreferences.setUserId(1);
-    }
-
-    //    @Override
-//    public void onMapReady(GoogleMap map) {
-//        // Add a marker in Sydney, Australia, and move the camera.
-//        LatLng sydney = new LatLng(-34, 151);
-//        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -186,17 +165,17 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         fenceManager = new FenceManager(getApplicationContext(), mMap);
     }
 
+    public void scheduleAutoUpdateFence(){
+        Intent intent = new Intent(this, AutoUpdateFenceReceiver.class);
+        PendingIntent pIntent =
+                PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        scheduleAutoTask(pIntent, autoUpdateFenceInterval);
+    }
+
     public void scheduleAutoTask(PendingIntent pendingIntent, long interval) {
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
                 interval, pendingIntent);
-    }
-
-    public void registerCurrentLocationUpdatedReceiver() {
-        IntentFilter onCurrentLocationUpdatedFilter
-                = new IntentFilter(LocationTrackerService.ACTION);
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(onCurrentLocationUpdated, onCurrentLocationUpdatedFilter);
     }
 
     private BroadcastReceiver onCurrentLocationUpdated = new BroadcastReceiver() {
