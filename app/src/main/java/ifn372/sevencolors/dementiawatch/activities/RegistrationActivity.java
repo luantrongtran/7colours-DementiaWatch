@@ -65,6 +65,8 @@ public class RegistrationActivity extends AppCompatActivity implements ICreateNe
         }
 
         CreateNewAccountService createNewAccountService = new CreateNewAccountService(this);
+        createNewAccountService.execute(carer);
+        finish();
     }
 
     private String validateForm() {
@@ -108,12 +110,15 @@ public class RegistrationActivity extends AppCompatActivity implements ICreateNe
         } else {
             Toast.makeText(RegistrationActivity.this, getString(R.string.registration_success),
                     Toast.LENGTH_SHORT).show();
+
+            Toast.makeText(RegistrationActivity.this, getString(R.string.login_after_registration),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
     public void goToSignIn(View view){
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, LoginActivity.class);
+//        startActivity(intent);
         finish();
     }
 }

@@ -15,6 +15,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import ifn372.sevencolors.backend.myApi.MyApi;
 import ifn372.sevencolors.backend.myApi.model.Fence;
@@ -54,6 +55,10 @@ public class UpdatePatientsListService extends IntentService {
 
         try {
             PatientList patientList = patientApi.getPatientListByCarerOrRelative(userId, role).execute();
+            if(patientList.getItems() == null){
+                patientList.setItems(new Vector<Patient>());
+            }
+
             Log.i(Constants.application_id, patientList.toString());
             checkPatientsLost(patientList);
             Log.i(Constants.application_id, patientList.toString());
@@ -69,6 +74,9 @@ public class UpdatePatientsListService extends IntentService {
     }
 
     public void checkPatientsLost(PatientList patientList) {
+        if(patientList == null || patientList.getItems() == null) {
+            return;
+        }
         int numOfLostPatients = 0;
         for(Patient patient : patientList.getItems()) {
             FenceList fenceList = patient.getFenceList();

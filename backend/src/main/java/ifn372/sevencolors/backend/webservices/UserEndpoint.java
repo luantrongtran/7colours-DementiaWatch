@@ -30,9 +30,9 @@ public class UserEndpoint {
     @ApiMethod(name = "createCarer")
     public Carer createCarer(Carer carer) {
         UserDao userDao = new UserDao();
-        if (carer.getPatientIds() == null) {
-            return null;
-        }
+//        if (carer.getPatientIds() == null) {
+//            return null;
+//        }
         carer = userDao.createCarer(carer);
         return carer;
     }

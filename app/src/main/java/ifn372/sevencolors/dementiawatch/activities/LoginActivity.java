@@ -124,4 +124,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginService {
         startActivity(intent);
         finish();
     }
+
+    public void goToRegistrationActivity(View view) {
+        Intent intent = new Intent(this, RegistrationActivity.class);
+        startActivityForResult(intent, 0);
+    }
 }

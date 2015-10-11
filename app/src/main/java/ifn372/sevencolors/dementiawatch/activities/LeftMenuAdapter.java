@@ -29,22 +29,24 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
 
     private static final int TYPE_ITEM = 1;
 
+    private static final int TYPE_FOOTER = 2;
+
     Activity context;
     Drawable patientIcon;
-
+    UserInfoPreferences userInfoPreferences;
     private String name;
-    private int profile;
+//    private int profile;
 //    private String email;
 
     LeftMenuAdapter(Activity context) {
         this.context = context;
 
-        UserInfoPreferences userInfoPreferences = new UserInfoPreferences(context);
+        userInfoPreferences = new UserInfoPreferences(context);
         name = userInfoPreferences.getFullName();
 //        email = userInfoPreferences.getEmail();
 
         //Modify later, should be url string not R.drawable.*
-        profile = R.drawable.profile;//userInfoPreferences.getProfilePicture();
+        //profile = R.drawable.app_logo;//userInfoPreferences.getProfilePicture();
 
         this.patientIcon = context.getResources()
                 .getDrawable(R.drawable.ic_room_black_24dp);
@@ -67,6 +69,12 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
             LeftMenuViewHolder vhHeader = new LeftMenuViewHolder(v, viewType);
 
             return vhHeader;
+        } else if (viewType == TYPE_FOOTER) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.add_new_patient_item, parent, false);
+
+            LeftMenuViewHolder vhFooter = new LeftMenuViewHolder(v, viewType);
+
+            return vhFooter;
         }
         return null;
 
@@ -75,7 +83,7 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
     @Override
     public void onBindViewHolder(LeftMenuViewHolder holder, final int position) {
         final int itemIndex = position - 1; //because of excluding the header
-        if (holder.Holderid == 1) {
+        if (holder.Holderid == TYPE_ITEM) {
             if(MapsActivity.patientManager.getPatientList().getItems() == null) {
                 return;
             }
@@ -113,8 +121,28 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
             });
 
             holder.settingButton.setOnTouchListener(onTouchListener);
+        } else if (holder.Holderid == TYPE_FOOTER){
+
+            if(userInfoPreferences.getRole() == UserInfoPreferences.CARER_ROLE) {
+                holder.imageView.setVisibility(View.GONE);
+                holder.textView.setVisibility(View.GONE);
+            } else {
+                holder.imageView.setVisibility(View.VISIBLE);
+                holder.textView.setVisibility(View.VISIBLE);
+            }
+            View.OnTouchListener touchListener = new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    Intent intent = new Intent(context, AddNewPatientActivity.class);
+                    context.startActivityForResult(intent, MapsActivity.PATIENT_SETTING_REQUEST_CODE);
+                    return false;
+                }
+            };
+
+            holder.imageView.setOnTouchListener(touchListener);
+            holder.textView.setOnTouchListener(touchListener);
         } else {
-            holder.profile.setImageResource(profile);
+//            holder.profile.setImageResource(profile);
             holder.Name.setText(name);
 //            holder.email.setText(email);
         }
@@ -124,13 +152,16 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
     public int getItemCount() {
         if(MapsActivity.patientManager.getPatientList().getItems() == null)
             return 0;
-        return MapsActivity.patientManager.getPatientList().getItems().size() + 1;
+
+        return MapsActivity.patientManager.getPatientList().getItems().size() + 2;
     }
 
     @Override
     public int getItemViewType(int position) {
         if (isPositionHeader(position)) {
             return TYPE_HEADER;
+        } else if (isPositionFooter(position)){
+            return TYPE_FOOTER;
         }
         return TYPE_ITEM;
     }
@@ -138,6 +169,7 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
     private boolean isPositionHeader(int position) {
         return position == 0;
     }
+    private boolean isPositionFooter(int position) {return position == getItemCount()-1;}
 
     public static class LeftMenuViewHolder extends RecyclerView.ViewHolder {
         int Holderid;
@@ -149,7 +181,7 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
         ImageView settingButton;
 
         //For header
-        ImageView profile;
+//        ImageView profile;
         TextView Name;
 //        TextView email;
 
@@ -162,10 +194,12 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
                 findLocationButton = (ImageView) itemView.findViewById(R.id.findLocationButton);
                 settingButton = (ImageView)itemView.findViewById(R.id.settingButton);
                 Holderid = 1;
+            } else if (ViewType == TYPE_FOOTER) {
+                textView = (TextView) itemView.findViewById(R.id.rowText);
+                imageView = (ImageView) itemView.findViewById(R.id.rowIcon);
+                Holderid = 2;
             } else {
                 Name = (TextView) itemView.findViewById(R.id.name);
-//                email = (TextView) itemView.findViewById(R.id.email);
-                profile = (ImageView) itemView.findViewById(R.id.circleView);
                 Holderid = 0;
             }
         }
