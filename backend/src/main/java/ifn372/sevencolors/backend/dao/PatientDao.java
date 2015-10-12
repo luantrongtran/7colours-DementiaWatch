@@ -324,7 +324,7 @@ public class PatientDao extends DAOBase {
         }
         return  patient;
     }
-	
+
     /**
      * Created by Koji
      * Get location history
@@ -358,15 +358,27 @@ public class PatientDao extends DAOBase {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             con = getConnection();
-            StringBuffer selectSql = new StringBuffer();
-            selectSql.append("select " + cl_colId + ", " + cl_colPatientId + ", max(" + cl_colUpdateTime + ") as " + cl_arias_closest_to_interval + ", ");
-            selectSql.append(cl_colLat + ", " + cl_colLon);
-            selectSql.append(" from " + currentLocationTableName);
-            StringBuffer countSql = new StringBuffer("select count(*) from " + currentLocationTableName);
-            StringBuffer whereSql = new StringBuffer(" where patient_id = ? and ( " + cl_colUpdateTime + " >= ? and " + cl_colUpdateTime + " <= ? )");
 
-            countSql.append(whereSql);
-            selectSql.append(whereSql);
+            //Sub query SQL
+            StringBuffer subQuerySql = new StringBuffer("select max(" + cl_colUpdateTime + ")");
+            StringBuffer fromSql = new StringBuffer(" from " + currentLocationTableName);
+            StringBuffer subWhereSql = new StringBuffer(" where " + cl_colPatientId + " = ? ");
+            subWhereSql.append("and (" + cl_colUpdateTime + " >= ? and " + cl_colUpdateTime + " <= ? )");
+            subQuerySql.append(fromSql);
+            subQuerySql.append(subWhereSql);
+
+            //Main SQL
+            StringBuffer selectSql = new StringBuffer("select " + cl_colId + ", " + cl_colPatientId);
+            selectSql.append(", " + cl_colLat + ", " + cl_colLon + ", " + cl_colUpdateTime + " as " + cl_arias_closest_to_interval);
+            selectSql.append(fromSql);
+            selectSql.append(" where " + cl_colUpdateTime + " = (");
+            selectSql.append(subQuerySql + " ) ");
+
+            //SQL for count the number of records
+            StringBuffer countSql = new StringBuffer("select count(*) from " + currentLocationTableName);
+            countSql.append(" where " + cl_colUpdateTime + " = (");
+            countSql.append(subQuerySql + " ) ");
+
             //debug code
             //long start = System.currentTimeMillis();
             for(int i = 0; i < Math.abs(MAX_OFFSET_HOURS_OF_LOCATION_HISTORY); i++)
@@ -375,26 +387,28 @@ public class PatientDao extends DAOBase {
                 ps.setInt(1, patientId);
                 ps.setString(2, sdf.format(oldest.getTime()));
                 ps.setString(3, sdf.format(interval.getTime()));
+//                System.out.println("===== Count sql result =====");
+//                System.out.println(ps);
                 ResultSet rs = ps.executeQuery();
-                boolean exist = false;
                 if (rs.next())
                 {
-                    exist = rs.getInt(1) == 0 ? false : true;
-                    //System.out.println(ps);
-                    //System.out.println("The number of result: " + rs.getInt(1));
-                }
-                if(!exist)
-                {
-                    //Increment interval
-                    hour = interval.get(Calendar.HOUR_OF_DAY);
-                    interval.set(Calendar.HOUR_OF_DAY, ++hour);
-                    continue;
+                    // If there is no location history recorde within the interval
+                    if(rs.getInt(1) == 0)
+                    {
+                        //Increment interval
+                        //System.out.println(" No location history record within the period found. ");
+                        hour = interval.get(Calendar.HOUR_OF_DAY);
+                        interval.set(Calendar.HOUR_OF_DAY, ++hour);
+                        continue;
+                    }
                 }
 
                 ps = con.prepareStatement(selectSql.toString());
                 ps.setInt(1, patientId);
                 ps.setString(2, sdf.format(oldest.getTime()));
                 ps.setString(3, sdf.format(interval.getTime()));
+//                System.out.println("===== Actual sql result =====");
+//                System.out.println(ps);
                 rs = ps.executeQuery();
                 Location loc = null;
                 while(rs.next())
@@ -416,10 +430,6 @@ public class PatientDao extends DAOBase {
                 hour = interval.get(Calendar.HOUR_OF_DAY);
                 interval.set(Calendar.HOUR_OF_DAY, ++hour);
             }
-//            //debug code
-//            long end = System.currentTimeMillis();
-//            long time = end - start;
-//            System.out.println("running time: " + time);
         }
         catch (Exception e)
         {
