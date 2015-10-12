@@ -1,5 +1,5 @@
 package ifn372.sevencolors.watch_app.activities;
-import android.content.Intent;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,45 +11,32 @@ import android.widget.Toast;
 import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
 import ifn372.sevencolors.watch_app.R;
-import ifn372.sevencolors.watch_app.webservices.ILoginService;
-import ifn372.sevencolors.watch_app.webservices.LoginService;
+import ifn372.sevencolors.watch_app.webservices.CreateNewAccountService;
+import ifn372.sevencolors.watch_app.webservices.ICreateNewAccountService;
 
-public class LoginActivity extends AppCompatActivity implements ILoginService {
 
+public class RegistrationActivity extends AppCompatActivity implements ICreateNewAccountService {
+    EditText txtFullName;
     EditText txtUsername;
     EditText txtPassword;
+    EditText txtConfirmPass;
 
     Patient patient = new Patient();
-    UserInfoPreferences userInfoPreferences;
-
-    private boolean isLoggedIn() {
-        return userInfoPreferences.isLoggedIn();
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_registration);
 
-        userInfoPreferences
-                = new UserInfoPreferences(getApplicationContext());
-
+        txtFullName = (EditText)findViewById(R.id.fullname);
         txtUsername = (EditText)findViewById(R.id.username);
         txtPassword = (EditText)findViewById(R.id.password);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(isLoggedIn()){
-            //if the user is logged in
-            goToMainActivity();
-        }
+        txtConfirmPass = (EditText)findViewById(R.id.confirm_password);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_login, menu);
+        getMenuInflater().inflate(R.menu.menu_registration, menu);
         return true;
     }
 
@@ -68,63 +55,64 @@ public class LoginActivity extends AppCompatActivity implements ILoginService {
         return super.onOptionsItemSelected(item);
     }
 
-    public void login(View view){
+    public void createNewAccount(View view) {
         String errorMsg = validateForm();
         if(!errorMsg.isEmpty()){
-            Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistrationActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        LoginService loginService = new LoginService(this);
-        loginService.execute(patient);
+        CreateNewAccountService createNewAccountService = new CreateNewAccountService(this);
+        createNewAccountService.execute(patient);
+        finish();
     }
 
     private String validateForm() {
         String errorMsg = "";
-
-        String username = txtUsername.getText().toString().trim();
+        String fullname = txtFullName.getText().toString();
+        if(fullname.isEmpty()){
+            errorMsg += getString(R.string.fullname_input_empty_error) + "\n";
+        }
+        String username = txtUsername.getText().toString();
         if(username.isEmpty()) {
             errorMsg += getString(R.string.username_input_empty_error) + "\n";
         }
 
-        String password = txtPassword.getText().toString().trim();
+        String password = txtPassword.getText().toString();
         if(password.isEmpty()){
             errorMsg += getString(R.string.password_input_empty_error) + "\n";
         }
+        String confirmPass= txtConfirmPass.getText().toString();
+        if(!confirmPass.equals(password)){
+            errorMsg += getString(R.string.confirm_password_wrong) + "\n";
+        }
 
+        patient.setFullName(fullname);
         patient.setUserName(username);
         patient.setPassword(password);
+        patient.setRole(UserInfoPreferences.PATIENT_ROLE);
+        patient.setCarerId(-1);
 
         return errorMsg;
     }
 
     @Override
-    public void OnLoginServiceFinished(Patient patient) {
-        if(patient == null){
-            //Login failed
-            Toast.makeText(LoginActivity.this, getString(R.string.login_failed),
+    public void OnAfterNewAccountCreated(Patient carer) {
+        if(carer == null){
+            Toast.makeText(RegistrationActivity.this, getString(R.string.registration_failed),
                     Toast.LENGTH_SHORT).show();
-        } else
-        {
-            Toast.makeText(LoginActivity.this, getString(R.string.login_successful),
+        } else {
+            Toast.makeText(RegistrationActivity.this, getString(R.string.registration_success),
                     Toast.LENGTH_SHORT).show();
 
-            //Store user info into SharedPreferences
-            userInfoPreferences.signIn(patient);
-
-            //Start MapsActivity
-            goToMainActivity();
+            Toast.makeText(RegistrationActivity.this, getString(R.string.login_after_registration),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void goToMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+    public void goToSignIn(View view){
+//        Intent intent = new Intent(this, LoginActivity.class);
+//        startActivity(intent);
         finish();
-    }
-
-    public void goToRegistrationActivity(View view) {
-        Intent intent = new Intent(this, RegistrationActivity.class);
-        startActivityForResult(intent, 0);
     }
 }

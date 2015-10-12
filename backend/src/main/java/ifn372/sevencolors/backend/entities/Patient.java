@@ -5,6 +5,15 @@ package ifn372.sevencolors.backend.entities;
  */
 public class Patient extends User {
 
+    public String getGcmId() {
+        return gcmId;
+    }
+
+    public void setGcmId(String gcmId) {
+        this.gcmId = gcmId;
+    }
+
+    String gcmId;
 
     private boolean safety;
 

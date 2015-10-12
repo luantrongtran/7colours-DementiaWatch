@@ -123,7 +123,8 @@ public class LeftMenuAdapter extends RecyclerView.Adapter<LeftMenuAdapter.LeftMe
             holder.settingButton.setOnTouchListener(onTouchListener);
         } else if (holder.Holderid == TYPE_FOOTER){
 
-            if(userInfoPreferences.getRole() == UserInfoPreferences.CARER_ROLE) {
+            if(userInfoPreferences.getRole() == UserInfoPreferences.CARER_ROLE
+                    && MapsActivity.patientManager.getPatientList().size() == PatientManager.MAX_NUM_OF_PATIENTS) {
                 holder.imageView.setVisibility(View.GONE);
                 holder.textView.setVisibility(View.GONE);
             } else {

@@ -16,22 +16,23 @@ import ifn372.sevencolors.backend.entities.Patient;
  * Created by zach on 28/08/15.
  */
 public class CarerDao extends DAOBase {
-    public CarerDao(){}
+    public CarerDao() {
+    }
+
     private static final Logger logger = Logger.getLogger(CarerDao.class.getName());
 
     /**
      * Created by Zachary Tang
+     *
      * @param carerId The ID of the carer
      * @return patientIds The list of patient IDs related to the carer
      */
-    public List<String> getPatientIds(int carerId)
-    {
+    public List<String> getPatientIds(int carerId) {
         //logger.info("CarerDao class getPatients() method starts.....");
         List<String> patientIds = new ArrayList<String>();
         Connection con = null;
         Statement stmt = null;
-        try
-        {
+        try {
             con = getConnection();
             stmt = con.createStatement();
             //logger.info("CarerDao class getPatients() method carer: " + String.valueOf(carerId));
@@ -47,19 +48,14 @@ public class CarerDao extends DAOBase {
             logger.info("CarerDao class getPatients() method count:" + String.valueOf(rowcount));*/
 
             // add patient id to list
-            while(rs.next())
-            {
+            while (rs.next()) {
                 String pid = rs.getString("id");
                 patientIds.add(pid); // add patient to the list
                 logger.info("Patient ID: " + pid);
             }
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
-        }
-        finally
-        {
+        } finally {
             logger.info("CarerDao class getPatients() method end.");
         }
         return patientIds;
@@ -67,16 +63,16 @@ public class CarerDao extends DAOBase {
 
     /**
      * Created by Zachary Tang
+     *
      * @param carer The carer to update GCM ID
-     * @param ID The GCM ID
+     * @param ID    The GCM ID
      * @return ID The GCM ID inserted into the database
      */
     public String updateGCMId(Carer carer, String ID) {
         logger.info("CarerDao class updateGCMId() method starts.....");
         Connection conn = null;
         PreparedStatement ps = null;
-        try
-        {
+        try {
             conn = getConnection();
             logger.info("CarerDao class updateGCMId() method RegID: " + ID);
             String query = "UPDATE user SET reg_id = ? WHERE id = ?";
@@ -86,15 +82,36 @@ public class CarerDao extends DAOBase {
 
             preparedStmt.executeUpdate();
             logger.info("CarerDao class updateGCMId() method updated successfully.");
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
-        }
-        finally
-        {
+        } finally {
             logger.info("CarerDao class updateGCMId() method end.");
         }
         return ID;
+    }
+
+    public Carer getCarerById(int carerId) {
+        Connection con = null;
+        Statement stmt = null;
+        Carer carer = new Carer();
+        carer.setId(carerId);
+        try {
+            con = getConnection();
+
+            // get carer ID
+            stmt = con.createStatement();
+            String sql = "SELECT * FROM user WHERE id=" + carerId;
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                carer.setId(rs.getInt("id"));
+                carer.setFullName(rs.getString("fullname"));
+                carer.setRole(rs.getInt("roles"));
+                carer.setGCMId(rs.getString("reg_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return carer;
     }
 }

@@ -316,6 +316,7 @@ public class PatientDao extends DAOBase {
                 patient.setCarer_id(rst.getInt("carer_id"));
                 patient.setRole(rst.getInt("roles"));
                 patient.setFullName(rst.getString("fullname"));
+                patient.setGcmId(rst.getString("reg_id"));
             }
         }
         catch (SQLException e)
@@ -427,5 +428,29 @@ public class PatientDao extends DAOBase {
         }
 
         return history;
+    }
+
+    public Patient getPatientByUsername(String username) {
+        UserDao userDao = new UserDao();
+        ResultSet rs = userDao.getUserEntry(username);
+        if(rs == null) {
+            return null;
+        }
+
+        Patient patient = null;
+        try {
+            while(rs.next()) {
+                patient = new Patient();
+                patient.setCarer_id(rs.getInt("carer_id"));
+                patient.setRole(rs.getInt("roles"));
+                patient.setFullName(rs.getString("fullname"));
+                patient.setGcmId(rs.getString("reg_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return patient;
     }
 }

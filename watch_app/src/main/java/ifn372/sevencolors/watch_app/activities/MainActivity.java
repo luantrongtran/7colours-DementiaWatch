@@ -11,6 +11,7 @@ import android.widget.Button;
 
 import ifn372.sevencolors.watch_app.R;
 import ifn372.sevencolors.watch_app.webservices.PanicButtonService;
+import ifn372.sevencolors.watch_app.webservices.RegistrationIntentService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        // get GCM token
+        Intent regIntent = new Intent(this, RegistrationIntentService.class);
+        startService(regIntent);
     }
 
     @Override

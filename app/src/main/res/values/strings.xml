@@ -57,6 +57,9 @@
     <string name="signout">Sign out</string>
 
     <string name="add_a_new_patient">Add new patient</string>
+    <string name="enter_username_of_patient">Enter the username of the patient you want to add</string>
+    <string name="add_new_patient_activity_title">Add new patient</string>
+    <string name="invitation_sent_successfully">Invitation has been sent</string>
 
     <string-array name="roles_array">
         <item>Select Role</item>

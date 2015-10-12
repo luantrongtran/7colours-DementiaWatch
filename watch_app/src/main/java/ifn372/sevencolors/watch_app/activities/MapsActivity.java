@@ -37,6 +37,7 @@ import ifn372.sevencolors.watch_app.backgroundservices.AutoUpdateFenceReceiver;
 import ifn372.sevencolors.watch_app.backgroundservices.LocationAutoTracker;
 import ifn372.sevencolors.watch_app.webservices.GetFencesService;
 import ifn372.sevencolors.watch_app.webservices.PanicButtonService;
+import ifn372.sevencolors.watch_app.webservices.RegistrationIntentService;
 
 
 public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{

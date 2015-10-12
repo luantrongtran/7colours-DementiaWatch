@@ -51,15 +51,6 @@ public class UserDao extends DAOBase {
         try {
             carer.setId(insertUser(carer.getFullName(), carer.getRole(), carer.getUserName(), carer.getPassword(), -1));
             return carer;
-//            if ((carer.getId() != -1) && updateUserAssignment(carer.getId(), carer.getPatientIds())) {
-//                logger.info("Carer created successfully.");
-//                logger.info("UserDao class createCarer() method ended.");
-//                return carer;
-//            } else {
-//                logger.info("Failed to create carer.");
-//                logger.info("UserDao class createCarer() method ended.");
-//                return null;
-//            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
