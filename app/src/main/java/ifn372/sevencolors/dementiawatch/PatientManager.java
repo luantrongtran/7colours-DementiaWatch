@@ -386,9 +386,9 @@ public class PatientManager {
         {
             for (int i = 0; i < mLocationHistoryMarkers.size(); i++) {
                 Marker marker = mLocationHistoryMarkers.get(i);
-                if (marker.isInfoWindowShown()) {
-                    patientIdShowingInfoWindow = patientList.getItems().get(i).getId();
-                }
+//                if (marker.isInfoWindowShown()) {
+//                    patientIdShowingInfoWindow = patientList.getItems().get(i).getId();
+//                }
                 marker.remove();
             }
         }
