@@ -1,5 +1,10 @@
 package ifn372.sevencolors.watch_app;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import ifn372.sevencolors.watch_app.webservices.ISayHi;
+import ifn372.sevencolors.watch_app.webservices.MyGcmListenerService;
 import ifn372.sevencolors.watch_app.webservices.SayHi;
 
 public class MainActivity extends AppCompatActivity implements ISayHi {
@@ -17,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements ISayHi {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_testing);
+
     }
 
     @Override
@@ -53,4 +60,6 @@ public class MainActivity extends AppCompatActivity implements ISayHi {
     public void processData(String greeting) {
         Toast.makeText(this, greeting, Toast.LENGTH_SHORT).show();
     }
+
+
 }

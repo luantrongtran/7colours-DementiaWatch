@@ -98,6 +98,7 @@ public class CarerEndpoint {
             Map<String, String> data = new HashMap<String, String>();
             data.put("title", "Invitation");
             data.put("message", carername + " sent you an invitation");
+            data.put("carer_id", carer.getId()+"");
             Map<String, Object> finalData = new HashMap<String, Object>();
             finalData.put("data", data);
             finalData.put("to", gcmId);

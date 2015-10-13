@@ -1,7 +1,9 @@
 package ifn372.sevencolors.watch_app.activities;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
@@ -26,6 +28,7 @@ import android.content.Intent;
 
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 
 import ifn372.sevencolors.watch_app.Constants;

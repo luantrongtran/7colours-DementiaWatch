@@ -13,12 +13,16 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
+import ifn372.sevencolors.watch_app.Constants;
+
 public class MyGcmListenerService extends GcmListenerService {
+    public static String ACTION = "NotificationInvitation";
 
     private static final String TAG = "MyGcmListenerService";
     private static Handler mHandler = new Handler();
@@ -39,6 +43,9 @@ public class MyGcmListenerService extends GcmListenerService {
         Log.i(TAG, "From: " + from);
         Log.i(TAG, "Message: " + message);
 
-        //Toast.makeText(MyGcmListenerService.this, message, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(ACTION);
+        intent.putExtra(Constants.gcm_title, title);
+        intent.putExtra(Constants.gcm_message, message);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }

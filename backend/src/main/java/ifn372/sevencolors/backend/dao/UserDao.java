@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import ifn372.sevencolors.backend.HashProvider;
 import ifn372.sevencolors.backend.entities.Carer;
 import ifn372.sevencolors.backend.entities.Patient;
+import ifn372.sevencolors.backend.entities.ResultCode;
 import ifn372.sevencolors.backend.webservices.UserEndpoint;
 
 /**
@@ -234,20 +235,27 @@ public class UserDao extends DAOBase {
      * @param patient
      * @return
      */
-    public Patient updatePatient(Patient patient) {
+    public ResultCode updatePatient(Patient patient) {
         logger.info("UserDao class updatePatient() method started.");
+        boolean isUpdateSuccessful = true;
         try
         {
             if(updateUser(patient.getId(), patient.getFullName(), patient.getRole(),
                 patient.getUserName(), patient.getPassword(), patient.getCarer_id()) == UserEndpoint.CODE_ERR_UPDATE_USER_FAILED)
             {
+                isUpdateSuccessful = false;
                 throw new Exception("Patient update has been failed.");
             }
         } catch (Exception e) {
+            isUpdateSuccessful = false;
             e.printStackTrace();
         }
         logger.info("UserDao class updatePatient() method ends.");
-        return patient;
+
+        ResultCode resultCode = new ResultCode();
+        resultCode.setResult(isUpdateSuccessful);
+
+        return resultCode;
     }
 
     /**
