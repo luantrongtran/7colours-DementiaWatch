@@ -63,13 +63,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // get GCM token
-        Intent regIntent = new Intent(this, RegistrationIntentService.class);
-        startService(regIntent);
-
         registerOnInvitationReceived();
 
         builder = new AlertDialog.Builder(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // get GCM token
+        Intent regIntent = new Intent(this, RegistrationIntentService.class);
+        startService(regIntent);
     }
 
     @Override

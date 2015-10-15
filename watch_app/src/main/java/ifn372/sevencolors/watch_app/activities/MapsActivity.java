@@ -39,6 +39,7 @@ import ifn372.sevencolors.watch_app.R;
 import ifn372.sevencolors.watch_app.backgroundservices.AutoUpdateFenceReceiver;
 import ifn372.sevencolors.watch_app.backgroundservices.LocationAutoTracker;
 import ifn372.sevencolors.watch_app.webservices.GetFencesService;
+import ifn372.sevencolors.watch_app.webservices.MyGcmListenerService;
 import ifn372.sevencolors.watch_app.webservices.PanicButtonService;
 import ifn372.sevencolors.watch_app.webservices.RegistrationIntentService;
 
@@ -69,6 +70,11 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         //sendPanicAlert();
 
         registerOnFencesUpdated();
+
+        registerOnInvitationReceived();
+
+        builder = new AlertDialog.Builder(this);
+
     }
 
     public void scheduleAlarm() {
@@ -254,6 +260,39 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         @Override
         public void onReceive(Context context, Intent intent) {
             fenceManager.updateFences();
+        }
+    };
+
+    AlertDialog.Builder builder;
+    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    //Yes button clicked
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    break;
+            }
+        }
+    };
+
+    public void registerOnInvitationReceived() {
+        IntentFilter intentFilter = new IntentFilter(MyGcmListenerService.ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onInvitationReceived, intentFilter);
+    }
+
+    private BroadcastReceiver onInvitationReceived = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String title = intent.getStringExtra(Constants.gcm_title);
+            String message = intent.getStringExtra(Constants.gcm_message);
+
+            builder.setMessage(message).setPositiveButton("Accept", dialogClickListener)
+                    .setNegativeButton("Deny", dialogClickListener).show();
         }
     };
 }
