@@ -49,21 +49,29 @@
 
     <string name="registration_failed">Couldn\'t create new account</string>
     <string name="registration_success">Account created</string>
+    <string name="login_after_registration">Please login using your new account</string>
 
     <string name="login_failed">Login failed</string>
     <string name="login_successful">Login successful</string>
 
     <string name="signout">Sign out</string>
 
+    <string name="add_a_new_patient">Add new patient</string>
+    <string name="enter_username_of_patient">Enter the username of the patient you want to add</string>
+    <string name="add_new_patient_activity_title">Add new patient</string>
+    <string name="invitation_sent_successfully">Invitation has been sent</string>
+
     <string-array name="roles_array">
         <item>Select Role</item>
         <item>Carer</item>
         <item>Patient\'s Relative</item>
     </string-array>
+	
     <string name="patient_setting_enable_location_history">Location History mode</string>
     <string name="patient_setting_enable_location_history_success">Location History enabled</string>
     <string name="patient_setting_enable_location_history_failed">Cannot enable Location History</string>
     <string name="patient_setting_disable_location_history_success">Location History disabled</string>
     <string name="patient_setting_disable_location_history_failed">Cannot disabled Location History</string>
 
+    <string name="title_activity_add_new_patient">AddNewPatientActivity</string>
 </resources>

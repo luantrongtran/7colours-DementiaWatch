@@ -39,6 +39,8 @@ import ifn372.sevencolors.dementiawatch.webservices.LocationHistoryService;
  */
 public class PatientManager {
 
+    public static final int MAX_NUM_OF_PATIENTS = 3;
+
     public static int[] patientColors = {0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xCCCCCC};
     public static int[] fenceColors = {0x4DFF0000, 0x4D00FF00, 0x4D0000FF, 0x4DFFFF00, 0x4DCCCCCC};
     public static float temporaryFenceRadius = 50;

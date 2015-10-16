@@ -20,4 +20,20 @@
     <string name="username_input_empty_error">Please enter username</string>
     <string name="username_input_length_error">Username must have at least 6 characters</string>
     <string name="password_input_empty_error">Please enter password</string>
+    <string name="title_activity_registration">RegistrationActivity</string>
+    <string name="confirm_password_wrong">Retyped password is not matched</string>
+
+    <string name="fullname_input_empty_error">Please enter your full name</string>
+    <string name="role_select_error">Please select role</string>
+
+    <string name="create_account"><u>Create New Account</u></string>
+    <string name="already_a_member">Already A Member</string>
+    <string name="fullname_hint">Full Name</string>
+
+    <string name="confirm_password_hint">Confirm password</string>
+    <string name="create_button_text">Create</string>
+
+    <string name="registration_failed">Couldn\'t create new account</string>
+    <string name="registration_success">Account created</string>
+    <string name="login_after_registration">Please login using your new account</string>
 </resources>

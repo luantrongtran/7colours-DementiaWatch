@@ -67,6 +67,7 @@ import ifn372.sevencolors.dementiawatch.webservices.IDeleteFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.IFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.IUpdateFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.FenceService;
+import ifn372.sevencolors.dementiawatch.webservices.UnregisterGCMService;
 import ifn372.sevencolors.dementiawatch.webservices.UpdateFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.RegistrationIntentService;
 import ifn372.sevencolors.dementiawatch.webservices.UpdatePatientsListReciever;
@@ -529,6 +530,11 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void signOut(View view){
+        //unregister GCM
+        UnregisterGCMService unregisterGCMService
+                = new UnregisterGCMService(this);
+        unregisterGCMService.execute();
+
         stopLocationUpdates();
         stopAllScheduleAlarm();
 

@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 import ifn372.sevencolors.backend.HashProvider;
 import ifn372.sevencolors.backend.entities.Carer;
 import ifn372.sevencolors.backend.entities.Patient;
+import ifn372.sevencolors.backend.entities.ResultCode;
+import ifn372.sevencolors.backend.entities.User;
 import ifn372.sevencolors.backend.webservices.UserEndpoint;
 
 /**
@@ -50,15 +52,7 @@ public class UserDao extends DAOBase {
         logger.info("UserDao class createCarer() method started.");
         try {
             carer.setId(insertUser(carer.getFullName(), carer.getRole(), carer.getUserName(), carer.getPassword(), -1));
-            if ((carer.getId() != -1) && updateUserAssignment(carer.getId(), carer.getPatientIds())) {
-                logger.info("Carer created successfully.");
-                logger.info("UserDao class createCarer() method ended.");
-                return carer;
-            } else {
-                logger.info("Failed to create carer.");
-                logger.info("UserDao class createCarer() method ended.");
-                return null;
-            }
+            return carer;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -108,7 +102,8 @@ public class UserDao extends DAOBase {
             try {
                 rs.next();
                 if (password.equals(rs.getString(colPassword))) {
-                    if (rs.getInt(colRoles) == 2) {
+                    if (rs.getInt(colRoles) == User.CARER_ROLE
+                            || rs.getInt(colRoles) == User.RELATIVE_ROLE) {
                         carer.setId(rs.getInt(colId));
                         carer.setFullName(rs.getString(colFullName));
                         carer.setRole(rs.getInt(colRoles));
@@ -170,7 +165,7 @@ public class UserDao extends DAOBase {
         try
         {
             con = getConnection();
-            String query = "SELECT * FROM user WHERE username = ?";
+            String query = "SELECT * FROM user WHERE lower(username) = lower(?)";
             PreparedStatement preparedStmt = con.prepareStatement(query);
             preparedStmt.setString(1, userName);
             ResultSet rs = preparedStmt.executeQuery();
@@ -242,20 +237,27 @@ public class UserDao extends DAOBase {
      * @param patient
      * @return
      */
-    public Patient updatePatient(Patient patient) {
+    public ResultCode updatePatient(Patient patient) {
         logger.info("UserDao class updatePatient() method started.");
+        boolean isUpdateSuccessful = true;
         try
         {
             if(updateUser(patient.getId(), patient.getFullName(), patient.getRole(),
                 patient.getUserName(), patient.getPassword(), patient.getCarer_id()) == UserEndpoint.CODE_ERR_UPDATE_USER_FAILED)
             {
+                isUpdateSuccessful = false;
                 throw new Exception("Patient update has been failed.");
             }
         } catch (Exception e) {
+            isUpdateSuccessful = false;
             e.printStackTrace();
         }
         logger.info("UserDao class updatePatient() method ends.");
-        return patient;
+
+        ResultCode resultCode = new ResultCode();
+        resultCode.setResult(isUpdateSuccessful);
+
+        return resultCode;
     }
 
     /**

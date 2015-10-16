@@ -11,6 +11,10 @@ import ifn372.sevencolors.watch_app.Constants;
  * Created by lua on 3/09/2015.
  */
 public class UserInfoPreferences {
+    public static int PATIENT_ROLE = 1;
+    public static int CARER_ROLE = 2;
+    public static int RELATIVE_ROLE = 3;
+
     private SharedPreferences sharedPreferences;
 
     public UserInfoPreferences(Context applicationContext) {

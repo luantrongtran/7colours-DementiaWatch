@@ -24,6 +24,7 @@ public class LoginService extends AsyncTask<Carer, Void, Carer> {
         try {
             carer = myApi.authenticateCarer(carer).execute();
         } catch (IOException e) {
+            carer = null;
             e.printStackTrace();
         }
         return carer;

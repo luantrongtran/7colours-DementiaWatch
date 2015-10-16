@@ -66,5 +66,13 @@
             android:text="@string/login_button_text"
             android:onClick="login"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_account"
+            android:gravity="center"
+            android:textColor="#0000FF"
+            android:onClick="goToRegistrationActivity"
+            />
     </LinearLayout>
 </ScrollView>

@@ -8,6 +8,7 @@ import com.google.api.server.spi.config.Named;
 import ifn372.sevencolors.backend.dao.UserDao;
 import ifn372.sevencolors.backend.entities.Carer;
 import ifn372.sevencolors.backend.entities.Patient;
+import ifn372.sevencolors.backend.entities.ResultCode;
 import ifn372.sevencolors.backend.entities.User;
 
 /**
@@ -30,9 +31,9 @@ public class UserEndpoint {
     @ApiMethod(name = "createCarer")
     public Carer createCarer(Carer carer) {
         UserDao userDao = new UserDao();
-        if (carer.getPatientIds() == null) {
-            return null;
-        }
+//        if (carer.getPatientIds() == null) {
+//            return null;
+//        }
         carer = userDao.createCarer(carer);
         return carer;
     }
@@ -57,7 +58,7 @@ public class UserEndpoint {
     }
 
     @ApiMethod(name = "updatePatient")
-    public Patient updatePatient(Patient patient)
+    public ResultCode updatePatient(Patient patient)
     {
         return new UserDao().updatePatient(patient);
     }

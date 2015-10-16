@@ -1,7 +1,9 @@
 package ifn372.sevencolors.watch_app.activities;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
@@ -26,20 +28,29 @@ import android.content.Intent;
 
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 
+import ifn372.sevencolors.backend.myApi.model.ResultCode;
 import ifn372.sevencolors.watch_app.Constants;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.CurrentLocationPreferences;
+import ifn372.sevencolors.watch_app.CustomSharedPreferences.InvitationSharedPreferences;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
 import ifn372.sevencolors.watch_app.FenceManager;
 import ifn372.sevencolors.watch_app.R;
 import ifn372.sevencolors.watch_app.backgroundservices.AutoUpdateFenceReceiver;
 import ifn372.sevencolors.watch_app.backgroundservices.LocationAutoTracker;
+import ifn372.sevencolors.watch_app.webservices.AcceptInvitationService;
 import ifn372.sevencolors.watch_app.webservices.GetFencesService;
+import ifn372.sevencolors.watch_app.webservices.IAcceptInvitationService;
+import ifn372.sevencolors.watch_app.webservices.MyGcmListenerService;
 import ifn372.sevencolors.watch_app.webservices.PanicButtonService;
+import ifn372.sevencolors.watch_app.webservices.RegistrationIntentService;
 
 
-public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+public class MapsActivity extends FragmentActivity
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        IAcceptInvitationService{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     GoogleApiClient googleApiClient;
@@ -77,13 +88,17 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         findViewById(R.id.panicBtn).setOnClickListener(handler);
 
         // mapFragment.getMapAsync(this);
-//        setUpDummyData();
         scheduleAlarm();
 
         setUpGoogleApiClient();
         //sendPanicAlert();
 
         registerOnFencesUpdated();
+
+        registerOnInvitationReceived();
+
+        builder = new AlertDialog.Builder(this);
+
     }
 
     public void scheduleAlarm() {
@@ -290,4 +305,52 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             fenceManager.updateFences();
         }
     };
+
+    AlertDialog.Builder builder;
+    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    //Yes button clicked
+                    AcceptInvitationService acceptInvitationService
+                            = new AcceptInvitationService(getApplicationContext(), MapsActivity.this);
+                    acceptInvitationService.execute();
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    break;
+            }
+            InvitationSharedPreferences invitationSharedPreferences
+                    = new InvitationSharedPreferences(getApplicationContext());
+            invitationSharedPreferences.clear();
+        }
+    };
+
+    public void registerOnInvitationReceived() {
+        IntentFilter intentFilter = new IntentFilter(MyGcmListenerService.ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onInvitationReceived, intentFilter);
+    }
+
+    private BroadcastReceiver onInvitationReceived = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String title = intent.getStringExtra(Constants.gcm_title);
+            String message = intent.getStringExtra(Constants.gcm_message);
+
+            builder.setMessage(message).setPositiveButton("Accept", dialogClickListener)
+                    .setNegativeButton("Deny", dialogClickListener).show();
+        }
+    };
+
+    @Override
+    public void onInvitationAccepted(ResultCode resultCode) {
+        if(resultCode.getResult()) {
+            Toast.makeText(MapsActivity.this, "Invitation accepted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(MapsActivity.this, "Couldn't accept the invitation", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

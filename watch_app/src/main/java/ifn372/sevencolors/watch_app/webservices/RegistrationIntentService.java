@@ -1,8 +1,9 @@
-package ifn372.sevencolors.dementiawatch.webservices;
+package ifn372.sevencolors.watch_app.webservices;
 
 /**
  * Created by zach on 13/09/15.
  */
+
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,18 +11,16 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 
 import ifn372.sevencolors.backend.myApi.MyApi;
-import ifn372.sevencolors.backend.myApi.model.Carer;
-import ifn372.sevencolors.dementiawatch.BackendApiProvider;
-import ifn372.sevencolors.dementiawatch.Constants;
-import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.UserInfoPreferences;
+import ifn372.sevencolors.watch_app.BackendApiProvider;
+import ifn372.sevencolors.watch_app.Constants;
+import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
+
 
 public class RegistrationIntentService extends IntentService {
 
@@ -78,7 +77,7 @@ public class RegistrationIntentService extends IntentService {
      */
     private void sendRegistrationToServer(String token) {
         UserInfoPreferences userInfoPreferences = new UserInfoPreferences(this);
-        MyApi myApi = BackendApiProvider.getPatientApi();
+        MyApi myApi = BackendApiProvider.getPatientApiBuilder();
         try {
             myApi.updateGcmId(userInfoPreferences.getUserId(), token).execute();
         } catch (Exception e) {

@@ -17,8 +17,10 @@ import java.util.logging.Logger;
 
 import javax.inject.Named;
 
+import ifn372.sevencolors.backend.dao.CarerDao;
 import ifn372.sevencolors.backend.dao.FenceDao;
 import ifn372.sevencolors.backend.dao.PatientDao;
+import ifn372.sevencolors.backend.dao.UserDao;
 import ifn372.sevencolors.backend.entities.Carer;
 import ifn372.sevencolors.backend.entities.Fence;
 import ifn372.sevencolors.backend.entities.FenceList;
@@ -26,6 +28,7 @@ import ifn372.sevencolors.backend.entities.Location;
 import ifn372.sevencolors.backend.entities.LocationList;
 import ifn372.sevencolors.backend.entities.Patient;
 import ifn372.sevencolors.backend.entities.PatientList;
+import ifn372.sevencolors.backend.entities.ResultCode;
 import ifn372.sevencolors.backend.entities.User;
 
 /**
@@ -62,18 +65,22 @@ public class PatientEndpoint {
      */
     @ApiMethod (name = "getPatientListByCarerOrRelative")
     public PatientList getPatientsListByCarerOrRelative(@Named("carerId") int carerOrRelativeId, @Named("role") int role) {
-        if(role == User.CARER_ROLE) {
-            Vector<Patient> patients = new Vector<Patient>();
+        PatientDao patientDao = new PatientDao();
+        Vector<Patient> patients = new Vector<Patient>();
 
-            PatientDao patientDao = new PatientDao();
+        if(role == User.CARER_ROLE) {
             patients = patientDao.getPatientsListByCarer(carerOrRelativeId);
             patientDao.getFencesForPatients(patients);
-
             PatientList patientList = new PatientList();
             patientList.setItems(patients);
             return patientList;
         } else if (role == User.RELATIVE_ROLE) {
             //return patient list related to the given relative.
+            patients = patientDao.getPatientListByRelative(carerOrRelativeId);
+            patientDao.getFencesForPatients(patients);
+            PatientList patientList = new PatientList();
+            patientList.setItems(patients);
+            return patientList;
         }
 
         return null;
@@ -189,5 +196,42 @@ public class PatientEndpoint {
         TreeMap history = dao.getLocationHistory(patientId);
         logger.info("getLocationHistory() method end");
         return history;
+    }
+
+    /**
+     * Accept an invitation sent from a carer or a relative
+     * @param carerId
+     */
+    @ApiMethod(name = "acceptInvitation")
+    public ResultCode acceptInvitation(@Named("patientId") int patientId, @Named("carerId") int carerId) {
+        if(patientId == carerId) {
+            //patientId and carerId should not be the same
+            return new ResultCode();
+        }
+
+        CarerDao carerDao =  new CarerDao();
+        Carer carer = carerDao.getCarerById(carerId);
+        int result = UserEndpoint.CODE_ERR_UPDATE_USER_FAILED;
+        if(carer.getRole() == User.CARER_ROLE) {
+            //if the invitation sent from a carer
+            UserDao userDao = new UserDao();
+            result = userDao.updateUser(patientId, null, -1, null, null, carerId);
+
+        } else if (carer.getRole() == User.RELATIVE_ROLE) {
+            PatientDao patientDao = new PatientDao();
+            result = patientDao.addRelative(patientId, carerId);
+            if(result == 0) {
+                //if couldn't connect patient to the relative
+                result = UserEndpoint.CODE_ERR_UPDATE_USER_FAILED;
+            }
+        }
+
+        ResultCode rc = new ResultCode();
+        if(result == UserEndpoint.CODE_ERR_UPDATE_USER_FAILED) {
+            rc.setResult(false);
+        } else {
+            rc.setResult(true);
+        }
+        return rc;
     }
 }
