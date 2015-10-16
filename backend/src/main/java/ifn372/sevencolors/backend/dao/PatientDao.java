@@ -182,8 +182,10 @@ public class PatientDao extends DAOBase {
 
                 patient.setCarer_id(carerId);
 
-                patientList.add(patient);
-            }
+                if(!patientList.contains(patient)) {
+                    //avoid the case in which 2 records have the same patient id
+                    patientList.add(patient);
+                }            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

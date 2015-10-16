@@ -58,4 +58,17 @@ public class Patient extends User {
     int carer_id;
 
     FenceList fenceList = new FenceList();
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Patient)) {
+            return false;
+        }
+
+        Patient pt = (Patient) obj;
+        if(pt.getId() == this.getId()) {
+            return true;
+        }
+        return false;
+    }
 }
