@@ -66,26 +66,7 @@ public class MapsActivity extends FragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.home_screen);
-        View.OnClickListener handler = new View.OnClickListener(){
-            public void onClick(View v) {
-
-                switch (v.getId()) {
-
-                    case R.id.showMapBtn:
-                        setContentView(R.layout.activity_maps);
-                        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                                .findFragmentById(R.id.map);
-                        setUpMapIfNeeded();
-                        break;
-                    case R.id.panicBtn:
-                        sendPanicAlert();
-                        break;
-                }
-            }
-        };
-        findViewById(R.id.showMapBtn).setOnClickListener(handler);
-        findViewById(R.id.panicBtn).setOnClickListener(handler);
+        setContentView(R.layout.activity_maps);
 
         // mapFragment.getMapAsync(this);
         scheduleAlarm();
@@ -120,26 +101,7 @@ public class MapsActivity extends FragmentActivity
     @Override
     protected void onResume() {
         super.onResume();
-        setContentView(R.layout.home_screen);
-        View.OnClickListener handler = new View.OnClickListener(){
-            public void onClick(View v) {
-
-                switch (v.getId()) {
-
-                    case R.id.showMapBtn:
-                        setContentView(R.layout.activity_maps);
-                        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                                .findFragmentById(R.id.map);
-                        setUpMapIfNeeded();
-                        break;
-                    case R.id.panicBtn:
-                        sendPanicAlert();
-                        break;
-                }
-            }
-        };
-        findViewById(R.id.showMapBtn).setOnClickListener(handler);
-        findViewById(R.id.panicBtn).setOnClickListener(handler);
+        setUpMapIfNeeded();
     }
 
     /**

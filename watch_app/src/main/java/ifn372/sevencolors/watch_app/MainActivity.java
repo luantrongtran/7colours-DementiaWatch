@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity implements ISayHi {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main_testing);
 
     }
@@ -61,4 +60,6 @@ public class MainActivity extends AppCompatActivity implements ISayHi {
     public void processData(String greeting) {
         Toast.makeText(this, greeting, Toast.LENGTH_SHORT).show();
     }
+
+
 }
