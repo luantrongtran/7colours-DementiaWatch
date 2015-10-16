@@ -31,20 +31,26 @@ import android.util.Log;
 import android.widget.Toast;
 
 
+import ifn372.sevencolors.backend.myApi.model.ResultCode;
 import ifn372.sevencolors.watch_app.Constants;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.CurrentLocationPreferences;
+import ifn372.sevencolors.watch_app.CustomSharedPreferences.InvitationSharedPreferences;
 import ifn372.sevencolors.watch_app.CustomSharedPreferences.UserInfoPreferences;
 import ifn372.sevencolors.watch_app.FenceManager;
 import ifn372.sevencolors.watch_app.R;
 import ifn372.sevencolors.watch_app.backgroundservices.AutoUpdateFenceReceiver;
 import ifn372.sevencolors.watch_app.backgroundservices.LocationAutoTracker;
+import ifn372.sevencolors.watch_app.webservices.AcceptInvitationService;
 import ifn372.sevencolors.watch_app.webservices.GetFencesService;
+import ifn372.sevencolors.watch_app.webservices.IAcceptInvitationService;
 import ifn372.sevencolors.watch_app.webservices.MyGcmListenerService;
 import ifn372.sevencolors.watch_app.webservices.PanicButtonService;
 import ifn372.sevencolors.watch_app.webservices.RegistrationIntentService;
 
 
-public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+public class MapsActivity extends FragmentActivity
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        IAcceptInvitationService{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     GoogleApiClient googleApiClient;
@@ -63,7 +69,6 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         setContentView(R.layout.activity_maps);
 
         // mapFragment.getMapAsync(this);
-//        setUpDummyData();
         scheduleAlarm();
 
         setUpGoogleApiClient();
@@ -270,12 +275,18 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
                     //Yes button clicked
+                    AcceptInvitationService acceptInvitationService
+                            = new AcceptInvitationService(getApplicationContext(), MapsActivity.this);
+                    acceptInvitationService.execute();
                     break;
 
                 case DialogInterface.BUTTON_NEGATIVE:
                     //No button clicked
                     break;
             }
+            InvitationSharedPreferences invitationSharedPreferences
+                    = new InvitationSharedPreferences(getApplicationContext());
+            invitationSharedPreferences.clear();
         }
     };
 
@@ -295,4 +306,13 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
                     .setNegativeButton("Deny", dialogClickListener).show();
         }
     };
+
+    @Override
+    public void onInvitationAccepted(ResultCode resultCode) {
+        if(resultCode.getResult()) {
+            Toast.makeText(MapsActivity.this, "Invitation accepted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(MapsActivity.this, "Couldn't accept the invitation", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

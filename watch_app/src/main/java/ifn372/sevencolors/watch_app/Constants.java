@@ -33,6 +33,9 @@ public class Constants {
 
     public static String sharedPreferences_user_info_is_logged_in = "is_logged_in";
 
+    public static String sharedPreferences_invitation = "invitation";
+    public static String sharedPreferences_invitation_carer_id = "carer_id";
+
     public static int timeout_before_sending_alert_to_carer = 20000;
 
     public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";

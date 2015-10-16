@@ -16,13 +16,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import ifn372.sevencolors.backend.myApi.model.ResultCode;
 import ifn372.sevencolors.watch_app.Constants;
+import ifn372.sevencolors.watch_app.CustomSharedPreferences.InvitationSharedPreferences;
 import ifn372.sevencolors.watch_app.R;
+import ifn372.sevencolors.watch_app.webservices.AcceptInvitationService;
+import ifn372.sevencolors.watch_app.webservices.IAcceptInvitationService;
 import ifn372.sevencolors.watch_app.webservices.MyGcmListenerService;
 import ifn372.sevencolors.watch_app.webservices.PanicButtonService;
 import ifn372.sevencolors.watch_app.webservices.RegistrationIntentService;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IAcceptInvitationService{
     AlertDialog.Builder builder;
     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
         @Override
@@ -30,12 +34,19 @@ public class MainActivity extends AppCompatActivity {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
                     //Yes button clicked
+                    AcceptInvitationService acceptInvitationService
+                            = new AcceptInvitationService(getApplicationContext(), MainActivity.this);
+                    acceptInvitationService.execute();
                     break;
 
                 case DialogInterface.BUTTON_NEGATIVE:
                     //No button clicked
                     break;
             }
+
+            InvitationSharedPreferences invitationSharedPreferences
+                    = new InvitationSharedPreferences(getApplicationContext());
+            invitationSharedPreferences.clear();
         }
     };
 
@@ -116,11 +127,21 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver onInvitationReceived = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String title = intent.getStringExtra(Constants.gcm_title);
+            InvitationSharedPreferences invitationSharedPreferences =
+                    new InvitationSharedPreferences(getApplicationContext());
             String message = intent.getStringExtra(Constants.gcm_message);
 
             builder.setMessage(message).setPositiveButton("Accept", dialogClickListener)
                     .setNegativeButton("Deny", dialogClickListener).show();
         }
     };
+
+    @Override
+    public void onInvitationAccepted(ResultCode resultCode) {
+        if(resultCode.getResult()) {
+            Toast.makeText(MainActivity.this, "Invitation accepted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(MainActivity.this, "Couldn't accept the invitation", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

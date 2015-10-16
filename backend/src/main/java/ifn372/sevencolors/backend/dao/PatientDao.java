@@ -28,6 +28,11 @@ public class PatientDao extends DAOBase {
     public static String colFullName = "fullname";
     public static String colRoes = "roles";
     public static String colCarer = "carer_id";
+    public static String colUsername = "username";
+
+    public static String patientRelativeTableName = "patient_relative";
+    public static String colPatientRelative_PatientId = "patient_id";
+    public static String colPatientRelative_RelativeId = "relative_id";
 
 
     public static String currentLocationTableName = "current_location";
@@ -146,14 +151,6 @@ public class PatientDao extends DAOBase {
         }
     }
 
-    public Vector<Patient> getPatientsListByRelative(int relativeId) {
-        Vector<Patient> patientList = new Vector<Patient>();
-
-        //need implementing later
-
-        return patientList;
-    }
-
     public Vector<Patient> getPatientsListByCarer(int carerId) {
         Connection con = getConnection();
         String sql = "SELECT * FROM " + patientView + " WHERE " + colCarer + " = ?";
@@ -169,6 +166,7 @@ public class PatientDao extends DAOBase {
                 patient.setId(rs.getInt(colPatientId));
                 patient.setFullName(rs.getString(colFullName));
                 patient.setRole(rs.getInt(colRoes));
+//                patient.setUserName(rs.getString(colUsername));
 
                 Location location = new Location();
                 location.setLat(rs.getDouble(cl_colLat));
@@ -445,6 +443,7 @@ public class PatientDao extends DAOBase {
                 patient.setRole(rs.getInt("roles"));
                 patient.setFullName(rs.getString("fullname"));
                 patient.setGcmId(rs.getString("reg_id"));
+                patient.setId(rs.getInt(colPatientId));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -452,5 +451,79 @@ public class PatientDao extends DAOBase {
         }
 
         return patient;
+    }
+
+    /**
+     * Connect a patient with his/her relative
+     * @param patientId
+     * @param relativeId
+     * @return 1 if succeeded, otherwise, return 0.
+     */
+    public int addRelative(int patientId, int relativeId) {
+        String sql = "INSERT INTO " + patientRelativeTableName + " (" + colPatientRelative_PatientId
+                + ", " + colPatientRelative_RelativeId +") VALUES(?,?)";
+        Connection con = getConnection();
+
+        PreparedStatement ps = null;
+
+        int result = 0;
+        try {
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, patientId);
+            ps.setInt(2, relativeId);
+            result = ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public Vector<Patient> getPatientListByRelative(int relativeId) {
+
+        String subQuery = "SELECT " + colPatientRelative_PatientId +
+                " FROM " + patientRelativeTableName + " WHERE " + colPatientRelative_RelativeId +
+                " = ?";
+        String sql = "SELECT * FROM " + patientView +" WHERE " + colPatientId
+                + " in (" + subQuery + ")";
+
+        Connection connection = getConnection();
+        Vector<Patient> patientList = new Vector<>();
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, relativeId);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()) {
+                Patient patient = new Patient();
+                patient.setId(rs.getInt(colPatientId));
+                patient.setFullName(rs.getString(colFullName));
+                patient.setRole(rs.getInt(colRoes));
+//                patient.setUserName(rs.getString(colUsername));
+
+                Location location = new Location();
+                location.setLat(rs.getDouble(cl_colLat));
+                location.setLon(rs.getDouble(cl_colLon));
+                patient.setCurrentLocation(location);
+
+                Timestamp ts = rs.getTimestamp(cl_colUpdateTime);
+                if(ts == null) {
+                    patient.setLocation_last_update(-1l);
+                } else {
+                    patient.setLocation_last_update(ts.getTime());
+                }
+
+                patient.setCarer_id(rs.getInt(colCarer));
+
+                if(!patientList.contains(patient)) {
+                    //avoid the case in which 2 records have the same patient id
+                    patientList.add(patient);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return patientList;
     }
 }

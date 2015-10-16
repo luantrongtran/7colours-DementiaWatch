@@ -114,4 +114,16 @@ public class CarerDao extends DAOBase {
         }
         return carer;
     }
+
+    public void removeGcmId(int userId) {
+        String sql = "UPDATE user SET " + " reg_id = '' WHERE id = ?";
+        try {
+            PreparedStatement ps = getConnection().prepareStatement(sql);
+            ps.setInt(1, userId);
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -50,6 +51,12 @@ public class CarerEndpoint {
         return carer;
     }
 
+    @ApiMethod(name = "removeGcmId")
+    public void removeGcmId(@Named("userId") int userId) {
+        CarerDao carerDao = new CarerDao();
+        carerDao.removeGcmId(userId);
+    }
+
     /**
      * This method is invoked when a carer/relative send an invitation to a patient
      * @param carerId carerid could be a carer or a relative of the patient.
@@ -62,15 +69,19 @@ public class CarerEndpoint {
         ResultCode resultCode = new ResultCode();
 
         CarerDao carerDao = new CarerDao();
-        Carer carer = carerDao.getCarerById(carerId);
+        Carer carer = carerDao.getCarerById(carerId);//The carer can be carer or a patient's relative
         String carername = carer.getFullName();
 
 
         PatientDao patientDao = new PatientDao();
         Patient patient = patientDao.getPatientByUsername(patientUsername);
+        if (patient == null) {
+            resultCode.setMessage("The patient does not exist");
+            return resultCode;
+        }
         String gcmId = patient.getGcmId();
 
-        if(carer.getRole() == User.CARER_ROLE && patient.getCarer_id() > 0) {
+        if (carer.getRole() == User.CARER_ROLE && patient.getCarer_id() > 0) {
             //If the sender is a carer.f the patient is already being taken care by
             //another carer then don't send the invitation.
             resultCode.setResult(false);
@@ -82,6 +93,14 @@ public class CarerEndpoint {
             }
             return resultCode;
 
+        } else if (carer.getRole() == User.RELATIVE_ROLE) {
+            List<Patient> patientList = patientDao.getPatientListByRelative(carerId);
+            for (Patient p : patientList ) {
+                if(p.getId() == patient.getId()) {
+                    resultCode.setMessage("The patient is already in your list");
+                    return resultCode;
+                }
+            }
         }
 
         String url = Constants.gcm_url;
@@ -98,7 +117,7 @@ public class CarerEndpoint {
             Map<String, String> data = new HashMap<String, String>();
             data.put("title", "Invitation");
             data.put("message", carername + " sent you an invitation");
-            data.put("carer_id", carer.getId()+"");
+            data.put("carer_id", carer.getId() + "");
             Map<String, Object> finalData = new HashMap<String, Object>();
             finalData.put("data", data);
             finalData.put("to", gcmId);

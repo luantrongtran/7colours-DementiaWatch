@@ -12,6 +12,7 @@ import ifn372.sevencolors.backend.HashProvider;
 import ifn372.sevencolors.backend.entities.Carer;
 import ifn372.sevencolors.backend.entities.Patient;
 import ifn372.sevencolors.backend.entities.ResultCode;
+import ifn372.sevencolors.backend.entities.User;
 import ifn372.sevencolors.backend.webservices.UserEndpoint;
 
 /**
@@ -101,7 +102,8 @@ public class UserDao extends DAOBase {
             try {
                 rs.next();
                 if (password.equals(rs.getString(colPassword))) {
-                    if (rs.getInt(colRoles) == 2) {
+                    if (rs.getInt(colRoles) == User.CARER_ROLE
+                            || rs.getInt(colRoles) == User.RELATIVE_ROLE) {
                         carer.setId(rs.getInt(colId));
                         carer.setFullName(rs.getString(colFullName));
                         carer.setRole(rs.getInt(colRoles));
@@ -163,7 +165,7 @@ public class UserDao extends DAOBase {
         try
         {
             con = getConnection();
-            String query = "SELECT * FROM user WHERE username = ?";
+            String query = "SELECT * FROM user WHERE lower(username) = lower(?)";
             PreparedStatement preparedStmt = con.prepareStatement(query);
             preparedStmt.setString(1, userName);
             ResultSet rs = preparedStmt.executeQuery();

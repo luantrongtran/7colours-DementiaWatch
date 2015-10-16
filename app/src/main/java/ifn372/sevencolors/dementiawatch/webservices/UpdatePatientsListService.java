@@ -55,6 +55,9 @@ public class UpdatePatientsListService extends IntentService {
 
         try {
             PatientList patientList = patientApi.getPatientListByCarerOrRelative(userId, role).execute();
+            if(patientList == null) {
+                patientList = new PatientList();
+            }
             if(patientList.getItems() == null){
                 patientList.setItems(new Vector<Patient>());
             }
