@@ -12,7 +12,9 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.api.client.util.ArrayMap;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import ifn372.sevencolors.backend.myApi.model.Fence;
+import ifn372.sevencolors.backend.myApi.model.JsonMap;
 import ifn372.sevencolors.backend.myApi.model.Location;
 import ifn372.sevencolors.backend.myApi.model.Patient;
 import ifn372.sevencolors.backend.myApi.model.PatientList;
@@ -29,6 +32,7 @@ import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.CurrentLocationP
 import ifn372.sevencolors.dementiawatch.CustomSharedPreferences.TemporaryFenceSharedPreferences;
 import ifn372.sevencolors.dementiawatch.webservices.DeleteFenceService;
 import ifn372.sevencolors.dementiawatch.webservices.FenceService;
+import ifn372.sevencolors.dementiawatch.webservices.LocationHistoryService;
 
 /**
  * Created by lua on 28/08/2015.
@@ -66,6 +70,20 @@ public class PatientManager {
      */
     int patientIdShowingInfoWindow = -1;
 
+    Vector<Marker> mLocationHistoryMarkers ;
+
+//    public JsonMap mLocationHistory;
+    Map<Integer, JsonMap> mLocationHistoryMap;
+
+//    public boolean mIsShowingLocHis;
+
+    Map<Integer, Boolean> mShowingLocHisPatients;
+
+//    Map<Integer, ArrayList<String>> mlats;
+//    Map<Integer, ArrayList<String>> mlons;
+//    ArrayList<String> mlats;
+//    ArrayList<String> mlons;
+
     public PatientManager() {
         patientList = new PatientList();
         patientList.setItems(new Vector<Patient>());
@@ -91,6 +109,19 @@ public class PatientManager {
                 pickedUpPatients.put(patientId, fenceId);
             }
         }
+        mLocationHistoryMarkers = new Vector<Marker>();
+        mShowingLocHisPatients = new HashMap<>();
+//        mLocationHistory = new JsonMap();
+        mLocationHistoryMap = new HashMap<>();
+//        mlats = new HashMap<>();
+//        mlons = new HashMap<>();
+//        mlats = new ArrayList<String>();
+//        mlons = new ArrayList<String>();
+
+        temporaryFenceOptions = new CircleOptions()
+                .fillColor(0x4D000000)
+                .strokeColor(0x4D000000)
+                .radius(50);
     }
 
     public PatientList getPatientList() {
@@ -369,5 +400,151 @@ public class PatientManager {
 
     public void signOut(Context context) {
         disableAllTemporaryFences(context);
+	}
+
+    public void updateLocationHistory(GoogleMap gMap, Context context)
+    {
+        Log.i(Constants.application_id, "Update map with patient location history");
+//        gMap.clear();
+        patientIdShowingInfoWindow = -1;
+
+        if ( mLocationHistoryMarkers != null )
+        {
+            for (int i = 0; i < mLocationHistoryMarkers.size(); i++) {
+                Marker marker = mLocationHistoryMarkers.get(i);
+//                if (marker.isInfoWindowShown()) {
+//                    patientIdShowingInfoWindow = patientList.getItems().get(i).getId();
+//                }
+                marker.remove();
+            }
+        }
+
+        mLocationHistoryMarkers.clear();
+
+        List<Patient> patients = patientList.getItems();
+        MarkerOptions markerOptions = new MarkerOptions();
+        Drawable drawable = context.getResources()
+                .getDrawable(R.drawable.ic_room_black_24dp);
+
+        for (int i = 0; i < patients.size(); i++) {
+            Patient p = patients.get(i);
+            if( !isShowingLocHis(p.getId()) )
+            {
+                continue;
+            }
+
+//            int c = 0;
+            for (Map.Entry<String, Object> entry : mLocationHistoryMap.get(p.getId()).entrySet()){ // mLocationHistory.entrySet()) {
+//                Patient p = patients.get(i);
+//                Location loc = p.getCurrentLocation();
+                String sdf = entry.getKey();
+                ArrayMap map = (ArrayMap) entry.getValue();
+                String mlat = map.get("lat").toString();
+                String mlon = map.get("lon").toString();
+//                String mlat = mlats.get(p.getId()).get(c);
+//                String mlon = mlons.get(p.getId()).get(c);
+//                c += 1;
+//                Location loc = (Location) entry.getValue();
+                LatLng location = new LatLng( Double.valueOf(mlat),Double.valueOf(mlon) );
+
+                markerOptions.position(location);
+//                markerOptions.title(p.getFullName());
+                markerOptions.title(map.get("time").toString());
+                Bitmap b = BitMapUtils.getMutableBitmapFromResourceFromResource(drawable, patientColors[i]);
+                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(b));
+                Marker marker = gMap.addMarker(markerOptions);
+
+                mLocationHistoryMarkers.add(marker);
+            }
+        }
+
+        // Show the info window after refreshing the map
+        // if there was a marker showing the info window
+
+        int index = getPatientIndexById(patientIdShowingInfoWindow);
+        if (index != -1) {
+            mLocationHistoryMarkers.get(index).showInfoWindow();
+        }
+    }
+
+    public boolean enableLocationHistory(int patientId, Context context) {
+        Patient patient = getPatientById(patientId);
+        if(patient == null) {
+            return false;
+        }
+
+        //Create new location history
+        LocationHistoryService locationHistoryService = new LocationHistoryService(null);
+        JsonMap locHis = null;
+        try {
+            locHis = locationHistoryService.execute(
+                    Integer.toString(patient.getId()) )
+                    .get(createTemporaryFenceTimeOut, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            e.printStackTrace();
+        }
+        if(locHis == null){
+            return false;
+        }
+
+//        mLocationHistory = locHis;
+
+        if(!mLocationHistoryMap.containsKey(patientId)) {
+            mLocationHistoryMap.put(patientId, locHis);
+//            mlats.put(patientId,new ArrayList<String>());
+//            mlons.put(patientId,new ArrayList<String>());
+        }
+
+        // The following makes fake location data so I can see different markers on map
+//        int j = 0;
+//        for (Map.Entry<String, Object> entry : mLocationHistoryMap.get(patientId).entrySet()) // mLocationHistory.entrySet())
+//        {
+//            ArrayMap map = (ArrayMap) entry.getValue();
+//            String mlat = map.get("lat").toString();
+//            String mlon = map.get("lon").toString();
+//            mlats.get(patientId).add(mlat + Integer.toString(patientId));
+//            mlons.get(patientId).add(mlon + Integer.toString(j));
+//            j++;
+//        }
+
+        if(!mShowingLocHisPatients.containsKey(patientId)) {
+            mShowingLocHisPatients.put(patientId, true);
+        }
+
+        return true;
+    }
+
+    public boolean disableLocationHistory(int patientId, Context context) {
+        Patient patient = getPatientById(patientId);
+        if(patient == null) {
+            return false;
+        }
+
+        boolean isShowing = mShowingLocHisPatients.get(patientId);
+        if(!isShowing) {
+            //if couldn't find the value for this patient, assume that the location history of
+            // specified patient was already disabled
+            return true;
+        }
+
+        mShowingLocHisPatients.remove(patientId);
+        mLocationHistoryMap.remove(patientId);
+
+//        mlats.remove(patientId);
+//        mlons.remove(patientId);
+
+//        mLocationHistory.clear();
+
+        //mLocationHistory should be null after disabling the location history
+//        mLocationHistory = null;
+
+//        mlats.clear();
+//        mlons.clear();
+
+        return true;
+    }
+
+    public boolean isShowingLocHis(int patientId) {
+        return mShowingLocHisPatients.containsKey(patientId);
     }
 }

@@ -44,4 +44,22 @@
             android:onClick="goToCreateFenceActivity"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="20dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/patient_setting_enable_location_history"
+            android:layout_weight="1"/>
+
+        <ToggleButton
+            android:id="@+id/locationHistoryToggleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+
 </LinearLayout>

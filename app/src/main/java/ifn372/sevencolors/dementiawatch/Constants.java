@@ -5,6 +5,7 @@ package ifn372.sevencolors.dementiawatch;
  */
 public class Constants {
     public static String webServiceUrl = "http://192.168.0.100:8080/_ah/api/";//"https://dementiawatch-7colors.appspot.com/_ah/api/"
+
     public static String application_id = "Tracker_application"; //for Log class
 
     public static int sharedPreferences_integer_default_value = -1;
