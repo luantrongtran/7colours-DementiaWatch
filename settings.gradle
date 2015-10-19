@@ -1,1 +1,1 @@
-include ':app', ':backend', ':watch_app'
+include ':backend'
