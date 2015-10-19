@@ -18,6 +18,7 @@ import ifn372.sevencolors.backend.webservices.FenceEndpoint;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -63,9 +64,12 @@ public class FenceDaoTest extends LocalDatabaseTest{
         return fence;
     }
 
-
+    /**
+     * test creating, updating and deleting fence
+     */
     @Test
-    public void testInsertANewFence() {
+    public void testFenceDaoCUD() {
+        //Test create a new fence
         Fence mockFence = mock(Fence.class);
         when(mockFence.getFenceName()).thenReturn("KIRTI");
         when(mockFence.getUserId()).thenReturn(2);
@@ -75,9 +79,10 @@ public class FenceDaoTest extends LocalDatabaseTest{
         when(mockFence.getAddress()).thenReturn("QUT Gardens point");
 
         int fenceId = spyFenceDao.createFence(mockFence);
+        assertNotEquals("The fence id should not be -1", fenceId, -1);
 
-        Fence f = this.findById(fenceId);//get the insterted from the database
-        assertNotNull("The fence should not be null", f);
+        Fence f = this.findById(fenceId);//get the created from the database
+        assertNotNull("The fence id should not be null", f);
 
         assertEquals("Address", f.getAddress(), "QUT Gardens point");
         assertEquals("Fence Name", f.getFenceName(), "KIRTI");
@@ -86,34 +91,46 @@ public class FenceDaoTest extends LocalDatabaseTest{
         assertEquals("Latitude", f.getLat(), 110.50, 0.0);
         assertEquals("Fence Radius", f.getRadius(), 5.01, 0.01);
 
+        //Test updateFenceById method
+        double lat = 200;
+        double lon = 300;
+        int ufs = spyFenceDao.updateFenceById(fenceId, lat, lon);
+        Fence fence = this.findById(fenceId);
+        assertThat("Success", ufs, is(FenceEndpoint.CODE_SUCCESS));
+        assertThat("Latitude", lat, is(lat));
+        assertThat("Longitude", lon, is(lon));
+
+        //Test deleteFenceById() method
+        int code = spyFenceDao.deleteFenceById(fenceId);
+        assertThat("Success", code, is(FenceEndpoint.CODE_SUCCESS));
     }
 
     /**
      * Test updateFenceById method()
      */
-    @Test
-    public void testUpdateFenceById() {
-        int fenceId = 6;
-        double lat = 200;
-        double lon = 300;
-//        int id = spyFenceDao.updateFenceById(fenceId, lat, lon);
-        int ufs = spyFenceDao.updateFenceById(fenceId, lat, lon);
-        Fence fence = this.findById(fenceId);
-//        assertThat("Fence ID", id, is(fenceId));
-        assertThat("Success", ufs, is(FenceEndpoint.CODE_SUCCESS));
-        assertThat("Latitude", lat, is(lat));
-        assertThat("Longitude", lon, is(lon));
-    }
-
-
-    /**
-     * Test deleteFenceById method()
-     */
-    @Test
-    public void testDeleteFenceById() {
-        int fenceId = 6;
-        int code = spyFenceDao.deleteFenceById(fenceId);
-        assertThat("Success", code, is(FenceEndpoint.CODE_SUCCESS));
-    }
+//    @Test
+//    public void testUpdateFenceById() {
+//        int fenceId = 6;
+//        double lat = 200;
+//        double lon = 300;
+////        int id = spyFenceDao.updateFenceById(fenceId, lat, lon);
+//        int ufs = spyFenceDao.updateFenceById(fenceId, lat, lon);
+//        Fence fence = this.findById(fenceId);
+////        assertThat("Fence ID", id, is(fenceId));
+//        assertThat("Success", ufs, is(FenceEndpoint.CODE_SUCCESS));
+//        assertThat("Latitude", lat, is(lat));
+//        assertThat("Longitude", lon, is(lon));
+//    }
+//
+//
+//    /**
+//     * Test deleteFenceById method()
+//     */
+//    @Test
+//    public void testDeleteFenceById() {
+//        int fenceId = 6;
+//        int code = spyFenceDao.deleteFenceById(fenceId);
+//        assertThat("Success", code, is(FenceEndpoint.CODE_SUCCESS));
+//    }
 }
 

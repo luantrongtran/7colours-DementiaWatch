@@ -56,7 +56,6 @@ public class CarerTest extends LocalDatabaseTest {
         //   assertNotNull("The fence should not be null", f);
 
         assertEquals("Patient Id", carerList.get(0), "1");
-
     }
 
     @Test

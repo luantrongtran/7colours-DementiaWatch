@@ -45,7 +45,6 @@ public class PatientTest extends LocalDatabaseTest{
         doReturn(getSpiedConnectionProvider()).when(spyPatientDao).getConnection();
     }
 
-
     @Test
     public void testUpdateCurrentLocation() {
 
@@ -61,8 +60,6 @@ public class PatientTest extends LocalDatabaseTest{
         assertEquals("PatientId", mockPatient.getId(), 2);
         assertEquals("Longitude", mockPatient.getCurrentLocation().getLat(), 128.76, 0.001);
         assertEquals("Latitude", mockPatient.getCurrentLocation().getLon(), 110.50, 0.0);
-
-
     }
 
     @Test
@@ -84,20 +81,14 @@ public class PatientTest extends LocalDatabaseTest{
 
     }
 
-    @Test
-    public void testGetPatientLocation(){
-        Patient mockPatient = mock(Patient.class);
-        Location mockLocation = mock(Location.class);
-        when(mockLocation.getLat()).thenReturn(128.76d);
-        when(mockLocation.getLon()).thenReturn(110.50d);
-
-
-
-    //    assertEquals("Latitude", f.getCurrentLocation().getLat(),128.76, 0.001 );
-
-
-    }
-
+//    @Test
+//    public void testGetPatientLocation(){
+//        Patient mockPatient = mock(Patient.class);
+//        Location mockLocation = mock(Location.class);
+//        when(mockLocation.getLat()).thenReturn(128.76d);
+//        when(mockLocation.getLon()).thenReturn(110.50d);
+//    //    assertEquals("Latitude", f.getCurrentLocation().getLat(),128.76, 0.001 );
+//    }
 
     @Test
     public void testGetLocationHistory()
@@ -148,7 +139,6 @@ public class PatientTest extends LocalDatabaseTest{
                 System.out.println("Time has not been found.");
             }
         }
-
     }
 
 
@@ -204,6 +194,4 @@ public class PatientTest extends LocalDatabaseTest{
         patient.setCurrentLocation(loc);
         return patient;
     }
-
-
 }

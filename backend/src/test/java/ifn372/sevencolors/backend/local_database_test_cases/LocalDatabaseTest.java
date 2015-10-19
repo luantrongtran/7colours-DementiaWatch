@@ -25,9 +25,11 @@ public abstract class LocalDatabaseTest {
             ConnectionProvider conProvider = new ConnectionProvider();
             Properties mockProp = mock(Properties.class);
             when(mockProp.getProperty("properties.driverClassName")).thenReturn("com.mysql.jdbc.Driver");
-            when(mockProp.getProperty("properties.url")).thenReturn("jdbc:mysql://localhost:3306/dementia");
+//            when(mockProp.getProperty("properties.url")).thenReturn("jdbc:mysql://localhost:3306/dementia");
+            when(mockProp.getProperty("properties.url")).thenReturn("jdbc:mysql://173.194.227.87:3306/dementia_test");
             when(mockProp.getProperty("properties.username")).thenReturn("root");
-            when(mockProp.getProperty("properties.password")).thenReturn("1231988");
+//            when(mockProp.getProperty("properties.password")).thenReturn("1231988");
+            when(mockProp.getProperty("properties.password")).thenReturn("");
 
             ConnectionProperty conProp = new ConnectionProperty(mockProp);
 
