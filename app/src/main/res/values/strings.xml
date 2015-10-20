@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Dementia\'s Partner</string>
+    <string name="app_name">Carer\'s Application</string>
     <string name="notification_title">Out of Bound Alert</string>
     <string name="notification_text">Your patient has step out of the fence!</string>
     <string name="hello_world">Hello world!</string>
@@ -22,14 +22,14 @@
     <string name="title_activity_patient_setting">PatientSettingActivity</string>
 
     <string name="patient_setting_activity_title">Settings</string>
-    <string name="patient_setting_fence_list_label">Fences List</string>
+    <string name="patient_setting_fence_list_label">Create fence</string>
     <string name="patient_setting_enable_picked_up_mode">Picked up mode</string>
     <string name="patient_setting_enable_picked_up_mode_success">Picked up mode enabled</string>
     <string name="patient_setting_enable_picked_up_mode_failed">Cannot enable picked up mode</string>
     <string name="patient_setting_disable_picked_up_mode_success">Picked up mode disabled</string>
     <string name="patient_setting_disable_picked_up_mode_failed">Cannot disabled Picked up mode</string>
     <string name="title_activity_registration">RegistrationActivity</string>
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login">Carer\'s Application</string>
 
     <string name="create_account"><u>Create New Account</u></string>
     <string name="already_a_member">Already A Member</string>

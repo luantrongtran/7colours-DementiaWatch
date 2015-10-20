@@ -92,6 +92,10 @@ public class PatientManager {
         patientMarkers = new Vector<Marker>();
         patientFences = new Vector<>();
         pickedUpPatients = new HashMap<>();
+
+        mLocationHistoryMarkers = new Vector<Marker>();
+        mShowingLocHisPatients = new HashMap<>();
+        mLocationHistoryMap = new HashMap<>();
     }
 
     /**
@@ -111,14 +115,9 @@ public class PatientManager {
                 pickedUpPatients.put(patientId, fenceId);
             }
         }
-        mLocationHistoryMarkers = new Vector<Marker>();
-        mShowingLocHisPatients = new HashMap<>();
-//        mLocationHistory = new JsonMap();
-        mLocationHistoryMap = new HashMap<>();
-//        mlats = new HashMap<>();
-//        mlons = new HashMap<>();
-//        mlats = new ArrayList<String>();
-//        mlons = new ArrayList<String>();
+//        mLocationHistoryMarkers = new Vector<Marker>();
+//        mShowingLocHisPatients = new HashMap<>();
+//        mLocationHistoryMap = new HashMap<>();
 
         temporaryFenceOptions = new CircleOptions()
                 .fillColor(0x4D000000)

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Watch_app</string>
+    <string name="app_name">Patient\'s Application</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -7,7 +7,7 @@
     <string name="notification_title">You are outside the safe zone</string>
     <string name="notification_text">You have stepped out of the fence! Please go back.</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login">Patient\'s Application</string>
 
     <string name="login_button_text">Login</string>
     <string name="login_failed">Login failed</string>

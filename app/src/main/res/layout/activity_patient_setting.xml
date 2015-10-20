@@ -34,14 +34,14 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/patient_setting_fence_list_label"
+            android:text="@string/patient_setting_enable_location_history"
             android:layout_weight="1"/>
 
-        <ImageView
+        <ToggleButton
+            android:id="@+id/locationHistoryToggleButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_add_circle_outline_black_24dp"
-            android:onClick="goToCreateFenceActivity"/>
+            />
     </LinearLayout>
 
     <LinearLayout
@@ -52,14 +52,14 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/patient_setting_enable_location_history"
+            android:text="@string/patient_setting_fence_list_label"
             android:layout_weight="1"/>
 
-        <ToggleButton
-            android:id="@+id/locationHistoryToggleButton"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
+            android:src="@drawable/ic_add_circle_outline_black_24dp"
+            android:onClick="goToCreateFenceActivity"/>
     </LinearLayout>
 
 </LinearLayout>
